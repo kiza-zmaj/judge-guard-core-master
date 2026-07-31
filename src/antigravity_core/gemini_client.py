@@ -32,12 +32,10 @@ class GeminiClient:
             # Fallback for backward compatibility
             single_key = os.getenv("GEMINI_API_KEY")
             if not single_key:
-                logger.warning("GEMINI_API_KEYS not found in environment. RUNNING IN MOCK MODE.")
-                self.api_keys = ["MOCK_KEY"]
-                self.mock_mode = True
+                logger.error("GEMINI_API_KEYS not found in environment. 100% PRODUCT MODE ACTIVE. Halting.")
+                raise ValueError("GEMINI_API_KEY is required in 100% Product Mode. Mocks are STRICTLY FORBIDDEN.")
             else:
                 self.api_keys = [single_key]
-                self.mock_mode = False
         else:
             self.api_keys = [k.strip() for k in keys_env.split(",") if k.strip()]
         
@@ -47,15 +45,8 @@ class GeminiClient:
 
     def _configure_client(self):
         """
-        Configure the Gemini client to use the currently selected API key or initialize mock mode.
-        
-        If mock mode is enabled, set self.model to None and log mock initialization. Otherwise, select the API key at self.current_key_index, configure the genai client and create the GenerativeModel assigned to self.model, then log a masked version of the key with its index and the total number of keys.
+        Configure the Gemini client to use the currently selected API key.
         """
-        if getattr(self, "mock_mode", False):
-            self.model = None
-            logger.info("GeminiClient: Initialized in MOCK MODE")
-            return
-
         # ⚡ Bolt: Lazy import google-generativeai to reduce startup latency
         global genai
         if genai is None:
@@ -65,10 +56,7 @@ class GeminiClient:
         genai.configure(api_key=current_key)
         self.model = genai.GenerativeModel(self.model_name)
         # Obscure key for logging
-        if current_key == "MOCK_KEY":
-            masked_key = "MOCK_KEY"
-        else:
-            masked_key = current_key[:4] + "..." + current_key[-4:] if len(current_key) > 8 else "****"
+        masked_key = current_key[:4] + "..." + current_key[-4:] if len(current_key) > 8 else "****"
         logger.info(f"configured Gemini with key: {masked_key} (Key {self.current_key_index + 1}/{len(self.api_keys)})")
 
     def _rotate_key(self):
@@ -93,18 +81,12 @@ class GeminiClient:
             generation_config (Optional[Dict]): Additional generation configuration (e.g., max_output_tokens).
         
         Returns:
-            str: The text produced by the model (or a deterministic mock string in mock mode).
+            str: The text produced by the model.
         
         Raises:
             Exception: Re-raises model errors that are not quota/rate-limit related.
             Exception: Raises Exception("Max retries exceeded for Gemini API") if all retry attempts fail.
         """
-        if getattr(self, "mock_mode", False):
-            # Deterministic mock responses
-            if "reply PASSED if it aligns" in prompt or "Evaluate if the CONTENT meets" in prompt:
-                return "PASSED"
-            return "Mock response from Gemini Client"
-
         max_retries = 3
         
         # We allow retries * (number of keys) effective attempts

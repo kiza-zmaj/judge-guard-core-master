@@ -753,9 +753,12 @@
       });
       result = await resp.json();
     } catch (err) {
-      // Backend not running — fall back to local simulation with warning
-      addLog('⚠️', 'Backend not reachable. Running local simulation. Start server: PYTHONPATH=. .venv/bin/python3 web_ui/server.py', 'info');
-      result = localSimulate(action);
+      // Backend not running — 100% PRODUCT MODE means hard fail.
+      addLog('🛑', 'SERVER ERROR: Backend unreachable or offline.', 'blocked');
+      document.getElementById('pipeline-status').textContent = 'Backend Error';
+      btn.disabled = false;
+      btn.textContent = '🚀 Execute Through JudgeGuard';
+      return;
     }
 
     // ─── Animate each layer from server response

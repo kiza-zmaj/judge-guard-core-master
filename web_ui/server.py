@@ -13,6 +13,8 @@ import sys
 import json
 import time
 import subprocess
+import uuid
+import jwt
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse
 
@@ -20,6 +22,7 @@ PORT = int(os.getenv("PORT", 8080))
 WEB_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(WEB_DIR)
 JUDGE_GUARD_SCRIPT = os.path.join(PROJECT_ROOT, "judge_guard.py")
+JWT_SECRET = os.getenv("JWT_SECRET", str(uuid.uuid4()))
 
 # Use the venv python if available
 VENV_PYTHON = os.path.join(PROJECT_ROOT, ".venv", "bin", "python3")
@@ -41,7 +44,7 @@ class GuardianHandler(BaseHTTPRequestHandler):
                 "status": "ok",
                 "agent": "JudgeGuard v2.0",
                 "python": PYTHON_BIN,
-                "mock_mode": not bool(os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEYS"))
+                "mode": "100% PRODUCT"
             })
         else:
             self.send_error(404, "Not Found")
@@ -171,6 +174,16 @@ class GuardianHandler(BaseHTTPRequestHandler):
         except Exception:
             pass
 
+        # Generate REAL signed JWT if approved
+        real_token = None
+        if approved:
+            payload = {
+                "scope": scope,
+                "iss": "judge-guard-auth0",
+                "exp": time.time() + 3600
+            }
+            real_token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
         return {
             "action": action,
             "scope": scope,
@@ -178,17 +191,26 @@ class GuardianHandler(BaseHTTPRequestHandler):
             "block_layer": block_layer,
             "block_reason": block_reason,
             "layers": layers_log,
-            "auth0_token": f"eyJhbGciOiJSUzI1NiJ9.mock.{scope.replace(':', '_')}" if approved else None,
+            "auth0_token": real_token,
             "timestamp": time.strftime("%H:%M:%S")
         }
 
 
 def main():
     server = HTTPServer(("0.0.0.0", PORT), GuardianHandler)
-    mock = not bool(os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEYS"))
+    
+    # Pre-flight check: ensure no mocks
+    has_keys = bool(os.getenv("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEYS"))
+    if not has_keys:
+        print("\n❌ CRITICAL ERROR: GEMINI_API_KEY is missing.")
+        print("   This project operates in 100% PRODUCT MODE.")
+        print("   Mocks and simulations are strictly forbidden.")
+        print("   Please create a .env file with a valid GEMINI_API_KEY.\n")
+        sys.exit(1)
+        
     print(f"\n🛡️  JudgeGuard Web UI Server")
     print(f"   Running at: http://localhost:{PORT}")
-    print(f"   Mode: {'⚠️  MOCK (set GEMINI_API_KEY for real AI)' if mock else '✅ LIVE Gemini AI'}")
+    print(f"   Mode: ✅ 100% PRODUCT MODE (Mocks FORBIDDEN)")
     print(f"   Python: {PYTHON_BIN}")
     print(f"\n   Press Ctrl+C to stop\n")
     try:

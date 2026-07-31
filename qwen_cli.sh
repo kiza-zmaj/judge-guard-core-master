@@ -1,36 +1,42 @@
-c#!/bin/bash
-# Qwen CLI Wrapper for Antigravity (Mocked for Now)
+#!/bin/bash
+# Qwen CLI Wrapper for Antigravity — 100% PRODUCT MODE
+# Matches gemini_cli.sh production standard.
 
 ACTION=$1
 if [ -z "$ACTION" ]; then
-    echo "Usage: qwen '<action>'"
+    echo ""
+    echo "  Usage: qwen_cli.sh '<action description>'"
+    echo ""
+    echo "  Examples:"
+    echo "    ./qwen_cli.sh 'Deploy new model'"
+    echo ""
+    echo "  This wrapper:"
+    echo "    1. Logs 🟡 Starting [ACTION] to WORK_LOG.md"
+    echo "    2. Runs JudgeGuard verification (judge_guard.py)"
+    echo "    3. Logs ✅ or 🛑 result to WORK_LOG.md"
+    echo ""
     exit 1
 fi
 
-echo "--- QWEN AGENT: Verifying Logic ---"
-echo "🔍 Checking logic for: $ACTION"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV_PYTHON="$SCRIPT_DIR/.venv/bin/python3"
 
-# 1. Update WORK_LOG.md (Consistency with Gemini)
-# Ensure a newline before appending to prevent corrupted log entries
-echo -e "\n🟡 QWEN: Starting $ACTION" >> WORK_LOG.md
-
-# 2. Logic Check (Simple mock check for now)
-if [[ "$ACTION" == *"sudo"* || "$ACTION" == *"rm -rf"* ]]; then
-    echo "🛑 QWEN BLOCK: Dangerous command detected."
-    echo -e "🛑 QWEN: Blocked $ACTION" >> WORK_LOG.md
-    exit 1
+if [ ! -f "$VENV_PYTHON" ]; then
+    echo "⚠️  .venv not found. Using system python3."
+    VENV_PYTHON="python3"
 fi
 
-echo "✅ QWEN: Action looks safe."
+echo "" >> "$SCRIPT_DIR/WORK_LOG.md"
+echo "🟡 Starting QWEN: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
 
-# 3. Call JudgeGuard using python3 from PATH
-python3 judge_guard.py "QWEN: $ACTION"
+cd "$SCRIPT_DIR" && PYTHONPATH="$SCRIPT_DIR" "$VENV_PYTHON" judge_guard.py "QWEN: $ACTION"
 RESULT=$?
 
 if [ $RESULT -eq 0 ]; then
-    echo "✅ Action Approved by Qwen + JudgeGuard"
+    echo "✅ Action Approved by JudgeGuard"
+    echo "✅ Completed QWEN: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
 else
-    echo "🛑 Action Rejected by JudgeGuard"
-    echo -e "🛑 QWEN: Rejected $ACTION" >> WORK_LOG.md
+    echo "🛑 Action BLOCKED by JudgeGuard"
+    echo "🛑 Failed: QWEN: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
     exit 1
 fi
