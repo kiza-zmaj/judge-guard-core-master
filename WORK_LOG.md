@@ -27,3 +27,6 @@
 🟡 Starting Setup Notion
 🟡 Starting Setup Notion
 ✅ Completed Setup Notion
+✅ Completed Setup Notion
+🟡 Starting Change background in web_ui/index.html
+✅ Completed Change background in web_ui/index.html

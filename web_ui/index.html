@@ -443,7 +443,7 @@
   
   <!-- Three.js & Vanta.js for 3D Background -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.halo.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -615,21 +615,17 @@
   // ── Initialize Vanta.js Background
   window.addEventListener('DOMContentLoaded', () => {
     try {
-      VANTA.NET({
+      VANTA.HALO({
         el: "body",
         mouseControls: true,
         touchControls: true,
         gyroControls: false,
         minHeight: 200.0,
         minWidth: 200.0,
-        scale: 1.0,
-        scaleMobile: 1.0,
-        color: 0x22d3ee, // matching portfolio cyan
-        backgroundColor: 0x050505, // deep dark background
-        points: 12.0,
-        maxDistance: 22.0,
-        spacing: 18.0,
-        showDots: true,
+        baseColor: 0x63b3ed,
+        backgroundColor: 0x0a0d14,
+        amplitudeFactor: 1.5,
+        size: 1.5
       });
     } catch (e) {
       console.error("Vanta initialization failed:", e);
