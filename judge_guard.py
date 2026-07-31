@@ -16,7 +16,13 @@ import os
 import sys
 import time
 import threading
-from typing import Optional
+import json
+import logging
+from typing import Dict, Any, List, Optional
+from dotenv import load_dotenv
+
+# Load .env automatically
+load_dotenv()
 from concurrent.futures import ThreadPoolExecutor
 
 # --- LAYER 3 CONSTANT ---

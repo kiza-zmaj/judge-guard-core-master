@@ -12,6 +12,10 @@ import os
 import sys
 import json
 import time
+from dotenv import load_dotenv
+
+# Load .env file automatically
+load_dotenv()
 import subprocess
 import uuid
 import jwt
