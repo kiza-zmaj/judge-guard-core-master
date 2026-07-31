@@ -1,0 +1,28 @@
+{
+  "id": "judge-guard-core",
+  "name": "JudgeGuard Core",
+  "description": "Multi-layered AI Agent Verification & Security System with Real-Time Web Dashboard",
+  "version": "2.0.0",
+  "type": "agent-security-framework",
+  "status": "active",
+  "created_at": "2026-07-31T21:16:00Z",
+  "paths": {
+    "root": "/home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master",
+    "dashboard": "web_ui/index.html",
+    "server": "web_ui/server.py",
+    "verifier": "judge_guard.py",
+    "cli": "gemini_cli.sh"
+  },
+  "layers": [
+    { "id": "L00", "name": "Security Check", "status": "active", "type": "hard_block" },
+    { "id": "L0",  "name": "Work Log Recency", "status": "active", "type": "recency_check" },
+    { "id": "L1",  "name": "Tool Enforcement", "status": "active", "type": "phase_gate" },
+    { "id": "L3",  "name": "Semantic Essence Drift", "status": "active", "type": "gemini_ai" }
+  ],
+  "tasks": {
+    "total": 4,
+    "completed": 4,
+    "backlog": 0,
+    "in_progress": 0
+  }
+}

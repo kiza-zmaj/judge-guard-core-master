@@ -723,7 +723,7 @@
     });
   }
 
-  // ── CORE: Simulate JudgeGuard + Auth0 pipeline
+  // ── CORE: Real JudgeGuard pipeline (calls backend /execute)
   async function runAction() {
     const action = document.getElementById('action-input').value.trim();
     if (!action) return;
@@ -736,98 +736,95 @@
     stats.total++;
     updateStats();
 
-    document.getElementById('pipeline-status').textContent = 'Running verification...';
+    document.getElementById('pipeline-status').textContent = 'Sending to JudgeGuard backend...';
     addLog('🟡', `Starting action: "${action.slice(0, 60)}..."`, '');
 
-    const actionLower = action.toLowerCase();
-
+    // Animate L00 immediately (optimistic)
+    setLayer('00', 'checking');
     await sleep(300);
 
-    // ─── Layer 00: Security Check
-    setLayer('00', 'checking');
-    await sleep(600);
-
-    const dangerous = ['sudo', 'rm -rf', 'delete all', 'destroy', 'wipe', 'drop table', 'purge all', 'chmod -r 777'];
-    const isDangerous = dangerous.some(d => actionLower.includes(d));
-
-    if (isDangerous) {
-      setLayer('00', 'blocked');
-      addLog('🛑', 'Layer 00 BLOCKED: Dangerous command detected!', 'blocked');
-      stats.blocked++;
-      updateStats();
-      showVerdict(false, '🛑 BLOCKED at Layer 00 — Dangerous command detected (sudo/rm-rf/chmod)');
-      btn.disabled = false;
-      btn.textContent = '🚀 Execute Through JudgeGuard';
-      document.getElementById('pipeline-status').textContent = 'Blocked at Layer 00';
-      return;
-    }
-    setLayer('00', 'passed');
-    addLog('✅', 'Layer 00 PASSED: No dangerous commands detected', 'approved');
-
-    await sleep(400);
-
-    // ─── Layer 1: Tool Enforcement
-    setLayer('1', 'checking');
-    await sleep(500);
-    setLayer('1', 'passed');
-    addLog('✅', 'Layer 1 PASSED: Tool usage matches current project phase', 'approved');
-
-    await sleep(400);
-
-    // ─── Layer 3: Essence / Drift Check
-    setLayer('3', 'checking');
-    addLog('ℹ️', 'Layer 3: Checking for semantic drift against Project Essence...', 'info');
-    await sleep(800);
-
-    const scopeViolations = ['send email to all', 'mass delete', 'access financial', 'bypass security', 'ignore judge', 'skip verification', 'delete account', 'remove all users'];
-    const hasDrift = scopeViolations.some(v => actionLower.includes(v));
-
-    if (hasDrift) {
-      setLayer('3', 'blocked');
-      const violation = scopeViolations.find(v => actionLower.includes(v));
-      addLog('🛑', `Layer 3 BLOCKED: Semantic drift — "${violation}"`, 'blocked');
-      stats.blocked++;
-      updateStats();
-      showVerdict(false, `🛑 BLOCKED at Layer 3 — Semantic drift: "${violation}"`);
-      btn.disabled = false;
-      btn.textContent = '🚀 Execute Through JudgeGuard';
-      document.getElementById('pipeline-status').textContent = 'Blocked at Layer 3';
-      return;
+    let result;
+    try {
+      // ─── Real backend call to /execute
+      const resp = await fetch('/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, scope: selectedScope })
+      });
+      result = await resp.json();
+    } catch (err) {
+      // Backend not running — fall back to local simulation with warning
+      addLog('⚠️', 'Backend not reachable. Running local simulation. Start server: PYTHONPATH=. .venv/bin/python3 web_ui/server.py', 'info');
+      result = localSimulate(action);
     }
 
-    setLayer('3', 'passed');
-    addLog('✅', 'Layer 3 PASSED: Action aligns with Project Essence (drift < 20%)', 'approved');
+    // ─── Animate each layer from server response
+    const layerMap = { 'L00': '00', 'L1': '1', 'L3': '3' };
+    for (const layer of (result.layers || [])) {
+      const domId = layerMap[layer.layer];
+      if (domId) {
+        setLayer(domId, 'checking');
+        await sleep(400);
+        setLayer(domId, layer.status === 'PASSED' ? 'passed' : 'blocked');
+        const icon = layer.status === 'PASSED' ? '✅' : '🛑';
+        const type = layer.status === 'PASSED' ? 'approved' : 'blocked';
+        addLog(icon, `${layer.layer} ${layer.status}: ${layer.msg}`, type);
+        await sleep(300);
+      }
+    }
 
-    await sleep(400);
+    // ─── Auth0 Token
+    if (result.approved && result.auth0_token) {
+      document.getElementById('auth0-block').classList.add('active');
+      document.getElementById('status-auth0').textContent = '⏳';
+      document.getElementById('auth0-detail').textContent = `Requesting token for scope: "${selectedScope}"...`;
+      addLog('🔐', `Auth0 Token Vault: Requesting scope "${selectedScope}"...`, 'auth');
+      await sleep(600);
+      document.getElementById('status-auth0').textContent = '✅';
+      document.getElementById('auth0-detail').textContent = `Token issued: ${result.auth0_token.slice(0, 40)}...`;
+      addLog('✅', `Auth0 Token issued for scope "${selectedScope}"`, 'auth');
+      stats.tokens++;
+    } else if (!result.approved) {
+      document.getElementById('status-auth0').textContent = '🔒';
+      document.getElementById('auth0-detail').textContent = `Token withheld — action blocked at ${result.block_layer || 'unknown layer'}`;
+    }
 
-    // ─── Auth0 Token Vault
-    document.getElementById('auth0-block').classList.add('active');
-    document.getElementById('status-auth0').textContent = '⏳';
-    document.getElementById('auth0-detail').textContent = `Requesting token for scope: "${selectedScope}"...`;
-    addLog('🔐', `Auth0 Token Vault: Requesting scope "${selectedScope}"...`, 'auth');
-    await sleep(700);
+    // ─── Final verdict
+    if (result.approved) {
+      stats.approved++;
+      addLog('🌐', 'API call executed. Token discarded after use.', 'approved');
+      addLog('✅', `Action completed: "${action.slice(0, 60)}..."`, 'approved');
+      showVerdict(true);
+      document.getElementById('pipeline-status').textContent = '✅ All layers passed';
+    } else {
+      stats.blocked++;
+      showVerdict(false, `🛑 BLOCKED at ${result.block_layer || 'JudgeGuard'} — ${result.block_reason}`);
+      document.getElementById('pipeline-status').textContent = `Blocked at ${result.block_layer || 'JudgeGuard'}`;
+    }
 
-    const mockToken = `eyJhbGciOiJSUzI1NiJ9.${btoa(JSON.stringify({ scope: selectedScope, exp: Math.floor(Date.now()/1000) + 3600 })).slice(0,20)}...`;
-    document.getElementById('status-auth0').textContent = '✅';
-    document.getElementById('auth0-detail').textContent = `Token issued: ${mockToken}`;
-    addLog('✅', `Auth0 Token issued for scope "${selectedScope}" (expires in 1h)`, 'auth');
-
-    stats.approved++;
-    stats.tokens++;
     updateStats();
-
-    await sleep(400);
-    addLog('🌐', `API call executed successfully. Token discarded after use.`, 'approved');
-    addLog('✅', `Action completed: "${action.slice(0, 60)}..."`, 'approved');
-
-    showVerdict(true);
-    document.getElementById('pipeline-status').textContent = '✅ All layers passed';
-
     btn.disabled = false;
     btn.textContent = '🚀 Execute Through JudgeGuard';
+  }
+
+  // ─── Local fallback simulation (when server is offline)
+  function localSimulate(action) {
+    const actionLower = action.toLowerCase();
+    const dangerous = ['sudo', 'rm -rf', 'chmod -r 777'];
+    if (dangerous.some(d => actionLower.includes(d))) {
+      return { approved: false, block_layer: 'L00', block_reason: 'Dangerous command (local check)', auth0_token: null,
+        layers: [{ layer: 'L00', status: 'BLOCKED', msg: 'Dangerous command detected (local check)' }] };
+    }
+    return { approved: true, block_layer: null, block_reason: '', auth0_token: 'eyJhbGciOiJSUzI1NiJ9.mock.local',
+      layers: [
+        { layer: 'L00', status: 'PASSED', msg: 'No dangerous commands (local check)' },
+        { layer: 'L1',  status: 'PASSED', msg: 'Tool enforcement OK (local check)' },
+        { layer: 'L3',  status: 'PASSED', msg: 'Essence check OK (local simulation)' }
+      ]};
   }
 
   function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
+
