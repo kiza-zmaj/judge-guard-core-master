@@ -1,54 +1,37 @@
-# Task: Agent Taming Research Project
+# Task: PhysioNet ECG Digitization (3-6-2 "Loptica" Protocol)
 
-## Current Focus
+## 🎯 Current Focus
 
-🎯 **Project:** Ukroćenje AI Agenata (Agent Taming)
-📄 **Plan:** [MASTER_RESEARCH_PLAN.md](file:///home/kizabgd/Desktop/33333333333333333333/MASTER_RESEARCH_PLAN.md)
-
----
-
-## Phase 0: Scoping ✅
-
-- [x] Define research scope
-- [x] Create `research/phase0_scoping/scope_definition.md`
-- [x] List key terms and definitions (Vocabulary identified)
-- [x] Set evaluation criteria (Success criteria defined)
-
-## Phase 1: Discovery (Deep Research) ✅
-
-- [x] **Workflow Patterns:** Chaining, Routing, Parallelization (Documented)
-- [x] **Refinement Techniques:** Self-Correction, Critique-Revision loops (Documented)
-- [x] **Verification Systems:** CoVe (Chain of Verification), Recursive CAI (Documented)
-- [x] **Framework Audit:** LangGraph, Nemo Guardrails, Guardrails AI (Documented)
-- [x] **Safety & Drift:** Detecting Agentic Drift & Chaos Engineering for Agents (Logic identified)
-
-## Phase 2: Analysis ✅
-
-- [x] Compare discovered patterns
-- [x] Create decision matrix (Priority: Drift Score, Self-Healing, CoVe)
-- [x] Map patterns to JudgeGuard architecture
-- [x] Identify implementation gaps (KEY: Already have Recursive CAI!)
-
-## Phase 1.1: Renewed Investigation (Advanced Browser CoT) 🟡
-
-- [ ] Define advanced research questions
-- [ ] Research state-of-the-art browser agents (Browser-use, LaVague)
-- [ ] Analyze 'Chain of Truth' implementation patterns
-- [ ] Document findings in `research/phase1_discovery/browser_cot_investigation.md`
-- [ ] Synthesize insights for JudgeGuard Layer 3 upgrade
-
-## Phase 4: Documentation
-
-- [ ] Create AGENT_TAMING_GUIDE.md
-- [ ] Update implementation_plan.md
-- [ ] Package as reusable skills
+- **Project:** PhysioNet ECG Digitization
+- **Protocol:** 3-6-2 "Loptica" Dynamic Resolution Protocol
+- **Verification Engine:** JudgeGuard v2.1 (Anti-Drift Protection)
+- **Transition:** Transitioned from CSIRO Image2Biomass (ARCHIVED)
+- **Research Context:** Gemini 2026 / MedGemma Impact Challenge
 
 ---
 
-## Verification Checkpoints
+## 📐 3-6-2 Loptica Architecture Breakdown
 
-- [ ] Phase 0 complete → JudgeGuard verify
-- [ ] Phase 1 complete → JudgeGuard verify
-- [ ] Phase 2 complete → JudgeGuard verify
-- [ ] Phase 3 complete → JudgeGuard verify
-- [ ] Phase 4 complete → Final commit
+### 🔬 3 Analysis Steps (Dekompozicija ECG Signala)
+- [x] Step A1: ECG Image Signal Preprocessing & Region Extraction
+- [x] Step A2: Lead Grid & Coordinate Calibration (Dynamic Resolution)
+- [x] Step A3: Multimodal Signal Trace Extraction Strategy
+
+### ⚡ 6 Implementation Steps (Izvršenje & Kodifikacija)
+- [ ] Step I1: Configure Safety & Agent Orchestration (`src/physionet_ecg/orchestration.py`)
+- [ ] Step I2: Implement ECG Image Loader & Grid Calibrator (`src/physionet_ecg/loader.py`)
+- [ ] Step I3: Implement Bounding Box & Lead Waveform Vectorizer (`src/physionet_ecg/vectorizer.py`)
+- [ ] Step I4: Implement Dynamic Resolution Signal Interpolator (`src/physionet_ecg/interpolator.py`)
+- [ ] Step I5: Implement MedGemma/PhysioNet WFDB Signal Exporter (`src/physionet_ecg/exporter.py`)
+- [ ] Step I6: Integrate Full 3-6-2 "Loptica" Digitization Pipeline (`src/physionet_ecg/pipeline.py`)
+
+### 🔍 2 Verification Steps (Zatvaranje & Arhiviranje)
+- [ ] Step V1: Comprehensive JudgeGuard v2.1 Verification & Synthetic ECG Digitization Benchmark
+- [ ] Step V2: Final Work Log Update & Archival
+
+---
+
+## 🔒 Verification & Compliance
+- **ONE_SKILL_FOCUS**: Active
+- **END_TO_END_DISCIPLINE**: Enforced
+- **VERIFY_BEFORE_EXECUTE**: Active via `judge_guard.py`
