@@ -4,6 +4,10 @@ Orchestrates loading, grid calibration, vectorization, dynamic resampling, and W
 """
 
 from typing import Dict, Any
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
 from src.physionet_ecg.orchestration import LopticaOrchestrator, check_drift
 from src.physionet_ecg.loader import ECGGridCalibrator
 from src.physionet_ecg.vectorizer import WaveformVectorizer
