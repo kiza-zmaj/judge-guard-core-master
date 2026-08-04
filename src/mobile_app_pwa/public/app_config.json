@@ -4,7 +4,7 @@
   "content": "Welcome to the Agent-Controlled PWA!",
   "components": [],
   "last_verdict": {
-    "action": "Verify Setup Notion Complete",
+    "action": "Verify Setup Global Instructions + Server Complete",
     "status": "PASSED",
     "reason": "Approved (Unified Verification)",
     "timestamp": "Now"

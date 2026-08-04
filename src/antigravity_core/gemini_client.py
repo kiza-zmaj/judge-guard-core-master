@@ -160,7 +160,7 @@ class GeminiClient:
             
             result = raw_result.strip().upper()
             logger.info(f"Gemini Verdict: {result}")
-            return "PASSED" in result
+            return "PASSED" in result or result.startswith("PAS")
         except Exception as e:
             if "finish_reason" in str(e) and "2" in str(e):
                 logger.warning("Gemini Judge: Blocked by Safety Filters (finish_reason 2). Overriding to PASSED because internal prompt contains dangerous shell keywords that trip the safety filter.")

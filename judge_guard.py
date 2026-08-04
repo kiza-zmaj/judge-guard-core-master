@@ -28,17 +28,14 @@ from concurrent.futures import ThreadPoolExecutor
 # --- LAYER 3 CONSTANT ---
 PROJECT_ESSENCE = """
 PROJECT ESSENCE (Golden Snapshot):
-The goal is to build an autonomous, self-improving AI agent system (Antigravity).
+The goal is to build a 100% free informational "Mental Game" platform.
 Core Values:
 1. User Control: The user is the ultimate authority.
 2. Safety: No destructive actions without verification.
-3. Quality: High standards for code and documentation.
-4. Transparency: Streaming thoughts and actions to the user.
-5. Modularity: A clean, plugin-based architecture for Agents.
-6. Research First: Always validate assumptions with browser research before coding.
-
-SKILL MANIFEST:
-- mobile-vibe-coding: Enforce '.cursorrules' for PWA development (XML Architecture + Vibe Snippets).
+3. Content First: High quality mental game information and videos.
+4. AI Chat Integration: Seamless iframe embedding of Open WebUI.
+5. Tech Stack: Next.js (App Router), identical design to the previous Cira/Vlada project.
+6. Research First: Validate with NotebookLM generated quizzes.
 """
 # ------------------------
 

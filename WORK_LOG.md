@@ -30,3 +30,5 @@
 ✅ Completed Setup Notion
 🟡 Starting Change background in web_ui/index.html
 ✅ Completed Change background in web_ui/index.html
+🟡 Starting [Setup Global Instructions + Server]
+✅ Completed [Setup Global Instructions + Server]
