@@ -4,7 +4,7 @@
   "content": "Welcome to the Agent-Controlled PWA!",
   "components": [],
   "last_verdict": {
-    "action": "Verify Setup Global Instructions + Server Complete",
+    "action": "Verify Install .agent skills Complete",
     "status": "PASSED",
     "reason": "Approved (Unified Verification)",
     "timestamp": "Now"
