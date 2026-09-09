@@ -103,6 +103,31 @@ def run_nlm(args: list, timeout: int = 120) -> subprocess.CompletedProcess:
         sys.exit(1)
 
 
+def get_error_message(result: subprocess.CompletedProcess) -> str:
+    """Extract error text from stderr or stdout, since nlm CLI prints errors to stdout."""
+    err = result.stderr.strip()
+    out = result.stdout.strip()
+    if err and out:
+        return f"{err}\n{out}"
+    return err or out or "Unknown error"
+
+
+def format_nlm_error(notebook_id: str, error_msg: str) -> str:
+    """Format an actionable diagnostic message for nlm errors."""
+    lines = [f"❌ Error: {error_msg}"]
+    if "PERMISSION_DENIED" in error_msg or "Could not retrieve" in error_msg:
+        lines.append(f"   ⚠️  Permission denied or session expired for notebook: {notebook_id}")
+        lines.append(f"   💡 Current nlm account profile may not have access to this notebook.")
+        lines.append(f"   👉 To check current profile: nlm doctor")
+        lines.append(f"   👉 To list profiles: nlm login profile list")
+        lines.append(f"   👉 To switch profile: nlm login switch <profile>")
+        lines.append(f"   👉 To view accessible notebooks: nlm notebook list")
+    elif "NOT_FOUND" in error_msg:
+        lines.append(f"   ❌ Notebook not found: {notebook_id}")
+        lines.append(f"   👉 Use 'nlm notebook list' to see available notebooks.")
+    return "\n".join(lines)
+
+
 def print_header(title: str) -> None:
     """Print a formatted section header."""
     print(f"\n{'='*60}")
@@ -129,12 +154,8 @@ def cmd_query(notebook_id: str, question: str, json_output: bool = False) -> str
     result = run_nlm(args, timeout=120)
 
     if result.returncode != 0:
-        error_msg = result.stderr.strip()
-        if "NOT_FOUND" in error_msg:
-            print(f"❌ Notebook not found: {notebook_id}")
-            print(f"   Hint: Double-check the notebook_id. Use 'nlm notebook list' to see available notebooks.")
-        else:
-            print(f"❌ Query failed: {error_msg}")
+        error_msg = get_error_message(result)
+        print(format_nlm_error(notebook_id, error_msg))
         log_work(f"🛑 Blocked [NLM Query]: {error_msg[:80]}")
         return ""
 
@@ -154,7 +175,8 @@ def cmd_status(notebook_id: str) -> list:
     result = run_nlm(["studio", "status", notebook_id], timeout=30)
 
     if result.returncode != 0:
-        print(f"❌ Status check failed: {result.stderr.strip()}")
+        error_msg = get_error_message(result)
+        print(format_nlm_error(notebook_id, error_msg))
         return []
 
     try:
