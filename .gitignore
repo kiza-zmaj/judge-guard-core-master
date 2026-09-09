@@ -26,6 +26,12 @@ Thumbs.db
 gradio.log
 research.db
 
+# NotebookLM exports (large binary artifacts)
+exports/
+
+# Actions Runner local credentials
+actions-runner/
+
 # Local tools
 .cache/
 .conda/
@@ -35,3 +41,4 @@ research.db
 .jules/
 .agent/
 .venv/
+node_modules

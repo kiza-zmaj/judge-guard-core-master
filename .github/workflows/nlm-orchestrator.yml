@@ -1,0 +1,107 @@
+name: NotebookLM Orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      notebook_id:
+        description: 'Notebook ID or alias (e.g., pitch, fk-sava-45)'
+        required: true
+        default: 'pitch'
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'status'
+        type: choice
+        options:
+          - query
+          - status
+          - fetch
+          - pipeline
+      query:
+        description: 'Query text (for query/pipeline actions)'
+        required: false
+        default: ''
+      output_dir:
+        description: 'Output directory for artifacts'
+        required: false
+        default: 'exports/general'
+
+jobs:
+  orchestrate:
+    runs-on: self-hosted
+    name: "NLM ${{ github.event.inputs.action }} — ${{ github.event.inputs.notebook_id }}"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify nlm CLI is available
+        run: |
+          echo "🔍 Checking nlm CLI..."
+          which nlm || (echo "❌ nlm not found on PATH" && exit 1)
+          nlm --version
+          echo "✅ nlm CLI ready"
+
+      - name: Verify ffmpeg is available
+        run: |
+          echo "🔍 Checking ffmpeg..."
+          which ffmpeg || (echo "⚠️  ffmpeg not found — audio conversion will be skipped")
+          echo "✅ ffmpeg ready"
+
+      - name: Run JudgeGuard Pre-Check
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "🟡 Starting [NLM Orchestrator CI: ${{ github.event.inputs.action }}]" >> WORK_LOG.md
+          if [ -f ".venv/bin/python3" ]; then
+            PYTHONPATH=. .venv/bin/python3 judge_guard.py \
+              "Start NLM Orchestrator CI: ${{ github.event.inputs.action }}" || true
+          else
+            echo "⚠️  JudgeGuard venv not found, skipping pre-check"
+          fi
+
+      - name: Execute Orchestrator
+        working-directory: ${{ github.workspace }}
+        run: |
+          NOTEBOOK_ID="${{ github.event.inputs.notebook_id }}"
+          ACTION="${{ github.event.inputs.action }}"
+          QUERY="${{ github.event.inputs.query }}"
+          OUTPUT="${{ github.event.inputs.output_dir }}"
+
+          echo "🚀 Running orchestrator: action=${ACTION} notebook=${NOTEBOOK_ID}"
+
+          case "${ACTION}" in
+            query)
+              python3 nlm_orchestrator.py query "${NOTEBOOK_ID}" "${QUERY}"
+              ;;
+            status)
+              python3 nlm_orchestrator.py status "${NOTEBOOK_ID}"
+              ;;
+            fetch)
+              python3 nlm_orchestrator.py fetch "${NOTEBOOK_ID}" --output "${OUTPUT}"
+              ;;
+            pipeline)
+              python3 nlm_orchestrator.py pipeline "${NOTEBOOK_ID}" "${QUERY}" --fetch --output "${OUTPUT}"
+              ;;
+            *)
+              echo "❌ Unknown action: ${ACTION}"
+              exit 1
+              ;;
+          esac
+
+      - name: JudgeGuard Post-Check
+        if: always()
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo "✅ Completed [NLM Orchestrator CI: ${{ github.event.inputs.action }}]" >> WORK_LOG.md
+          if [ -f ".venv/bin/python3" ]; then
+            PYTHONPATH=. .venv/bin/python3 judge_guard.py \
+              "Verify NLM Orchestrator CI: ${{ github.event.inputs.action }} Complete" || true
+          fi
+
+      - name: Upload artifacts
+        if: success() && (github.event.inputs.action == 'fetch' || github.event.inputs.action == 'pipeline')
+        uses: actions/upload-artifact@v4
+        with:
+          name: nlm-exports-${{ github.run_id }}
+          path: ${{ github.event.inputs.output_dir }}/
+          if-no-files-found: ignore
