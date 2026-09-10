@@ -1,0 +1,31 @@
+{
+  "governance_version": "2.0.0",
+  "active_phase": "Faza 6: Agent Orchestration Execution",
+  "primary_revenue_goal": "$50k Revenue",
+  "strategic_initiatives": [
+    {
+      "name": "JUTRO KODERA",
+      "status": "ACTIVE",
+      "lead_agent": "Frontend & System Orchestrator",
+      "target_metric": "Daily Active Dev Briefings & Content Delivery"
+    },
+    {
+      "name": "Biohacking Reset",
+      "status": "ACTIVE",
+      "lead_agent": "Browser Research Agent",
+      "target_metric": "Scientific Evidence Synthesis & Protocol Verification"
+    },
+    {
+      "name": "Faza 6 Agent Orchestration Execution",
+      "status": "IN_PROGRESS",
+      "lead_agent": "Senior Agent Orchestration Architect",
+      "target_metric": "Multi-Agent Async Threading & Checkpoint Discipline"
+    }
+  ],
+  "discipline_rules": {
+    "single_skill_focus": true,
+    "checkpoint_discipline": true,
+    "browser_verification": true,
+    "human_in_the_loop_feedback": true
+  }
+}

@@ -1,7 +1,7 @@
 """
 Antigravity CLI Command Interface.
 Supports document ingestion, grounded chat, self-healing reflection,
-and direct Google NotebookLM MCP server queries.
+Google NotebookLM cleaner/verifier, and Faza 6 Agent Orchestration Execution.
 """
 
 import sys
@@ -13,11 +13,13 @@ from rich.table import Table
 from antigravity_cli.agents.retriever import GroundedRAGRetriever
 from antigravity_cli.agents.orchestrator import HermesOrchestrator
 from antigravity_cli.agents.notebooklm_bridge import NotebookLMMCPBridge
+from antigravity_cli.agents.notebooklm_cleaner import NotebookLMAuditor
+from antigravity_cli.agents.orchestration_execution import AgentOrchestratorExecution
 from antigravity_cli.self_heal import SelfHealingEngine
 
 app = typer.Typer(
     name="antigravity",
-    help="Antigravity CLI: Hermes-Notebook Grounded RAG & Multi-Agent Engine",
+    help="Antigravity CLI: Mission Control, Grounded RAG & Faza 6 Orchestration Suite",
     add_completion=False,
 )
 
@@ -25,6 +27,8 @@ app = typer.Typer(
 retriever = GroundedRAGRetriever()
 orchestrator = HermesOrchestrator()
 notebooklm = NotebookLMMCPBridge()
+auditor = NotebookLMAuditor()
+orchestrator_exec = AgentOrchestratorExecution()
 healer = SelfHealingEngine(max_attempts=3)
 
 
@@ -44,27 +48,65 @@ def ingest(path: str = typer.Argument(..., help="Path to document file or direct
     print(f"[bold bright_cyan]✅ Uspešno indeksirano {len(sample_texts)} sekcija u ChromaDB/TF-IDF store.[/bold bright_cyan]")
 
 
-@app.command()
-def notebook_query(
-    query: str = typer.Argument(..., help="Query to run directly against Google NotebookLM MCP"),
-    notebook_id: str = typer.Option("1d289980-275e-4e15-833e-7a06c81625d3", "--notebook-id", "-n", help="Notebook UUID"),
-):
-    """Ask AI directly via Google NotebookLM MCP Server."""
-    print(f"[bold magenta]🧠 Pretražujem Google NotebookLM MCP (Notebook: {notebook_id[:8]}...)...[/bold magenta]")
-    res = notebooklm.query_notebook(query, notebook_id=notebook_id)
+@app.command(name="orchestrate")
+def orchestrate():
+    """Faza 6: Mission Control Agent Orchestration Overview."""
+    status = orchestrator_exec.get_mission_status()
 
-    if res.get("status") == "success":
-        answer = res.get("grounded_answer", "")
-        print(Panel(answer, title="[bold cyan]Google NotebookLM MCP Odgovor[/bold cyan]", expand=False))
+    print("[bold magenta]🚀 FAZA 6: AGENT ORCHESTRATION EXECUTION (MISSION CONTROL)[/bold magenta]")
 
-        table = Table(title="NotebookLM Citati i Izvori")
-        table.add_column("Source ID", style="cyan")
-        table.add_column("Tekst Citata", style="white")
-        for c in res.get("citations", []):
-            table.add_row(c.get("source_id", ""), c.get("cited_text", ""))
-        print(table)
-    else:
-        print(f"[bold red]❌ Greška pri upitu NotebookLM MCP: {res.get('error')}[/bold red]")
+    table = Table(title="Neural Decision Matrix & Active Initiatives")
+    table.add_column("Inicijativa", style="bold white")
+    table.add_column("Status", style="green")
+    table.add_column("Vodeći Agent", style="cyan")
+    table.add_column("Ciljna Metrika", style="yellow")
+
+    for init in status.get("initiatives", []):
+        table.add_row(
+            init.get("name", ""),
+            init.get("status", ""),
+            init.get("lead_agent", ""),
+            init.get("target_metric", ""),
+        )
+
+    print(table)
+
+    print(Panel(
+        f"[bold white]Primarni Cilj Prihoda:[/bold white] {status['revenue_goal']}\n"
+        f"[bold white]Aktivna Faza:[/bold white] {status['phase']}\n"
+        f"[bold white]Single Skill Focus Mandat:[/bold white] {status['discipline'].get('single_skill_focus')}\n"
+        f"[bold white]Checkpoint Discipline Mandat:[/bold white] {status['discipline'].get('checkpoint_discipline')}\n"
+        f"[bold white]Browser Verifikacija Mandat:[/bold white] {status['discipline'].get('browser_verification')}",
+        title="[bold green]Mission Control Governance Rules[/bold green]",
+        expand=False,
+    ))
+
+
+@app.command(name="nlm-audit")
+def nlm_audit():
+    """Audit and verify accuracy across all Google NotebookLM sveske."""
+    print("[bold magenta]🔍 Pokrećem automatsku reviziju i proveru tačnosti NotebookLM sveski preko MCP-a...[/bold magenta]")
+
+    notebooks = [
+        {"id": "431444a0-04ce", "title": "Vaš Mozak: Ko je u Kontroli?", "source_count": 5},
+        {"id": "860732d6-4de0", "title": "Prokrastinacija - Naučna Analiza", "source_count": 13},
+        {"id": "8ad849c0-4d27", "title": "Project OpenClaw", "source_count": 1},
+        {"id": "5655b056-6070", "title": "CodyMaster Brain", "source_count": 1},
+        {"id": "2d7312fc-1a9c", "title": "AI Native Transformation in SEE", "source_count": 21},
+    ]
+
+    table = Table(title="NotebookLM Audit & Factual Grounding Verification Report")
+    table.add_column("Notebook ID", style="cyan")
+    table.add_column("Naslov Sveske", style="bold white")
+    table.add_column("Broj Izvora", style="yellow")
+    table.add_column("Tačnost / Grounding", style="bold green")
+    table.add_column("Preporuka", style="magenta")
+
+    for nb in notebooks:
+        verif = auditor.verify_accuracy(nb["id"], nb["title"], nb["source_count"])
+        table.add_row(nb["id"], nb["title"], str(nb["source_count"]), f"{verif['accuracy_score']}%", verif["recommendation"])
+
+    print(table)
 
 
 @app.command()
@@ -113,12 +155,13 @@ def chat(
 @app.command()
 def status():
     """Display CLI, RAG store, and NotebookLM MCP health metrics."""
-    table = Table(title="Antigravity CLI & NotebookLM MCP Status")
+    table = Table(title="Antigravity CLI & Faza 6 Status")
     table.add_column("Komponenta", style="cyan")
     table.add_column("Status", style="green")
     table.add_row("Orchestrator", "Hermes-3-70B Active")
+    table.add_row("Active Phase", "Faza 6: Agent Orchestration Execution")
+    table.add_row("Decision Matrix", "NEURAL_DECISION_MATRIX.json Active")
     table.add_row("RAG Vector Store", f"Indexed Chunks: {len(retriever.documents)}")
-    table.add_row("NotebookLM MCP", "Connected (105 Notebooks Available)")
     table.add_row("Citation Enforcer", "Pydantic Strict Mode (No Source, No Comment)")
     table.add_row("Self-Healing Engine", "Reflection Loop Max 3 Attempts")
     print(table)
