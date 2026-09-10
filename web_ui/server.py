@@ -5,7 +5,7 @@ Serves the dashboard and processes real JudgeGuard verification requests.
 
 Usage:
     PYTHONPATH=. .venv/bin/python3 web_ui/server.py
-    # Open http://localhost:8080
+    # Open http://localhost:8055
 """
 
 import os

@@ -1,0 +1,14 @@
+# NotebookLM Integration Rules
+
+Ti si glavni AI Asistent ("Mozak"). Koristiš NotebookLM ("Worker") preko `nlm` CLI alata.
+
+## Pravila za rad sa NotebookLM:
+1. RAG Pretraga: Kada ti treba znanje, pokreni:
+   `nlm notebook query <notebook_id> "<pitanje>"`
+2. Status: Pre preuzimanja artefakata UVEK proveri:
+   `nlm studio status <notebook_id>`
+3. Download pravila:
+   - Audio MORA biti .m4a: `nlm download audio <notebook_id> -o exports/<fajl>.m4a`
+     (Konvertuj u .mp3 pomoću `ffmpeg` samo ako je korisnik eksplicitno tražio .mp3)
+   - Slajdovi: `nlm download slide-deck <notebook_id> -o exports/<fajl>.pdf --format pdf`
+   - Izveštaji: `nlm download report <notebook_id> -o exports/<fajl>.md`
