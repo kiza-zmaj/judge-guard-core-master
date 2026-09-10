@@ -103,3 +103,18 @@
 🟡 Starting [NLM Fetch]: notebook=4f6b5323-346...
 ✅ Completed [NLM Fetch]: 11 files → exports/linkedin/
 ✅ Completed Goal inscription: NotebookLM Orchestrator Setup
+
+🟡 Starting [read:emails]: Fetch unread emails from inbox to summarize daily digest for user
+🛑 Blocked [read:emails]: Fetch unread emails from inbox to summarize daily digest for user — JudgeGuard verification timeout (30s)
+
+🟡 Starting [read:emails]: Fetch unread emails from inbox to summarize daily digest for user
+🟡 Starting [NLM Pipeline]: notebook=7c85c185-28b...
+🟡 Starting [NLM Query]: "Summarize the pitch..."
+✅ Completed [NLM Query]: "Summarize the pitch..."
+🟡 Starting [NLM Fetch]: notebook=7c85c185-28b...
+✅ Completed [NLM Fetch]: 6 files → /home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master/exports/general
+✅ Completed [NLM Pipeline]: query=yes, generated=0, downloaded=6
+🟡 Starting [NLM Fetch]: notebook=83fc213b-068...
+✅ Completed [NLM Fetch]: 2 files → /home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master/exports/general
+🟡 Starting Live 8-Stage Cycle Verification Probe
+✅ Completed Live 8-Stage Cycle Verification Probe
