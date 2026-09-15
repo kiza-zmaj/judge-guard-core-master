@@ -105,11 +105,20 @@ class ResearchPipeline:
     def close(self):
         """⚡ Bolt: Ensure ThreadPoolExecutor and Session are cleanly shut down."""
         if hasattr(self, "_executor"):
-            self._executor.shutdown(wait=True)
+            try:
+                self._executor.shutdown(wait=False)
+            except Exception:
+                pass
         if hasattr(self, "_session") and self._session:
-            self._session.close()
+            try:
+                self._session.close()
+            except Exception:
+                pass
         if hasattr(self, "conn") and self.conn:
-            self.conn.close()
+            try:
+                self.conn.close()
+            except Exception:
+                pass
         
     def log_audit(self, action: str, details: str = "", commit: bool = True, sync_notion: bool = True):
         """Log action for Notion sync and local audit."""
