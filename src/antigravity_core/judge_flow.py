@@ -19,17 +19,18 @@ class BlockJudge:
         # ⚡ Bolt: Allow dependency injection of GeminiClient to avoid redundant initialization
         self.client = client or GeminiClient()
 
-    def evaluate(self, content: str) -> Tuple[bool, bool]:
+    def evaluate(self, content: str) -> bool:
         """
         Calls Gemini to judge the content.
 
         Returns:
-            Tuple[bool, bool]: (verdict, is_authoritative)
-                - verdict: True = PASSED, False = FAILED/BLOCKED
-                - is_authoritative: True if Gemini responded normally, False if blocked/degraded.
+            bool: True = PASSED, False = FAILED/BLOCKED
         """
         logger.info(f"Judging context against criteria: {self.criteria[:100]}...")
-        return self.client.judge_content(content, self.criteria)
+        res = self.client.judge_content(content, self.criteria)
+        if isinstance(res, tuple):
+            return res[0]
+        return bool(res)
 
     def generate_report(self, content: str) -> str:
         """
@@ -59,7 +60,13 @@ class JudgeFlowBlock:
             try:
                 result = self.action(context)
 
-                verdict, is_authoritative = self.judge.evaluate(result)
+                res = self.judge.evaluate(result)
+                if isinstance(res, tuple):
+                    verdict, is_authoritative = res
+                else:
+                    verdict = bool(res)
+                    is_authoritative = getattr(getattr(self.judge, "client", None), "last_is_authoritative", True)
+
                 if verdict and is_authoritative:
                     logger.info("JudgeFlow: Content PASSED verification (authoritative).")
                     return result

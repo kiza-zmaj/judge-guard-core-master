@@ -66,3 +66,41 @@ def test_verdict_caching(temp_db):
     pipeline.cache_verdict("Action 1", "PASSED")
     verdict = pipeline.get_cached_verdict("Action 1")
     assert verdict == "PASSED"
+
+def test_verdict_caching_non_authoritative(temp_db):
+    pipeline = ResearchPipeline()
+    pipeline.init_db()
+
+    pipeline.cache_verdict("Action Non-Auth", "PASSED", is_authoritative=False)
+    # Non-authoritative cached entries must be treated as cache misses
+    verdict = pipeline.get_cached_verdict("Action Non-Auth")
+    assert verdict is None
+
+def test_invalidate_verdict(temp_db):
+    pipeline = ResearchPipeline()
+    pipeline.init_db()
+
+    pipeline.cache_verdict("Action to Invalidate", "PASSED")
+    assert pipeline.get_cached_verdict("Action to Invalidate") == "PASSED"
+
+    deleted = pipeline.invalidate_verdict("Action to Invalidate")
+    assert deleted is True
+    assert pipeline.get_cached_verdict("Action to Invalidate") is None
+
+    # Deleting again returns False
+    assert pipeline.invalidate_verdict("Action to Invalidate") is False
+
+def test_purge_non_authoritative_verdicts(temp_db):
+    pipeline = ResearchPipeline()
+    pipeline.init_db()
+
+    pipeline.cache_verdict("Action 1", "PASSED")
+    pipeline.cache_verdict("Action 2", "PASSED")
+    pipeline.cache_verdict("Action 3", "FAILED")
+
+    purged = pipeline.purge_non_authoritative_verdicts()
+    assert purged == 2
+
+    assert pipeline.get_cached_verdict("Action 1") is None
+    assert pipeline.get_cached_verdict("Action 2") is None
+    assert pipeline.get_cached_verdict("Action 3") == "FAILED"
