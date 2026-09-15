@@ -1,4 +1,16 @@
 {
+  "name": "judge-guard-core",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix src/mobile_app_pwa run dev",
+    "build": "npm --prefix src/mobile_app_pwa run build",
+    "preview": "npm --prefix src/mobile_app_pwa run preview",
+    "lint": "npm --prefix src/mobile_app_pwa run lint",
+    "test": "npm --prefix src/mobile_app_pwa run test",
+    "probe": "python3 src/antigravity_core/unified_runner.py --probe",
+    "health": "python3 src/antigravity_core/unified_runner.py --health"
+  },
   "dependencies": {
     "os": "^0.1.2",
     "packet": "^0.0.7",
