@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, Callable, Optional
+from typing import Dict, Any, Callable, Optional, Tuple
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -10,17 +10,25 @@ from src.antigravity_core.gemini_client import GeminiClient
 class BlockJudge:
     """
     Evaluates content using Real Gemini AI.
+
+    SECURITY CONTRACT: `evaluate()` returns `(verdict: bool, is_authoritative: bool)`.
+    Callers MUST NOT cache the verdict when `is_authoritative` is False.
     """
     def __init__(self, criteria: str, client: Optional[GeminiClient] = None):
         self.criteria = criteria
         # ⚡ Bolt: Allow dependency injection of GeminiClient to avoid redundant initialization
         self.client = client or GeminiClient()
 
-    def evaluate(self, content: str) -> bool:
+    def evaluate(self, content: str) -> Tuple[bool, bool]:
         """
         Calls Gemini to judge the content.
+
+        Returns:
+            Tuple[bool, bool]: (verdict, is_authoritative)
+                - verdict: True = PASSED, False = FAILED/BLOCKED
+                - is_authoritative: True if Gemini responded normally, False if blocked/degraded.
         """
-        logger.info(f"Judging context against criteria: {self.criteria}")
+        logger.info(f"Judging context against criteria: {self.criteria[:100]}...")
         return self.client.judge_content(content, self.criteria)
 
     def generate_report(self, content: str) -> str:
@@ -47,18 +55,22 @@ class JudgeFlowBlock:
         """
         for attempt in range(1, self.max_retries + 1):
             logger.info(f"Attempt {attempt}/{self.max_retries}")
-            
+
             try:
                 result = self.action(context)
-                
-                if self.judge.evaluate(result):
-                    logger.info("JudgeFlow: Content PASSED verification.")
+
+                verdict, is_authoritative = self.judge.evaluate(result)
+                if verdict and is_authoritative:
+                    logger.info("JudgeFlow: Content PASSED verification (authoritative).")
                     return result
-                
-                logger.warning("JudgeFlow: Content FAILED verification.")
+                elif verdict and not is_authoritative:
+                    logger.warning("JudgeFlow: Verdict was PASS but non-authoritative — treating as FAILED.")
+                else:
+                    logger.warning("JudgeFlow: Content FAILED verification.")
+
                 # Add feedback to context for next attempt
                 context['feedback'] = f"Attempt {attempt} failed criteria: {self.judge.criteria}"
-                
+
             except Exception as e:
                 logger.error(f"Error during execution: {e}")
                 context['feedback'] = f"Error: {str(e)}"
