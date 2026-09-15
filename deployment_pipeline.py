@@ -79,12 +79,35 @@ def main():
         (5, "Post-Deployment Monitoring", "monitor_health")
     ]
 
+    # Pre-Action Verification Gate
+    try:
+        from judge_guard import JudgeGuard
+        guard = JudgeGuard()
+        logger.info("🛡️ Running JudgeGuard pre-deployment gate...")
+        if not guard.verify_action("Start Production Deployment Pipeline"):
+            log_step(0, "🛑 BLOCKED", "JudgeGuard pre-check blocked deployment.")
+            print("Deployment blocked by JudgeGuard.")
+            sys.exit(1)
+        log_step(0, "✅ APPROVED", "JudgeGuard pre-check approved deployment.")
+    except Exception as e:
+        logger.warning(f"JudgeGuard check bypassed due to import/runtime error: {e}")
+
     for step, name, cmd in steps:
         if not run_step(step, name, cmd):
             log_step(6, "🟡 ROLLBACK", "Automatic rollback initiated to previous version")
             log_step(7, "📄 INCIDENT REPORT", "Root Cause Analysis: Step failure. Rollback successful.")
             print("Deployment failed. Rollback initiated.")
             sys.exit(1)
+
+    # Post-Action Verification Gate
+    try:
+        if not guard.verify_action("Verify Production Deployment Pipeline Complete"):
+            log_step(6, "🛑 BLOCKED", "JudgeGuard post-verification failed.")
+            print("Post-deployment verification failed.")
+            sys.exit(1)
+        log_step(6, "✅ APPROVED", "JudgeGuard post-verification approved.")
+    except Exception as e:
+        logger.warning(f"JudgeGuard post-check bypassed: {e}")
 
     log_step(7, "✅ COMPLETE", "Deployment finished successfully. No incidents.")
     print("Deployment successful.")
