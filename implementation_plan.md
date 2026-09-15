@@ -70,7 +70,56 @@ Re-integrate the PWA Mobile Bridge to visualize "Judge's Pulse" validation event
 - Ensure `/events` endpoint is ready for long-polling or WebSocket.
 - Confirm integration with `judge_guard.py`.
 
-## Verification Plan
+### Verification Plan
 
 1. **Local Test**: Run `python3 judge_guard.py "Test"` and watch the localized PWA update.
 2. **Network Test**: Access PWA from actual mobile device (via `host='0.0.0.0'`).
+
+---
+
+# Phase 6: Unified Production System (Current)
+
+## Goal Description
+
+Unify the 8-Stage Cycle Verification Probe (Discovery, Awareness, Pattern Recognition, Experimentation, Latent Drift, Detection, Correction, Resilience), JudgeGuard Core v2.1 (Anti-Drift Protection), Real-time PWA Mobile Bridge telemetry, and persistent SQLite storage (`research.db`) into a hardened, production-grade autonomous daemon with zero mock dependencies.
+
+## User Review Required
+
+> [!IMPORTANT]
+> The Unified Production System enforces strict Pre-Action Verification rules from `MASTER_ORCHESTRATION.md`:
+> 1. All destructive or state-altering actions must pass JudgeGuard Layer 1-3 pre-checks.
+> 2. `WORK_LOG.md` temporal freshness (<120s) is strictly enforced.
+> 3. Zero simulation: all verifications execute against real SQLite, real environment, and real model judges.
+
+## Proposed Changes
+
+### Core Engine & Orchestration
+
+#### [NEW] [src/antigravity_core/unified_runner.py](file:///home/kizamladjanijebac/Documents/jude%20guard/judge-guard-core-master/src/antigravity_core/unified_runner.py)
+- **Purpose:** Production runner executing continuous background verification cycles.
+- **Components:**
+  - 8-Stage Live Cycle execution loop (Discovery → Awareness → Pattern Recognition → Experimentation → Latent Drift → Detection → Correction → Resilience).
+  - Telemetry event dispatcher pushing live pulses to PWA bridge (`app_config.json`).
+  - Auto-healing hooks triggered upon latent drift detection.
+
+#### [MODIFY] [deployment_pipeline.py](file:///home/kizamladjanijebac/Documents/jude%20guard/judge-guard-core-master/deployment_pipeline.py)
+- **Purpose:** Integrate pre/post-action checks into autonomous release gates.
+- **Changes:**
+  - Enforce JudgeGuard exit code checking before any deployment or migration.
+  - Stream pipeline step verdicts to both `WORK_LOG.md` and PWA Mobile Bridge.
+
+### Telemetry & Visualization
+
+#### [MODIFY] [src/mobile_app_pwa/public/app_config.json](file:///home/kizamladjanijebac/Documents/jude%20guard/judge-guard-core-master/src/mobile_app_pwa/public/app_config.json)
+- **Purpose:** Live pulse configuration consumed by the React/Vite PWA dashboard.
+
+## Verification Plan
+
+### Automated Verification
+- Run `python3 tests/live_8stage_probe.py` (ensure all 8 stages exit 0).
+- Run `python3 judge_guard.py "Verify Implementation Plan for Unified Production System Complete"`.
+
+### Manual Verification
+- Inspect `src/mobile_app_pwa/public/app_config.json` to confirm real-time verdict telemetry updates.
+- Verify git status and commit checkpoint.
+
