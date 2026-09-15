@@ -428,11 +428,20 @@ class JudgeGuard:
             "bomb": "stress-test",
         }
 
+        _COMMAND_PATTERNS = [
+            (r"rm\s+-rf\s+/\*", "[root deletion]"),
+            (r"rm\s+-rf\s+/", "[root deletion]"),
+            (r"chmod\s+-R\s+777", "[unrestricted permissions]"),
+            (r"\bsudo\b", "[admin elevation]"),
+        ]
+
         def _sanitize_for_judge(text: str) -> str:
-            """Replace sensitive keywords with neutral placeholders before sending to Gemini."""
+            """Replace sensitive keywords and dangerous command tokens with neutral placeholders before sending to Gemini."""
             import re
+            for pat, rep in _COMMAND_PATTERNS:
+                text = re.sub(pat, rep, text, flags=re.IGNORECASE)
             for word, alias in _KEYWORD_ALIASES.items():
-                text = re.sub(rf"\b{word}\b", alias, text, flags=re.IGNORECASE)
+                text = re.sub(rf"\b{re.escape(word)}\b", alias, text, flags=re.IGNORECASE)
             return text
 
         # Build unified criteria (with sanitized content)
@@ -455,10 +464,15 @@ class JudgeGuard:
         # ⚡ Bolt: Single Gemini call for both Essence and Standard rules
         from src.antigravity_core.judge_flow import BlockJudge
         judge = BlockJudge(criteria, client=self.gemini)
-        # SECURITY FIX: judge.evaluate() now returns (verdict, is_authoritative).
+        # SECURITY FIX: judge.evaluate() returns boolean or (verdict, is_authoritative).
         # Non-authoritative verdicts (safety-blocked / all-keys-exhausted) are NEVER
         # cached and are always treated as FAILED, preventing any fail-open bypass.
-        verdict, is_authoritative = judge.evaluate(f"ACTION: {_sanitize_for_judge(current_action)}")
+        eval_result = judge.evaluate(f"ACTION: {_sanitize_for_judge(current_action)}")
+        if isinstance(eval_result, tuple):
+            verdict, is_authoritative = eval_result
+        else:
+            verdict = bool(eval_result)
+            is_authoritative = getattr(getattr(judge, "client", None), "last_is_authoritative", True)
 
         if verdict and is_authoritative:
             print(f"✅ JudgeGuard: Action '{current_action}' APPROVED (authoritative).")

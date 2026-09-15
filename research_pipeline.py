@@ -83,6 +83,12 @@ CREATE INDEX IF NOT EXISTS idx_patterns_name ON patterns(name);
 CREATE INDEX IF NOT EXISTS idx_verdicts_hash ON verdicts(action_hash);
 """
 
+# SECURITY FIX: Add is_authoritative column to existing verdicts tables.
+# This migration is idempotent — it silently skips if the column already exists.
+_MIGRATION_ADD_AUTHORITATIVE = """
+    ALTER TABLE verdicts ADD COLUMN is_authoritative INTEGER NOT NULL DEFAULT 1;
+"""
+
 
 class ResearchPipeline:
     def __init__(self):
@@ -145,9 +151,22 @@ class ResearchPipeline:
         self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
+        self._apply_migrations()
         self.conn.commit()
         self.log_audit("DB_INIT", f"Created {DB_PATH}")
         return self
+
+    def _apply_migrations(self):
+        """Idempotent schema migrations."""
+        try:
+            self.conn.execute(_MIGRATION_ADD_AUTHORITATIVE)
+            self.conn.commit()
+            logger.info("Migration applied: verdicts.is_authoritative column added.")
+        except Exception as e:
+            if "duplicate column" in str(e).lower():
+                pass  # Already migrated
+            else:
+                logger.warning(f"Migration warning: {e}")
     
     def connect(self):
         """Connect to existing database."""
@@ -156,6 +175,7 @@ class ResearchPipeline:
         # ⚡ Bolt: Enable check_same_thread=False for background sync safety
         self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
+        self._apply_migrations()
         return self
 
     def parse_markdown_files(self) -> List[int]:
@@ -321,40 +341,112 @@ class ResearchPipeline:
         self.log_audit("QUERY", f"'{term}' → {len(results)} results")
         return results
 
-    def cache_verdict(self, action: str, verdict: str):
-        """Cache JudgeGuard verdict to avoid repeated API calls."""
+    def cache_verdict(self, action: str, verdict: str, is_authoritative: bool = True):
+        """Cache JudgeGuard verdict to avoid repeated API calls.
+
+        SECURITY CONTRACT: Only call this with is_authoritative=True.
+        Non-authoritative verdicts (safety-blocked / degraded Gemini responses)
+        must NEVER be stored — judge_guard.py enforces this at call site.
+        """
         if not self.conn:
             self.connect()
-        
+
         action_hash = hashlib.md5(action.encode()).hexdigest()
-        
+        auth_int = 1 if is_authoritative else 0
+
         self.conn.execute("""
-            INSERT INTO verdicts (action, action_hash, verdict)
-            VALUES (?, ?, ?)
+            INSERT INTO verdicts (action, action_hash, verdict, is_authoritative)
+            VALUES (?, ?, ?, ?)
             ON CONFLICT(action) DO UPDATE SET
                 verdict = excluded.verdict,
+                is_authoritative = excluded.is_authoritative,
                 timestamp = CURRENT_TIMESTAMP
-        """, (action, action_hash, verdict))
+        """, (action, action_hash, verdict, auth_int))
         self.conn.commit()
-        self.log_audit("VERDICT_CACHED", f"{action[:50]}... → {verdict}")
+        self.log_audit("VERDICT_CACHED", f"{action[:50]}... → {verdict} (auth={is_authoritative})")
 
     def get_cached_verdict(self, action: str) -> Optional[str]:
-        """Check if verdict is cached."""
+        """Check if verdict is cached.
+
+        SECURITY FIX: Non-authoritative cached entries (is_authoritative=0) are
+        treated as cache misses and will be re-evaluated by the Gemini judge.
+        """
         if not self.conn:
             self.connect()
-        
+
         action_hash = hashlib.md5(action.encode()).hexdigest()
         result = self.conn.execute(
-            "SELECT verdict FROM verdicts WHERE action_hash = ?",
+            "SELECT verdict, is_authoritative FROM verdicts WHERE action_hash = ?",
             (action_hash,)
         ).fetchone()
-        
+
         if result:
+            # SECURITY FIX: Never serve cached verdicts that were stored without
+            # authoritative Gemini confirmation (is_authoritative=0).
+            # Legacy rows have is_authoritative=1 (DEFAULT 1 in migration) — these
+            # were stored before the safety fix and may be tainted. Use
+            # purge_non_authoritative_verdicts() to clear the tainted window.
+            if result["is_authoritative"] == 0:
+                logger.warning(
+                    f"🚨 VERDICT_CACHE_MISS (non-authoritative): '{action[:60]}...'"
+                    " — forcing re-evaluation."
+                )
+                return None
             # ⚡ Bolt: Removed log_audit here to eliminate synchronous SQLite write
             # and redundant Notion queueing on the hot path (improves latency by ~99%).
-            # ⚡ Bolt: Removed redundant log_audit here to reduce hit latency by ~99% (2.5ms -> 0.02ms)
             return result["verdict"]
         return None
+
+    def invalidate_verdict(self, action: str) -> bool:
+        """Invalidate (delete) a single cached verdict by action string.
+
+        Returns True if a row was deleted, False if no match found.
+        """
+        if not self.conn:
+            self.connect()
+
+        action_hash = hashlib.md5(action.encode()).hexdigest()
+        cursor = self.conn.execute(
+            "DELETE FROM verdicts WHERE action_hash = ?",
+            (action_hash,)
+        )
+        self.conn.commit()
+        deleted = cursor.rowcount > 0
+        if deleted:
+            self.log_audit("VERDICT_INVALIDATED", f"{action[:60]}...")
+        else:
+            logger.warning(f"invalidate_verdict: no cached entry found for '{action[:60]}'")
+        return deleted
+
+    def purge_non_authoritative_verdicts(self) -> int:
+        """Delete all verdicts that may have been stored under the old fail-open code.
+
+        Before the security fix, safety-blocked Gemini responses were silently
+        converted to PASSED and cached. Since we cannot retroactively distinguish
+        legitimate PASSed verdicts from tainted ones in old rows (all have
+        is_authoritative=1 via migration DEFAULT), this method purges ALL PASSED
+        verdicts so they are re-evaluated with the hardened judge on next run.
+
+        FAILED verdicts are safe to keep — a false negative has no security
+        impact (it just forces a re-check).
+
+        Returns the number of rows deleted.
+        """
+        if not self.conn:
+            self.connect()
+
+        cursor = self.conn.execute(
+            "DELETE FROM verdicts WHERE verdict = 'PASSED'"
+        )
+        self.conn.commit()
+        count = cursor.rowcount
+        self.log_audit(
+            "CACHE_PURGE_TAINTED",
+            f"Deleted {count} PASSED verdict(s) stored under old fail-open code.",
+            sync_notion=False
+        )
+        logger.info(f"🗑️  Purged {count} tainted PASSED verdict(s) from cache.")
+        return count
 
     def sync_to_notion(self):
         """
@@ -454,6 +546,10 @@ def main():
     parser.add_argument("--query", type=str, help="Search patterns/documents")
     parser.add_argument("--sync-notion", action="store_true", help="Sync to Notion")
     parser.add_argument("--stats", action="store_true", help="Show database stats")
+    parser.add_argument("--purge-tainted", action="store_true",
+                        help="[SECURITY] Delete all PASSED verdicts stored under old fail-open code")
+    parser.add_argument("--invalidate-verdict", type=str, metavar="ACTION",
+                        help="[SECURITY] Remove a single cached verdict by action string")
     
     args = parser.parse_args()
     pipeline = ResearchPipeline()
@@ -487,6 +583,19 @@ def main():
         logger.info("📊 Database Stats:")
         for k, v in stats.items():
             logger.info(f"  {k}: {v}")
+
+    elif args.purge_tainted:
+        pipeline.connect()
+        n = pipeline.purge_non_authoritative_verdicts()
+        logger.info(f"✅ Purge complete: {n} tainted PASSED verdict(s) removed.")
+
+    elif args.invalidate_verdict:
+        pipeline.connect()
+        removed = pipeline.invalidate_verdict(args.invalidate_verdict)
+        if removed:
+            logger.info(f"✅ Verdict invalidated: '{args.invalidate_verdict}'")
+        else:
+            logger.warning(f"⚠️  No cached verdict found for: '{args.invalidate_verdict}'")
     
     else:
         parser.print_help()
