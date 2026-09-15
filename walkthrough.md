@@ -58,3 +58,33 @@ The `App.jsx` now listens for `last_verdict` and renders a **Verdict Card**:
 ```
 
 This confirms the pipe is **ACTIVE**. Any action taken by agents on this machine will now show up on your "Judge Console" PWA.
+
+---
+
+## 5. Phase 6: Unified Production System Integration
+
+### Overview
+We unified the physical 8-Stage verification cycle probe, JudgeGuard v2.1 anti-drift protection, real-time PWA telemetry dispatch, and deployment release gates into an autonomous production pipeline.
+
+### Components
+1. **`src/antigravity_core/unified_runner.py`**:
+   - `run_probe()`: Executes live 8-stage cycle probe (Discovery → Awareness → Pattern Recognition → Experimentation → Latent Drift → Detection → Correction → Resilience).
+   - `run_health_check()`: Verifies `WORK_LOG.md` temporal freshness (<120s), SQLite DB integrity, and telemetry bridge.
+   - `execute_gated_action()`: Wraps any critical function in the mandatory pre/post verification workflow.
+   - `start_daemon()`: Continuous monitoring loop with graceful signal handling (`SIGINT`/`SIGTERM`).
+   - CLI flags: `--probe`, `--health`, `--daemon`, `--interval`.
+
+2. **`deployment_pipeline.py` Hardening**:
+   - Step 0: Pre-Action Verification Gate (`Start Production Deployment Pipeline`).
+   - Step 6: Post-Action Verification Gate (`Verify Production Deployment Pipeline Complete`).
+   - Automatic rollback & incident reporting if any release gate fails.
+
+3. **Production PWA Bundle**:
+   - Built via Vite (`npm run build`) in `src/mobile_app_pwa`.
+   - Production artifacts in `dist/` ready for offline PWA deployment.
+
+### Physical Invariant Verification Results
+- **8-Stage Live Probe:** Passed all 8 stages without mocks (`tests/live_8stage_probe.py`).
+- **Deployment Pipeline:** Successfully passed all gates (`npm --version`, `ls src/mobile_app_pwa/package.json`, `node --version`, and simulated prod/health checks).
+- **Audit Counts:** 50+ cached verdicts and 53+ audit entries recorded in `research.db`.
+
