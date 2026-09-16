@@ -9,11 +9,10 @@ Verifies the strict chronological invariants required for valid out-of-sample te
 5. Frozen Strategy Isolation: Sizing and thresholds are constant throughout the OOS evaluation
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, Any, List
 from dataclasses import dataclass
-from unified_betting_core.data_ingestion.real_data_provider import RealDataProvider
+from typing import Any
+
+import pandas as pd
 
 
 @dataclass
@@ -21,7 +20,7 @@ class LeakageCheckResult:
     test_name: str
     passed: bool
     evidence: str
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
 
 class LeakageAuditor:
@@ -35,15 +34,15 @@ class LeakageAuditor:
         df_sorted = df.copy()
         df_sorted["dt"] = pd.to_datetime(df_sorted["date"])
         diffs = df_sorted["dt"].diff()
-        
+
         # Check for any negative time steps (going backwards)
         backwards_steps = diffs[diffs < pd.Timedelta(0)]
         passed = len(backwards_steps) == 0
 
         evidence = (
             f"Verified {len(df)} matches chronologically from {df_sorted['dt'].min().date()} to {df_sorted['dt'].max().date()}."
-            if passed else
-            f"VIOLATION: Found {len(backwards_steps)} instances where matches moved backwards in time!"
+            if passed
+            else f"VIOLATION: Found {len(backwards_steps)} instances where matches moved backwards in time!"
         )
 
         return LeakageCheckResult(
@@ -54,12 +53,14 @@ class LeakageAuditor:
                 "total_records": len(df),
                 "earliest_date": str(df_sorted["dt"].min().date()),
                 "latest_date": str(df_sorted["dt"].max().date()),
-                "violations_count": len(backwards_steps)
-            }
+                "violations_count": len(backwards_steps),
+            },
         )
 
     @staticmethod
-    def audit_calibration_window_past_only(burn_in: int = 380, calib_window: int = 150) -> LeakageCheckResult:
+    def audit_calibration_window_past_only(
+        burn_in: int = 380, calib_window: int = 150
+    ) -> LeakageCheckResult:
         """Verifies that calibration window index range is strictly strictly < current index."""
         # For any index t >= burn_in: window is [t - calib_window, t)
         # Proof by construction: max(window_idx) = t - 1 < t.
@@ -68,7 +69,9 @@ class LeakageAuditor:
         for t in [380, 500, 750, 1139]:
             window = list(range(max(0, t - calib_window), t))
             is_valid = max(window) < t
-            sample_checks.append({"current_t": t, "window_max": max(window), "strictly_past": is_valid})
+            sample_checks.append(
+                {"current_t": t, "window_max": max(window), "strictly_past": is_valid}
+            )
             if not is_valid:
                 window_upper_bounded = False
 
@@ -81,18 +84,22 @@ class LeakageAuditor:
             test_name="calibration_past_only_test",
             passed=window_upper_bounded,
             evidence=evidence,
-            details={"sample_checks": sample_checks, "calib_window_size": calib_window}
+            details={"sample_checks": sample_checks, "calib_window_size": calib_window},
         )
 
     @staticmethod
-    def audit_opening_vs_closing_odds_independence(df: pd.DataFrame) -> LeakageCheckResult:
+    def audit_opening_vs_closing_odds_independence(
+        df: pd.DataFrame,
+    ) -> LeakageCheckResult:
         """Verifies opening odds and closing odds are distinct market states and not copy-pasted."""
         diff_h = (df["home_odds"] != df["closing_home_odds"]).sum()
         diff_a = (df["away_odds"] != df["closing_away_odds"]).sum()
-        
+
         # In a real market, opening and closing odds differ in the vast majority of fixtures
         pct_changed = (diff_h / len(df)) * 100.0
-        passed = pct_changed > 75.0  # More than 75% of lines move between open and close
+        passed = (
+            pct_changed > 75.0
+        )  # More than 75% of lines move between open and close
 
         evidence = (
             f"Opening and closing odds are independently recorded market states: "
@@ -107,12 +114,14 @@ class LeakageAuditor:
                 "total_matches": len(df),
                 "home_odds_moved": int(diff_h),
                 "away_odds_moved": int(diff_a),
-                "pct_home_odds_moved": round(pct_changed, 2)
-            }
+                "pct_home_odds_moved": round(pct_changed, 2),
+            },
         )
 
     @staticmethod
-    def audit_candidate_warehouse_isolation(warehouse: List[Dict[str, Any]]) -> LeakageCheckResult:
+    def audit_candidate_warehouse_isolation(
+        warehouse: list[dict[str, Any]],
+    ) -> LeakageCheckResult:
         """
         Verifies that candidate signals were recorded with decision-time odds,
         and that CLV and P&L metrics were evaluated without modifying candidate definitions.
@@ -122,7 +131,7 @@ class LeakageAuditor:
                 test_name="candidate_isolation_test",
                 passed=False,
                 evidence="Candidate warehouse is empty.",
-                details={}
+                details={},
             )
 
         # Check that odds at decision time are positive and distinct from closing
@@ -144,12 +153,14 @@ class LeakageAuditor:
                 "total_candidates": len(warehouse),
                 "valid_odds": has_decision_odds,
                 "valid_model_probs": has_p_model,
-                "valid_calib_probs": has_p_calib
-            }
+                "valid_calib_probs": has_p_calib,
+            },
         )
 
     @classmethod
-    def run_full_leakage_audit(cls, df: pd.DataFrame, warehouse: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def run_full_leakage_audit(
+        cls, df: pd.DataFrame, warehouse: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Runs all 4 forensic leakage tests and returns summary verdict."""
         t1 = cls.audit_chronological_ordering(df)
         t2 = cls.audit_calibration_window_past_only()
@@ -162,9 +173,25 @@ class LeakageAuditor:
             "all_leakage_tests_passed": all_passed,
             "verdict": "PASS" if all_passed else "FAIL",
             "tests": {
-                t1.test_name: {"passed": t1.passed, "evidence": t1.evidence, "details": t1.details},
-                t2.test_name: {"passed": t2.passed, "evidence": t2.evidence, "details": t2.details},
-                t3.test_name: {"passed": t3.passed, "evidence": t3.evidence, "details": t3.details},
-                t4.test_name: {"passed": t4.passed, "evidence": t4.evidence, "details": t4.details},
-            }
+                t1.test_name: {
+                    "passed": t1.passed,
+                    "evidence": t1.evidence,
+                    "details": t1.details,
+                },
+                t2.test_name: {
+                    "passed": t2.passed,
+                    "evidence": t2.evidence,
+                    "details": t2.details,
+                },
+                t3.test_name: {
+                    "passed": t3.passed,
+                    "evidence": t3.evidence,
+                    "details": t3.details,
+                },
+                t4.test_name: {
+                    "passed": t4.passed,
+                    "evidence": t4.evidence,
+                    "details": t4.details,
+                },
+            },
         }

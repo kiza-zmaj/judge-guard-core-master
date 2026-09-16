@@ -4,13 +4,14 @@ Records every prediction opportunity, gate evaluation, and retrospective settlem
 Enforces complete reproducibility and zero retrospective tampering.
 """
 
-import os
-import json
-import time
 import hashlib
-from typing import Dict, Any, List, Optional
+import json
+import os
 from datetime import datetime, timezone
+from typing import Any
+
 from unified_betting_core.config import DATA_DIR
+
 
 class AuditTrail:
     """
@@ -18,8 +19,10 @@ class AuditTrail:
     Every prediction receives a deterministic event ID and cryptographic input hash.
     """
 
-    def __init__(self, log_path: Optional[str] = None):
-        self.log_path = log_path or os.path.join(str(DATA_DIR), "prediction_audit_trail.jsonl")
+    def __init__(self, log_path: str | None = None):
+        self.log_path = log_path or os.path.join(
+            str(DATA_DIR), "prediction_audit_trail.jsonl"
+        )
 
     def record_prediction(
         self,
@@ -36,9 +39,9 @@ class AuditTrail:
         is_executable: bool,
         stake: float,
         data_quality_state: str,
-        gate_verdicts: Dict[str, bool],
-        notes: List[str]
-    ) -> Dict[str, Any]:
+        gate_verdicts: dict[str, bool],
+        notes: list[str],
+    ) -> dict[str, Any]:
         """
         Appends an immutable prediction record before match kickoff.
         """
@@ -64,18 +67,18 @@ class AuditTrail:
             "stake": round(stake, 2),
             "gate_verdicts": gate_verdicts,
             "audit_notes": notes,
-            "settlement": None  # Populated only when retrospective closing line & result arrive
+            "settlement": None,  # Populated only when retrospective closing line & result arrive
         }
 
         try:
             with open(self.log_path, "a", encoding="utf-8") as f:
                 f.write(json.dumps(record) + "\n")
-        except Exception as e:
+        except Exception:
             pass
 
         return record
 
-    def get_all_records(self) -> List[Dict[str, Any]]:
+    def get_all_records(self) -> list[dict[str, Any]]:
         """Reads all recorded audit entries."""
         if not os.path.exists(self.log_path):
             return []

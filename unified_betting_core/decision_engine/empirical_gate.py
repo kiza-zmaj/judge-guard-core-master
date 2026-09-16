@@ -10,42 +10,46 @@ EMPIRICALLY_SUPPORTED_EV requires ALL THREE to PASS independently.
 EXECUTABLE_EV adds per-bet risk/Kelly sizing on top.
 """
 
-from enum import Enum
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional
-
+from enum import Enum
+from typing import Any
 
 # ─── Status taxonomy per Do.md Phase 6 ────────────────────────────────────────
 
+
 class CalibrationStatus(Enum):
-    CALIBRATION_PASS   = "CALIBRATION_PASS"
+    CALIBRATION_PASS = "CALIBRATION_PASS"
     CALIBRATION_FAILED = "CALIBRATION_FAILED"
 
+
 class MarketAlphaStatus(Enum):
-    MARKET_ALPHA_PASS   = "MARKET_ALPHA_PASS"
+    MARKET_ALPHA_PASS = "MARKET_ALPHA_PASS"
     MARKET_ALPHA_FAILED = "MARKET_ALPHA_FAILED"
     INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
 
+
 class EconomicStatus(Enum):
-    ECONOMIC_PASS              = "ECONOMIC_PASS"
+    ECONOMIC_PASS = "ECONOMIC_PASS"
     ECONOMIC_VALIDATION_FAILED = "ECONOMIC_VALIDATION_FAILED"
-    INSUFFICIENT_EVIDENCE      = "INSUFFICIENT_EVIDENCE"
+    INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
+
 
 class FinalStatus(Enum):
     EMPIRICALLY_SUPPORTED_EV = "EMPIRICALLY_SUPPORTED_EV"
-    EXECUTABLE_EV            = "EXECUTABLE_EV"
+    EXECUTABLE_EV = "EXECUTABLE_EV"
     # Rejections
-    FAKE_EV               = "FAKE_EV"
-    MARGINAL_EV           = "MARGINAL_EV"
-    CALIBRATION_FAILED    = "CALIBRATION_FAILED"
-    MARKET_ALPHA_FAILED   = "MARKET_ALPHA_FAILED"
-    ECONOMIC_FAILED       = "ECONOMIC_VALIDATION_FAILED"
+    FAKE_EV = "FAKE_EV"
+    MARGINAL_EV = "MARGINAL_EV"
+    CALIBRATION_FAILED = "CALIBRATION_FAILED"
+    MARKET_ALPHA_FAILED = "MARKET_ALPHA_FAILED"
+    ECONOMIC_FAILED = "ECONOMIC_VALIDATION_FAILED"
     INSUFFICIENT_EVIDENCE = "INSUFFICIENT_EVIDENCE"
-    MARKET_FAILED         = "MARKET_FAILED"
-    DATA_DEGRADED         = "DATA_DEGRADED"
-    NO_EDGE               = "NO_EDGE"
-    RAW_EV                = "RAW_EV"
-    CALIBRATED_EV         = "CALIBRATED_EV"
+    MARKET_FAILED = "MARKET_FAILED"
+    DATA_DEGRADED = "DATA_DEGRADED"
+    NO_EDGE = "NO_EDGE"
+    RAW_EV = "RAW_EV"
+    CALIBRATED_EV = "CALIBRATED_EV"
+
 
 # Alias for backwards compatibility
 DecisionStatus = FinalStatus
@@ -53,38 +57,42 @@ DecisionStatus = FinalStatus
 
 # ─── Three-Gate Verdict ────────────────────────────────────────────────────────
 
+
 @dataclass
 class GateAResult:
     """Calibration Gate result. Populated once per walk-forward run."""
+
     status: CalibrationStatus
     passed: bool
     brier_score: float
-    ece_pct: Optional[float]       # None = not measurable (empty input)
-    mce_pct: Optional[float]
+    ece_pct: float | None  # None = not measurable (empty input)
+    mce_pct: float | None
     sample_size: int
     drift_detected: bool
-    failure_reasons: List[str]
-    reliability_table: List[Dict[str, Any]] = field(default_factory=list)
+    failure_reasons: list[str]
+    reliability_table: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
 class GateBResult:
     """Market Alpha / CLV Gate result. Populated over candidate population."""
+
     status: MarketAlphaStatus
     passed: bool
-    candidate_count: int           # ALL candidates, not just approved bets
+    candidate_count: int  # ALL candidates, not just approved bets
     settled_count: int
     avg_raw_clv_pct: float
     avg_fair_clv_pct: float
     beat_closing_rate_pct: float
     ci_95_lower_pct: float
     ci_95_upper_pct: float
-    failure_reasons: List[str]
+    failure_reasons: list[str]
 
 
 @dataclass
 class GateCResult:
     """Economic P&L Gate result. Populated from frozen-strategy simulation."""
+
     status: EconomicStatus
     passed: bool
     total_bets: int
@@ -94,8 +102,8 @@ class GateCResult:
     roi_ci_upper_pct: float
     max_drawdown_pct: float
     final_bankroll: float
-    failure_reasons: List[str]
-    pnl_by_outcome: Dict[str, Any] = field(default_factory=dict)
+    failure_reasons: list[str]
+    pnl_by_outcome: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -104,6 +112,7 @@ class ThreeGateVerdict:
     Final governance verdict combining all three independent gates.
     EMPIRICALLY_SUPPORTED_EV only when ALL THREE pass.
     """
+
     gate_a: GateAResult
     gate_b: GateBResult
     gate_c: GateCResult
@@ -112,7 +121,7 @@ class ThreeGateVerdict:
     is_executable: bool
     summary: str
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "final_status": self.final_status.value,
             "is_empirically_supported": self.is_empirically_supported,
@@ -126,7 +135,7 @@ class ThreeGateVerdict:
                 "mce_pct": self.gate_a.mce_pct,
                 "sample_size": self.gate_a.sample_size,
                 "drift_detected": self.gate_a.drift_detected,
-                "failure_reasons": self.gate_a.failure_reasons
+                "failure_reasons": self.gate_a.failure_reasons,
             },
             "gate_b": {
                 "status": self.gate_b.status.value,
@@ -138,7 +147,7 @@ class ThreeGateVerdict:
                 "beat_closing_rate_pct": self.gate_b.beat_closing_rate_pct,
                 "ci_95_lower_pct": self.gate_b.ci_95_lower_pct,
                 "ci_95_upper_pct": self.gate_b.ci_95_upper_pct,
-                "failure_reasons": self.gate_b.failure_reasons
+                "failure_reasons": self.gate_b.failure_reasons,
             },
             "gate_c": {
                 "status": self.gate_c.status.value,
@@ -150,17 +159,16 @@ class ThreeGateVerdict:
                 "roi_ci_upper_pct": self.gate_c.roi_ci_upper_pct,
                 "max_drawdown_pct": self.gate_c.max_drawdown_pct,
                 "failure_reasons": self.gate_c.failure_reasons,
-                "pnl_by_outcome": self.gate_c.pnl_by_outcome
-            }
+                "pnl_by_outcome": self.gate_c.pnl_by_outcome,
+            },
         }
 
 
 # ─── Three-Gate Evaluator ─────────────────────────────────────────────────────
 
+
 def evaluate_three_gate_verdict(
-    gate_a: GateAResult,
-    gate_b: GateBResult,
-    gate_c: GateCResult
+    gate_a: GateAResult, gate_b: GateBResult, gate_c: GateCResult
 ) -> ThreeGateVerdict:
     """
     Combines three independent gate results into a final governance verdict.
@@ -202,7 +210,7 @@ def evaluate_three_gate_verdict(
         final_status=final,
         is_empirically_supported=all_pass,
         is_executable=all_pass,
-        summary=summary
+        summary=summary,
     )
 
 
@@ -227,8 +235,8 @@ class GateEvaluationResult:
     raw_ev_pct: float
     calibrated_ev_pct: float
     recommended_stake: float
-    gate_verdicts: Dict[str, bool]
-    audit_notes: List[str]
+    gate_verdicts: dict[str, bool]
+    audit_notes: list[str]
 
 
 class EmpiricalDecisionGate:
@@ -244,7 +252,7 @@ class EmpiricalDecisionGate:
         max_divergence: float = 0.14,
         max_rel_divergence: float = 0.85,
         base_model_weight: float = 0.28,
-        longshot_odds_threshold: float = 5.50
+        longshot_odds_threshold: float = 5.50,
     ):
         self.min_edge = min_edge
         self.max_divergence = max_divergence
@@ -252,7 +260,9 @@ class EmpiricalDecisionGate:
         self.base_model_weight = base_model_weight
         self.longshot_odds_threshold = longshot_odds_threshold
 
-    def calculate_shrinkage_weight(self, p_model: float, p_devig: float, odds: float) -> float:
+    def calculate_shrinkage_weight(
+        self, p_model: float, p_devig: float, odds: float
+    ) -> float:
         abs_div = abs(p_model - p_devig)
         weight = self.base_model_weight
         if odds >= self.longshot_odds_threshold or p_devig < 0.12:
@@ -263,7 +273,9 @@ class EmpiricalDecisionGate:
             weight = min(weight * 1.35, 0.45)
         return round(weight, 4)
 
-    def calibrate_probability(self, p_model: float, p_devig: float, odds: float) -> float:
+    def calibrate_probability(
+        self, p_model: float, p_devig: float, odds: float
+    ) -> float:
         if p_devig <= 0:
             return p_model
         weight = self.calculate_shrinkage_weight(p_model, p_devig, odds)
@@ -279,7 +291,7 @@ class EmpiricalDecisionGate:
         out_of_sample_calibration_passed: bool = False,
         historical_clv_demonstrated: bool = False,
         historical_sample_size: int = 0,
-        three_gate_passed: bool = False
+        three_gate_passed: bool = False,
     ) -> GateEvaluationResult:
         """
         Per-bet anti-delusion audit.
@@ -293,19 +305,28 @@ class EmpiricalDecisionGate:
             "anti_delusion_gate": False,
         }
 
-        if data_quality in [DataQualityState.CORRUPT_OR_MISSING, DataQualityState.DEGRADED]:
+        if data_quality in [
+            DataQualityState.CORRUPT_OR_MISSING,
+            DataQualityState.DEGRADED,
+        ]:
             notes.append(f"Data degraded: {data_quality.value}")
-            return self._reject(FinalStatus.DATA_DEGRADED, p_model, p_devig, best_odds, verdicts, notes)
+            return self._reject(
+                FinalStatus.DATA_DEGRADED, p_model, p_devig, best_odds, verdicts, notes
+            )
         verdicts["data_quality_gate"] = True
 
         if best_odds <= 1.01 or not (0.0 < p_model < 1.0):
             notes.append(f"Invalid odds ({best_odds}) or prob ({p_model})")
-            return self._reject(FinalStatus.MARKET_FAILED, p_model, p_devig, best_odds, verdicts, notes)
+            return self._reject(
+                FinalStatus.MARKET_FAILED, p_model, p_devig, best_odds, verdicts, notes
+            )
         verdicts["probability_validity_gate"] = True
 
         if not (0.0 < p_devig < 1.0):
             notes.append(f"De-vig prob invalid ({p_devig})")
-            return self._reject(FinalStatus.MARKET_FAILED, p_model, p_devig, best_odds, verdicts, notes)
+            return self._reject(
+                FinalStatus.MARKET_FAILED, p_model, p_devig, best_odds, verdicts, notes
+            )
         verdicts["market_devig_gate"] = True
 
         raw_ev = (p_model * best_odds) - 1.0
@@ -321,19 +342,65 @@ class EmpiricalDecisionGate:
 
         if raw_ev <= self.min_edge:
             notes.append(f"No edge: raw EV {raw_ev_pct}%")
-            return self._result(FinalStatus.NO_EDGE, p_model, p_devig, p_calib, best_odds, raw_ev_pct, cal_ev_pct, verdicts, notes)
+            return self._result(
+                FinalStatus.NO_EDGE,
+                p_model,
+                p_devig,
+                p_calib,
+                best_odds,
+                raw_ev_pct,
+                cal_ev_pct,
+                verdicts,
+                notes,
+            )
 
         if is_longshot and high_div:
-            notes.append(f"Longshot overconfidence: odds {best_odds:.2f}, divergence {abs_div*100:.1f}%")
-            return self._result(FinalStatus.FAKE_EV, p_model, p_devig, p_calib, best_odds, raw_ev_pct, cal_ev_pct, verdicts, notes)
+            notes.append(
+                f"Longshot overconfidence: odds {best_odds:.2f}, divergence {abs_div * 100:.1f}%"
+            )
+            return self._result(
+                FinalStatus.FAKE_EV,
+                p_model,
+                p_devig,
+                p_calib,
+                best_odds,
+                raw_ev_pct,
+                cal_ev_pct,
+                verdicts,
+                notes,
+            )
 
         if cal_ev <= 0.0:
-            notes.append(f"Model delusion: raw EV +{raw_ev_pct}% but calibrated EV {cal_ev_pct}%")
-            return self._result(FinalStatus.FAKE_EV, p_model, p_devig, p_calib, best_odds, raw_ev_pct, cal_ev_pct, verdicts, notes)
+            notes.append(
+                f"Model delusion: raw EV +{raw_ev_pct}% but calibrated EV {cal_ev_pct}%"
+            )
+            return self._result(
+                FinalStatus.FAKE_EV,
+                p_model,
+                p_devig,
+                p_calib,
+                best_odds,
+                raw_ev_pct,
+                cal_ev_pct,
+                verdicts,
+                notes,
+            )
 
         if cal_ev < self.min_edge:
-            notes.append(f"Marginal edge: {cal_ev_pct}% < threshold {self.min_edge*100:.1f}%")
-            return self._result(FinalStatus.MARGINAL_EV, p_model, p_devig, p_calib, best_odds, raw_ev_pct, cal_ev_pct, verdicts, notes)
+            notes.append(
+                f"Marginal edge: {cal_ev_pct}% < threshold {self.min_edge * 100:.1f}%"
+            )
+            return self._result(
+                FinalStatus.MARGINAL_EV,
+                p_model,
+                p_devig,
+                p_calib,
+                best_odds,
+                raw_ev_pct,
+                cal_ev_pct,
+                verdicts,
+                notes,
+            )
 
         verdicts["anti_delusion_gate"] = True
         notes.append(f"Anti-delusion passed: calibrated EV +{cal_ev_pct}%")
@@ -341,13 +408,35 @@ class EmpiricalDecisionGate:
         # Three-Gate Governance Verification
         if out_of_sample_calibration_passed is False:
             notes.append("Rejected: Out-of-sample calibration gate failed")
-            return self._reject(FinalStatus.CALIBRATION_FAILED, p_model, p_devig, best_odds, verdicts, notes)
+            return self._reject(
+                FinalStatus.CALIBRATION_FAILED,
+                p_model,
+                p_devig,
+                best_odds,
+                verdicts,
+                notes,
+            )
 
-        if (historical_sample_size < 100 or not historical_clv_demonstrated) and not three_gate_passed:
-            notes.append(f"Rejected: Insufficient empirical evidence (sample={historical_sample_size}, clv_demo={historical_clv_demonstrated})")
-            return self._reject(FinalStatus.INSUFFICIENT_EVIDENCE, p_model, p_devig, best_odds, verdicts, notes)
+        if (
+            historical_sample_size < 100 or not historical_clv_demonstrated
+        ) and not three_gate_passed:
+            notes.append(
+                f"Rejected: Insufficient empirical evidence (sample={historical_sample_size}, clv_demo={historical_clv_demonstrated})"
+            )
+            return self._reject(
+                FinalStatus.INSUFFICIENT_EVIDENCE,
+                p_model,
+                p_devig,
+                best_odds,
+                verdicts,
+                notes,
+            )
 
-        has_empirical_proof = three_gate_passed or (out_of_sample_calibration_passed and historical_clv_demonstrated and historical_sample_size >= 100)
+        has_empirical_proof = three_gate_passed or (
+            out_of_sample_calibration_passed
+            and historical_clv_demonstrated
+            and historical_sample_size >= 100
+        )
         if has_empirical_proof:
             status = FinalStatus.EXECUTABLE_EV
             is_exe = True
@@ -357,28 +446,61 @@ class EmpiricalDecisionGate:
             status = FinalStatus.CALIBRATED_EV
             is_exe = False
             is_emp = False
-            notes.append("Calibrated EV candidate pending portfolio Three-Gate empirical proof")
+            notes.append(
+                "Calibrated EV candidate pending portfolio Three-Gate empirical proof"
+            )
 
         return self._result(
-            status, p_model, p_devig, p_calib, best_odds,
-            raw_ev_pct, cal_ev_pct, verdicts, notes, exe=is_exe, emp=is_emp
+            status,
+            p_model,
+            p_devig,
+            p_calib,
+            best_odds,
+            raw_ev_pct,
+            cal_ev_pct,
+            verdicts,
+            notes,
+            exe=is_exe,
+            emp=is_emp,
         )
 
-
-    def _result(self, status, p_model, p_devig, p_calib, best_odds, raw_ev_pct, cal_ev_pct, verdicts, notes, exe=False, emp=False):
-        mfo = round(1.0/p_model, 3) if p_model > 0 else 999.0
-        mkt = round(1.0/p_devig, 3) if p_devig > 0 else 999.0
-        cal = round(1.0/p_calib, 3) if p_calib > 0 else 999.0
+    def _result(
+        self,
+        status,
+        p_model,
+        p_devig,
+        p_calib,
+        best_odds,
+        raw_ev_pct,
+        cal_ev_pct,
+        verdicts,
+        notes,
+        exe=False,
+        emp=False,
+    ):
+        mfo = round(1.0 / p_model, 3) if p_model > 0 else 999.0
+        mkt = round(1.0 / p_devig, 3) if p_devig > 0 else 999.0
+        cal = round(1.0 / p_calib, 3) if p_calib > 0 else 999.0
         return GateEvaluationResult(
-            status=status, is_executable=exe, is_empirically_supported=emp,
-            p_model=round(p_model,4), model_fair_odds=mfo,
-            p_devig=round(p_devig,4), market_fair_odds=mkt,
-            p_calibrated=round(p_calib,4), calibrated_fair_odds=cal,
-            best_odds=round(best_odds,3), raw_ev_pct=raw_ev_pct,
-            calibrated_ev_pct=cal_ev_pct, recommended_stake=0.0,
-            gate_verdicts=verdicts, audit_notes=notes
+            status=status,
+            is_executable=exe,
+            is_empirically_supported=emp,
+            p_model=round(p_model, 4),
+            model_fair_odds=mfo,
+            p_devig=round(p_devig, 4),
+            market_fair_odds=mkt,
+            p_calibrated=round(p_calib, 4),
+            calibrated_fair_odds=cal,
+            best_odds=round(best_odds, 3),
+            raw_ev_pct=raw_ev_pct,
+            calibrated_ev_pct=cal_ev_pct,
+            recommended_stake=0.0,
+            gate_verdicts=verdicts,
+            audit_notes=notes,
         )
 
     def _reject(self, status, p_model, p_devig, best_odds, verdicts, notes):
         p_fb = p_devig if p_devig > 0 else p_model
-        return self._result(status, p_model, p_devig, p_fb, best_odds, 0.0, 0.0, verdicts, notes)
+        return self._result(
+            status, p_model, p_devig, p_fb, best_odds, 0.0, 0.0, verdicts, notes
+        )

@@ -6,19 +6,24 @@ NO SIMULATION OR GUESSED CLOSING ODDS ALLOWED IN REAL EVALUATION.
 """
 
 import math
-import numpy as np
 from enum import Enum
-from typing import Dict, Any, List, Optional
+from typing import Any
+
+import numpy as np
+
 
 class CLVState(Enum):
-    SETTLED = "SETTLED"               # Real closing line observed and verified
-    PENDING_CLOSE = "PENDING_CLOSE"   # Fixture has not closed; closing odds not yet available
-    MISSING_DATA = "MISSING_DATA"     # Closing line data could not be obtained from source
+    SETTLED = "SETTLED"  # Real closing line observed and verified
+    PENDING_CLOSE = (
+        "PENDING_CLOSE"  # Fixture has not closed; closing odds not yet available
+    )
+    MISSING_DATA = "MISSING_DATA"  # Closing line data could not be obtained from source
+
 
 class CLVCalculator:
     """
     Calculates and aggregates Closing Line Value (CLV).
-    
+
     Formulas:
     1. Raw CLV: (Placed_Odds / Closing_Odds) - 1.0
     2. Fair CLV (Zero-Vig): (Placed_Odds / Fair_Closing_Odds) - 1.0
@@ -28,9 +33,9 @@ class CLVCalculator:
     @staticmethod
     def calculate_clv(
         placed_odds: float,
-        closing_odds: Optional[float] = None,
-        closing_fair_odds: Optional[float] = None
-    ) -> Dict[str, Any]:
+        closing_odds: float | None = None,
+        closing_fair_odds: float | None = None,
+    ) -> dict[str, Any]:
         """
         Calculates CLV metrics for a single wager.
         If closing odds are not available (e.g. upcoming fixture), marks state as PENDING_CLOSE.
@@ -43,7 +48,7 @@ class CLVCalculator:
                 "fair_clv": None,
                 "fair_clv_pct": None,
                 "beat_closing": False,
-                "note": "Invalid placed odds"
+                "note": "Invalid placed odds",
             }
 
         if closing_odds is None or closing_odds <= 1.01:
@@ -57,7 +62,7 @@ class CLVCalculator:
                 "fair_clv": None,
                 "fair_clv_pct": None,
                 "beat_closing": False,
-                "note": "Closing odds pending kickoff"
+                "note": "Closing odds pending kickoff",
             }
 
         # Raw CLV vs bookmaker closing line
@@ -75,17 +80,19 @@ class CLVCalculator:
             "state": CLVState.SETTLED.value,
             "placed_odds": round(placed_odds, 3),
             "closing_odds": round(closing_odds, 3),
-            "closing_fair_odds": round(closing_fair_odds if closing_fair_odds else (closing_odds * 1.035), 3),
+            "closing_fair_odds": round(
+                closing_fair_odds if closing_fair_odds else (closing_odds * 1.035), 3
+            ),
             "raw_clv": round(raw_clv, 4),
             "raw_clv_pct": round(raw_clv * 100, 2),
             "fair_clv": round(fair_clv, 4),
             "fair_clv_pct": round(fair_clv * 100, 2),
             "beat_closing": raw_clv > 0.0,
-            "note": "Verified against real closing line"
+            "note": "Verified against real closing line",
         }
 
     @staticmethod
-    def evaluate_portfolio_clv(bets: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def evaluate_portfolio_clv(bets: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Aggregates CLV performance across a portfolio of placed bets with real closing prices.
         Computes mean, median, beat-closing rate, sample size, and 95% confidence interval.
@@ -103,7 +110,7 @@ class CLVCalculator:
                 "ci_95_lower_pct": 0.0,
                 "ci_95_upper_pct": 0.0,
                 "expected_roi_from_clv_pct": 0.0,
-                "has_demonstrated_clv_edge": False
+                "has_demonstrated_clv_edge": False,
             }
 
         raw_clvs = []
@@ -141,7 +148,7 @@ class CLVCalculator:
                 "ci_95_lower_pct": 0.0,
                 "ci_95_upper_pct": 0.0,
                 "expected_roi_from_clv_pct": 0.0,
-                "has_demonstrated_clv_edge": False
+                "has_demonstrated_clv_edge": False,
             }
 
         raw_np = np.array(raw_clvs)
@@ -153,7 +160,11 @@ class CLVCalculator:
         beat_rate = (beat_count / n_settled) * 100.0
 
         # Standard error and 95% CI
-        std_err = float(np.std(raw_np, ddof=1) / math.sqrt(n_settled)) if n_settled > 1 else 0.0
+        std_err = (
+            float(np.std(raw_np, ddof=1) / math.sqrt(n_settled))
+            if n_settled > 1
+            else 0.0
+        )
         ci_lower = avg_raw - (1.96 * std_err)
         ci_upper = avg_raw + (1.96 * std_err)
 
@@ -172,5 +183,5 @@ class CLVCalculator:
             "ci_95_lower_pct": round(ci_lower * 100, 2),
             "ci_95_upper_pct": round(ci_upper * 100, 2),
             "expected_roi_from_clv_pct": round(avg_fair * 100, 2),
-            "has_demonstrated_clv_edge": has_clv_edge
+            "has_demonstrated_clv_edge": has_clv_edge,
         }

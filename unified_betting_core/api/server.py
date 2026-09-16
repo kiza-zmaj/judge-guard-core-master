@@ -6,18 +6,22 @@ Exposes the complete 11-step empirical sharp betting and out-of-sample validatio
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from typing import Dict, Any, List
 
-from unified_betting_core.data_ingestion.data_pipeline import DataPipeline, normalize_name
-from unified_betting_core.data_ingestion.real_data_provider import RealDataProvider, DataQualityState
-from unified_betting_core.models.poisson_model import PoissonEngine
-from unified_betting_core.models.llm_sharp_agent import LLMSharpAgent
-from unified_betting_core.models.walk_forward_engine import WalkForwardEngine
-from unified_betting_core.decision_engine.devig_engine import DevigEngine
-from unified_betting_core.decision_engine.clv_calculator import CLVCalculator, CLVState
-from unified_betting_core.decision_engine.empirical_gate import EmpiricalDecisionGate, DecisionStatus
-from unified_betting_core.decision_engine.kelly_criterion import KellyCriterion
 from unified_betting_core.config import DEFAULT_BANKROLL, MIN_EDGE
+from unified_betting_core.data_ingestion.data_pipeline import (
+    DataPipeline,
+)
+from unified_betting_core.data_ingestion.real_data_provider import (
+    DataQualityState,
+)
+from unified_betting_core.decision_engine.devig_engine import DevigEngine
+from unified_betting_core.decision_engine.empirical_gate import (
+    EmpiricalDecisionGate,
+)
+from unified_betting_core.decision_engine.kelly_criterion import KellyCriterion
+from unified_betting_core.models.llm_sharp_agent import LLMSharpAgent
+from unified_betting_core.models.poisson_model import PoissonEngine
+from unified_betting_core.models.walk_forward_engine import WalkForwardEngine
 
 app = Flask(__name__)
 CORS(app)
@@ -28,31 +32,35 @@ empirical_gate = EmpiricalDecisionGate(min_edge=MIN_EDGE)
 kelly = KellyCriterion()
 sharp_agent = LLMSharpAgent()
 
+
 @app.route("/", methods=["GET"])
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({
-        "status": "OPERATIONAL",
-        "service": "SharpBet Core REST API",
-        "version": "3.0.0",
-        "evidence_taxonomy": [
-            "RAW_EV",
-            "CALIBRATED_EV",
-            "EMPIRICALLY_SUPPORTED_EV",
-            "EXECUTABLE_EV",
-            "FAKE_EV (Rejection)",
-            "CALIBRATION_FAILED (Rejection)",
-            "INSUFFICIENT_EVIDENCE (Rejection)"
-        ],
-        "endpoints": [
-            "/api/fixtures",
-            "/api/value-bets",
-            "/api/audit-all",
-            "/api/walk-forward",
-            "/api/empirical-report",
-            "/api/analyze-match"
-        ]
-    })
+    return jsonify(
+        {
+            "status": "OPERATIONAL",
+            "service": "SharpBet Core REST API",
+            "version": "3.0.0",
+            "evidence_taxonomy": [
+                "RAW_EV",
+                "CALIBRATED_EV",
+                "EMPIRICALLY_SUPPORTED_EV",
+                "EXECUTABLE_EV",
+                "FAKE_EV (Rejection)",
+                "CALIBRATION_FAILED (Rejection)",
+                "INSUFFICIENT_EVIDENCE (Rejection)",
+            ],
+            "endpoints": [
+                "/api/fixtures",
+                "/api/value-bets",
+                "/api/audit-all",
+                "/api/walk-forward",
+                "/api/empirical-report",
+                "/api/analyze-match",
+            ],
+        }
+    )
+
 
 @app.route("/api/fixtures", methods=["GET"])
 def get_fixtures():
@@ -62,18 +70,21 @@ def get_fixtures():
         probs = poisson_engine.predict_match(
             row["home_team"], row["away_team"], row["home_xg"], row["away_xg"]
         )
-        results.append({
-            "match": f"{row['home_team']} vs {row['away_team']}",
-            "date": row["date"],
-            "league": row["league"],
-            "odds": {
-                "home": row["home_odds"],
-                "draw": row["draw_odds"],
-                "away": row["away_odds"]
-            },
-            "probabilities": probs
-        })
+        results.append(
+            {
+                "match": f"{row['home_team']} vs {row['away_team']}",
+                "date": row["date"],
+                "league": row["league"],
+                "odds": {
+                    "home": row["home_odds"],
+                    "draw": row["draw_odds"],
+                    "away": row["away_odds"],
+                },
+                "probabilities": probs,
+            }
+        )
     return jsonify({"count": len(results), "fixtures": results})
+
 
 @app.route("/api/audit-all", methods=["GET"])
 def audit_all_fixtures():
@@ -89,11 +100,13 @@ def audit_all_fixtures():
         a_team = row["away_team"]
         match_title = f"{h_team} vs {a_team}"
 
-        model_probs = poisson_engine.predict_match(h_team, a_team, row["home_xg"], row["away_xg"])
+        model_probs = poisson_engine.predict_match(
+            h_team, a_team, row["home_xg"], row["away_xg"]
+        )
         market_odds = {
             "home": float(row["home_odds"]),
             "draw": float(row["draw_odds"]),
-            "away": float(row["away_odds"])
+            "away": float(row["away_odds"]),
         }
         devig_probs = DevigEngine.devig_power(market_odds)
 
@@ -109,14 +122,16 @@ def audit_all_fixtures():
                 p_devig=p_dvg,
                 best_odds=best_odds,
                 data_quality=DataQualityState.LIVE,
-                out_of_sample_calibration_passed=False, # Fail closed until walk-forward proves edge
+                out_of_sample_calibration_passed=False,  # Fail closed until walk-forward proves edge
                 historical_clv_demonstrated=False,
-                historical_sample_size=1140
+                historical_sample_size=1140,
             )
 
             stake = 0.0
             if gate_eval.is_executable:
-                stake = kelly.calculate_stake(gate_eval.p_calibrated, best_odds, bankroll)
+                stake = kelly.calculate_stake(
+                    gate_eval.p_calibrated, best_odds, bankroll
+                )
 
             audit_entry = {
                 "outcome": outcome,
@@ -132,18 +147,23 @@ def audit_all_fixtures():
                 "stake": stake,
                 "status": gate_eval.status.value,
                 "is_executable": gate_eval.is_executable,
-                "audit_notes": gate_eval.audit_notes
+                "audit_notes": gate_eval.audit_notes,
             }
             match_audits.append(audit_entry)
 
-        all_audits.append({
-            "match": match_title,
-            "date": row["date"],
-            "league": row["league"],
-            "audits": match_audits
-        })
+        all_audits.append(
+            {
+                "match": match_title,
+                "date": row["date"],
+                "league": row["league"],
+                "audits": match_audits,
+            }
+        )
 
-    return jsonify({"bankroll": bankroll, "matches_audited": len(all_audits), "data": all_audits})
+    return jsonify(
+        {"bankroll": bankroll, "matches_audited": len(all_audits), "data": all_audits}
+    )
+
 
 @app.route("/api/value-bets", methods=["GET"])
 def get_value_bets():
@@ -160,11 +180,13 @@ def get_value_bets():
         a_team = row["away_team"]
         match_title = f"{h_team} vs {a_team}"
 
-        model_probs = poisson_engine.predict_match(h_team, a_team, row["home_xg"], row["away_xg"])
+        model_probs = poisson_engine.predict_match(
+            h_team, a_team, row["home_xg"], row["away_xg"]
+        )
         market_odds = {
             "home": float(row["home_odds"]),
             "draw": float(row["draw_odds"]),
-            "away": float(row["away_odds"])
+            "away": float(row["away_odds"]),
         }
         devig_probs = DevigEngine.devig_power(market_odds)
 
@@ -179,31 +201,36 @@ def get_value_bets():
                 p_devig=p_dvg,
                 best_odds=b_odds,
                 data_quality=DataQualityState.LIVE,
-                out_of_sample_calibration_passed=False, # Fail closed
+                out_of_sample_calibration_passed=False,  # Fail closed
                 historical_clv_demonstrated=False,
-                historical_sample_size=1140
+                historical_sample_size=1140,
             )
 
             if gate_eval.is_executable:
                 stake = kelly.calculate_stake(gate_eval.p_calibrated, b_odds, bankroll)
                 if stake > 0:
-                    executable_bets.append({
-                        "match": match_title,
-                        "date": row["date"],
-                        "outcome": outcome,
-                        "best_odds": b_odds,
-                        "p_calibrated": gate_eval.p_calibrated,
-                        "calibrated_ev_pct": gate_eval.calibrated_ev_pct,
-                        "stake": stake,
-                        "status": gate_eval.status.value
-                    })
+                    executable_bets.append(
+                        {
+                            "match": match_title,
+                            "date": row["date"],
+                            "outcome": outcome,
+                            "best_odds": b_odds,
+                            "p_calibrated": gate_eval.p_calibrated,
+                            "calibrated_ev_pct": gate_eval.calibrated_ev_pct,
+                            "stake": stake,
+                            "status": gate_eval.status.value,
+                        }
+                    )
 
-    return jsonify({
-        "bankroll": bankroll,
-        "count": len(executable_bets),
-        "executable_bets": executable_bets,
-        "governance_note": "Fails closed: Bets require out-of-sample calibration and CLV proof before execution."
-    })
+    return jsonify(
+        {
+            "bankroll": bankroll,
+            "count": len(executable_bets),
+            "executable_bets": executable_bets,
+            "governance_note": "Fails closed: Bets require out-of-sample calibration and CLV proof before execution.",
+        }
+    )
+
 
 @app.route("/api/walk-forward", methods=["GET"])
 def run_walk_forward_endpoint():
@@ -214,6 +241,7 @@ def run_walk_forward_endpoint():
     engine = WalkForwardEngine(bankroll=bankroll)
     res = engine.run_walk_forward()
     return jsonify(res)
+
 
 @app.route("/api/empirical-report", methods=["GET"])
 def get_empirical_report():
@@ -230,26 +258,32 @@ def get_empirical_report():
             "source": "football-data.co.uk",
             "total_matches": res["total_matches_evaluated"],
             "out_of_sample_matches": res["out_of_sample_matches"],
-            "data_quality_state": res["data_quality_state"]
+            "data_quality_state": res["data_quality_state"],
         },
         "calibration": res["calibration_metrics"],
         "market_clv": res["clv_metrics"],
         "realized_performance": res["pnl_metrics"],
         "rejections": res["rejections_summary"],
-        "empirically_supported_ev_verdict": "PASS" if res["has_empirical_proof"] else "FAIL",
+        "empirically_supported_ev_verdict": "PASS"
+        if res["has_empirical_proof"]
+        else "FAIL",
         "verdict_reasons": [
             "Out-of-sample Brier score is 0.5936.",
             "167 FAKE_EV delusion bets blocked by Bayesian shrinkage.",
             "376 CALIBRATION_FAILED bets blocked by Out-of-Sample Calibration Gate.",
             "Standalone Poisson model does not yet demonstrate positive CLV on closing market lines.",
-            "Capital preserved: €1,000.00."
-        ] if not res["has_empirical_proof"] else ["Empirical edge proven."]
+            "Capital preserved: €1,000.00.",
+        ]
+        if not res["has_empirical_proof"]
+        else ["Empirical edge proven."],
     }
     return jsonify(report)
+
 
 def run_server(host: str = "0.0.0.0", port: int = 5055):
     print(f"Starting SharpBet Core API server on http://{host}:{port} ...")
     app.run(host=host, port=port, debug=False)
+
 
 if __name__ == "__main__":
     run_server()

@@ -3,16 +3,21 @@ Poisson Distribution Probability Engine for Football Match Outcomes.
 Simulates goal probabilities to derive 1X2, Over/Under, and BTTS probabilities.
 """
 
+import logging
 import os
 import pickle
-import logging
+from typing import Any
+
 from scipy.stats import poisson
-from typing import Dict, Any, Optional
+
 from unified_betting_core.config import MODELS_STORE_DIR
 
 logger = logging.getLogger("SharpBet.PoissonModel")
 
-def dixon_coles_tau(x: int, y: int, h_xg: float, a_xg: float, rho: float = -0.11) -> float:
+
+def dixon_coles_tau(
+    x: int, y: int, h_xg: float, a_xg: float, rho: float = -0.11
+) -> float:
     """
     Dixon-Coles bivariate adjustment factor tau for low scores:
     Adjusts probability mass for (0,0), (1,0), (0,1), and (1,1) to correct for
@@ -31,7 +36,7 @@ def dixon_coles_tau(x: int, y: int, h_xg: float, a_xg: float, rho: float = -0.11
 
 class SimplePoissonModel:
     """Trained weights container from historical matches."""
-    pass
+
 
 class _PoissonUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
@@ -39,10 +44,13 @@ class _PoissonUnpickler(pickle.Unpickler):
             return SimplePoissonModel
         return super().find_class(module, name)
 
+
 class PoissonEngine:
-    def __init__(self, model_path: Optional[str] = None):
+    def __init__(self, model_path: str | None = None):
         self.max_goals = 10
-        self.model_path = model_path or os.path.join(str(MODELS_STORE_DIR), "poisson_model.pkl")
+        self.model_path = model_path or os.path.join(
+            str(MODELS_STORE_DIR), "poisson_model.pkl"
+        )
         self.external_model = None
         self._try_load_pickle()
 
@@ -54,9 +62,13 @@ class PoissonEngine:
                     self.external_model = _PoissonUnpickler(f).load()
                 logger.info(f"Loaded trained Poisson model from {self.model_path}")
             except Exception as e:
-                logger.warning(f"Could not unpickle {self.model_path}: {e}. Using direct Poisson PMF simulation.")
+                logger.warning(
+                    f"Could not unpickle {self.model_path}: {e}. Using direct Poisson PMF simulation."
+                )
 
-    def predict_match(self, home_team: str, away_team: str, home_xg: float, away_xg: float) -> Dict[str, float]:
+    def predict_match(
+        self, home_team: str, away_team: str, home_xg: float, away_xg: float
+    ) -> dict[str, float]:
         """
         Calculates probabilities for match outcomes given home and away expected goals.
         Includes Dixon-Coles low-score bivariate correlation correction.
@@ -64,17 +76,21 @@ class PoissonEngine:
         # If external model implements predict_match, we can invoke it
         if self.external_model and hasattr(self.external_model, "predict_match"):
             try:
-                return self.external_model.predict_match(home_team, away_team, home_xg, away_xg)
-            except Exception:
-                pass
+                return self.external_model.predict_match(
+                    home_team, away_team, home_xg, away_xg
+                )
+            except Exception as e:
+                logger.debug(
+                    f"External model predict_match failed ({e}), falling back to direct PMF simulation."
+                )
 
         # Direct mathematical simulation using Poisson PMF with Dixon-Coles adjustment
         h_xg = float(home_xg)
         if h_xg > 8.0:
-            h_xg = h_xg / 38.0 # Normalize season aggregate to single match
+            h_xg = h_xg / 38.0  # Normalize season aggregate to single match
         a_xg = float(away_xg)
         if a_xg > 8.0:
-            a_xg = a_xg / 38.0 # Normalize season aggregate to single match
+            a_xg = a_xg / 38.0  # Normalize season aggregate to single match
 
         h_xg = max(round(h_xg, 2), 0.2)
         a_xg = max(round(a_xg, 2), 0.2)
@@ -129,7 +145,7 @@ class PoissonEngine:
             "btts": round(prob_btts, 4),
             "predicted_score": best_score,
             "home_xg": h_xg,
-            "away_xg": a_xg
+            "away_xg": a_xg,
         }
 
     def predict_in_play(
@@ -140,8 +156,8 @@ class PoissonEngine:
         current_away_score: int,
         elapsed_minutes: float,
         home_xg: float,
-        away_xg: float
-    ) -> Dict[str, Any]:
+        away_xg: float,
+    ) -> dict[str, Any]:
         """
         Calculates in-play probabilities for match outcomes conditioning on current score and elapsed time.
         Models remaining goals using Poisson with remaining expected goals adjusted for remaining time.
@@ -216,6 +232,5 @@ class PoissonEngine:
             "away_xg": rem_away_xg,
             "in_play": True,
             "current_score": f"{current_home_score}-{current_away_score}",
-            "elapsed_minutes": elapsed_minutes
+            "elapsed_minutes": elapsed_minutes,
         }
-
