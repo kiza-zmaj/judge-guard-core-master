@@ -1,6 +1,6 @@
 # SharpBet Core v3.0.0 — Commercial Release Evidence Report
 
-**Audit Date:** 2026-09-16 05:00:50 UTC
+**Audit Date:** 2026-09-16 05:10:28 UTC
 **Auditor:** Antigravity Research Division / Clean-Room Automation Engine
 
 ---
@@ -75,7 +75,7 @@ tests/test_sharpbet_core.py::test_zero_future_leakage_in_walk_forward_data PASSE
 tests/test_sharpbet_core.py::test_paper_trading_logger_enforces_zero_stake PASSED [ 93%]
 tests/test_sharpbet_core.py::test_bias_stress_auditor_detects_tail_sensitivity PASSED [100%]
 
-============================== 16 passed in 1.48s ==============================
+============================== 16 passed in 1.53s ==============================
 ```
 
 ---
