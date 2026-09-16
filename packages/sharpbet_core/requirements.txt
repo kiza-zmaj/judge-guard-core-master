@@ -1,0 +1,17 @@
+# SharpBet Core - Quantitative Betting & Forensic Audit Engine
+# Minimal, isolated dependencies
+
+# Quantitative & Statistical Computing
+pandas>=2.0.0
+numpy>=1.26.0
+scipy>=1.11.0
+scikit-learn>=1.4.0
+
+# REST API & Web Server
+flask>=3.0.0
+flask-cors>=4.0.0
+
+# Network & Utilities
+requests>=2.31.0
+python-dateutil>=2.9.0
+python-dotenv>=1.0.0

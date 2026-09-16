@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sharpbet-core"
+version = "3.0.0"
+description = "Production Quantitative Sports Betting, Calibration & Walk-Forward Audit Engine"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "kizabgd123", email = "research@antigravity.ai"}
+]
+keywords = ["sports-betting", "quantitative-finance", "clv", "expected-value", "calibration", "poisson", "backtesting"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+    "pandas>=2.0.0",
+    "numpy>=1.26.0",
+    "scipy>=1.11.0",
+    "scikit-learn>=1.4.0",
+    "flask>=3.0.0",
+    "flask-cors>=4.0.0",
+    "requests>=2.31.0",
+    "python-dateutil>=2.9.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+sharpbet-api = "unified_betting_core.api.server:app.run"
+sharpbet-walkforward = "unified_betting_core.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["unified_betting_core*"]

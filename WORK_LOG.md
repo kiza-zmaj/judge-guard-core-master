@@ -176,3 +176,5 @@
 ✅ Completed SharpBet Production Readiness Implementation Plan
 🟡 Starting Clean Code Refactor
 ✅ Completed Clean Code Refactor
+🟡 Starting Decouple Packages: SharpBet Core and JudgeGuard Core
+✅ Completed Decouple Packages: SharpBet Core and JudgeGuard Core
