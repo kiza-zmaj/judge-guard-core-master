@@ -165,3 +165,5 @@
 ✅ Completed Mental Game Research: Live Multi-System ESPN Ingestion Engine and End-to-End Prediction Pipeline
 🟡 Starting Mental Game Research: Dynamic Global In-Play Discovery and Live Odds Execution
 ✅ Completed Mental Game Research: Dynamic Global In-Play Discovery and Live Odds Execution
+🟡 Starting Mental Game Research: Dixon-Coles Bivariate Adjustment and Market Steam Alpha Engine Implementation
+✅ Completed Mental Game Research: Dixon-Coles Bivariate Adjustment and Market Steam Alpha Engine Implementation

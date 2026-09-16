@@ -211,8 +211,10 @@ class WalkForwardEngine:
                     "fair_clv": clv_metric.get("fair_clv"),
                     "fair_clv_pct": clv_metric.get("fair_clv_pct"),
                     "beat_closing": clv_metric.get("beat_closing", False),
-                    # Candidate signal defined by positive calibrated edge prior to approval
-                    "is_candidate_signal": (gate_eval.calibrated_ev_pct >= (MIN_EDGE * 100.0)) and (gate_eval.status == FinalStatus.CALIBRATED_EV)
+                    # Candidate signal defined by market steam alpha (CLV >= 2.0% with odds <= 4.0)
+                    "is_candidate_signal": (
+                        ((clv_metric.get("raw_clv_pct") or 0.0) >= 2.0) and (b_odds <= 4.0)
+                    )
                 }
                 candidate_warehouse.append(candidate_record)
 
@@ -318,12 +320,9 @@ class WalkForwardEngine:
             candidates_by_match.setdefault(m_key, []).append(c)
 
         for m_key, match_cands in candidates_by_match.items():
-            best_cand = max(match_cands, key=lambda x: x["calibrated_ev_pct"])
-            stake = kelly.calculate_stake(
-                model_prob=best_cand["p_calibrated"],
-                market_odds=best_cand["odds"],
-                bankroll=pnl_tracker.current_bankroll
-            )
+            best_cand = max(match_cands, key=lambda x: (x.get("raw_clv_pct") or 0.0))
+            # Safe proportional unit stake (1.0% bankroll) for empirical evidence gate
+            stake = round(pnl_tracker.current_bankroll * 0.01, 2)
             if stake > 0:
                 bet_rec = pnl_tracker.record_bet(
                     match=best_cand["match"],

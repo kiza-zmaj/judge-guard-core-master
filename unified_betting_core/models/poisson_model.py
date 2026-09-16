@@ -12,6 +12,23 @@ from unified_betting_core.config import MODELS_STORE_DIR
 
 logger = logging.getLogger("SharpBet.PoissonModel")
 
+def dixon_coles_tau(x: int, y: int, h_xg: float, a_xg: float, rho: float = -0.11) -> float:
+    """
+    Dixon-Coles bivariate adjustment factor tau for low scores:
+    Adjusts probability mass for (0,0), (1,0), (0,1), and (1,1) to correct for
+    empirical low-score dependence and draw underestimation in independent Poisson models.
+    """
+    if x == 0 and y == 0:
+        return max(1.0 - (h_xg * a_xg * rho), 0.0)
+    elif x == 0 and y == 1:
+        return max(1.0 + (h_xg * rho), 0.0)
+    elif x == 1 and y == 0:
+        return max(1.0 + (a_xg * rho), 0.0)
+    elif x == 1 and y == 1:
+        return max(1.0 - rho, 0.0)
+    return 1.0
+
+
 class SimplePoissonModel:
     """Trained weights container from historical matches."""
     pass
@@ -42,14 +59,7 @@ class PoissonEngine:
     def predict_match(self, home_team: str, away_team: str, home_xg: float, away_xg: float) -> Dict[str, float]:
         """
         Calculates probabilities for match outcomes given home and away expected goals.
-        Returns:
-            home: probability of home win
-            draw: probability of draw
-            away: probability of away win
-            over_2_5: probability of over 2.5 goals
-            under_2_5: probability of under 2.5 goals
-            btts: probability both teams score
-            most_likely_score: (home_goals, away_goals)
+        Includes Dixon-Coles low-score bivariate correlation correction.
         """
         # If external model implements predict_match, we can invoke it
         if self.external_model and hasattr(self.external_model, "predict_match"):
@@ -58,7 +68,7 @@ class PoissonEngine:
             except Exception:
                 pass
 
-        # Direct mathematical simulation using Poisson PMF
+        # Direct mathematical simulation using Poisson PMF with Dixon-Coles adjustment
         h_xg = float(home_xg)
         if h_xg > 8.0:
             h_xg = h_xg / 38.0 # Normalize season aggregate to single match
@@ -83,7 +93,8 @@ class PoissonEngine:
 
         for h in range(self.max_goals):
             for a in range(self.max_goals):
-                p = home_probs[h] * away_probs[a]
+                tau = dixon_coles_tau(h, a, h_xg, a_xg)
+                p = home_probs[h] * away_probs[a] * tau
 
                 if h > a:
                     prob_home += p
