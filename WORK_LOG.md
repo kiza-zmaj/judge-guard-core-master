@@ -169,3 +169,6 @@
 ✅ Completed Mental Game Research: Dixon-Coles Bivariate Adjustment and Market Steam Alpha Engine Implementation
 🟡 Starting CLV Methodology Fix + Upcoming Fixtures Engine
 ✅ Completed CLV Methodology Fix + Upcoming Fixtures Engine
+🟡 Starting Phase 1: Forensic audit of calculate_ece
+🟡 Starting [Forenzicki Audit i Regresioni Testovi]
+✅ Completed [Forenzicki Audit i Regresioni Testovi]
