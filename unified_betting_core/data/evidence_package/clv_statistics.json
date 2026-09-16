@@ -1,12 +1,14 @@
 {
-  "status": "MARKET_ALPHA_PASS",
-  "passed": true,
-  "candidate_count": 809,
-  "settled_count": 809,
-  "avg_raw_clv_pct": 3.58,
-  "avg_fair_clv_pct": 0.58,
-  "beat_closing_rate_pct": 100.0,
-  "ci_95_lower_pct": 3.45,
-  "ci_95_upper_pct": 3.71,
-  "failure_reasons": []
+  "status": "MARKET_ALPHA_FAILED",
+  "passed": false,
+  "candidate_count": 214,
+  "settled_count": 214,
+  "avg_raw_clv_pct": -0.88,
+  "avg_fair_clv_pct": -0.88,
+  "beat_closing_rate_pct": 57.94,
+  "ci_95_lower_pct": -1.99,
+  "ci_95_upper_pct": 0.24,
+  "failure_reasons": [
+    "Mean fair CLV is non-positive (-0.88%). Strategy fails to beat fair closing line."
+  ]
 }

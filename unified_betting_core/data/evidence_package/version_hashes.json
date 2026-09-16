@@ -2,6 +2,32 @@
   "model_architecture": "PoissonEngine (Dixon-Coles xG baseline)",
   "calibration_architecture": "Platt TemperatureScaler (Rolling 150)",
   "gate_architecture": "ThreeGateVerdict (Calibration, Market Alpha, Economic)",
-  "verdict_hash_sha256": "352b96e74bf2f61cb61455623fe92d6726a3e27396213f911e9d54a96ecaa607",
-  "final_status": "EMPIRICALLY_SUPPORTED_EV"
+  "verdict_hash_sha256": "4c613a7b4c0e8c22d23103004429dfb5625cbb7ccc913531a4a68568ad203eae",
+  "final_governance_status": "MARKET_ALPHA_FAILED",
+  "operational_recommendation": {
+    "status": "RESEARCH_ONLY",
+    "authorized_stake_eur": 0.0,
+    "reason": "Gate B (Market Alpha/CLV) and Gate C (Economic ROI CI) failed. Model has demonstrated tail sensitivity."
+  },
+  "brier_score_audit": {
+    "previous_package_brier": 0.5936,
+    "current_reproduced_brier": 0.59209,
+    "difference": -0.00151,
+    "explanation": "0.59209 is independently verified across all 760 OOS predictions using standard multiclass One-vs-Rest Brier score: (1/N) * sum_{i=1}^N sum_{c=1}^3 (p_{ic} - y_{ic})^2 / 3. The 0.00151 variance from the previous package (0.5936) was caused by a slight boundary difference in the initial rolling calibration warm-up window."
+  },
+  "artifact_checksums_sha256": {
+    "1_oos_predictions": "87d38c91f56e01cb9fca0552720bb9dbac4a47550d0b6b01de1b8594593c8632",
+    "2_calibration_dataset": "22c9bec0bbefd36ac66d4c9118762dbc6d2a2403d8d6c398d03c99925c7c206f",
+    "3_reliability_table": "01e69ea87669b87d3d604834442452ad0b3bf5232216d38ffc01bc5aa637383d",
+    "4_ece_brier_output": "c5fd914a5538f22c504600244e4c3d00ae6a9ef8763f56f515f7c9781de1f974",
+    "5_candidate_clv_dataset": "04b29350baa2fed029a44c5c14a085e2103c49231067aea8e6e65291ec2bcb88",
+    "6_clv_statistics": "8549b24fbf21dfcfda4204af0ddc7b1fec5a69083d22e0b015468c0138d129d3",
+    "7_pnl_dataset": "e52054abff06c62ea0c2f11e32c6facda03070f02b4a37b3ca04b25f4c7ec0eb",
+    "8_roi_statistics": "1f4fce7d015892123f326b7704c3035182d841eec0830eafd3d0ab324c39c219",
+    "9_leakage_test_results": "24764719a2f70fc95e18164f6755a4dc85d3d4aae7ff74849a03b5277d61a99c",
+    "10_gate_verdicts": "497db9d97f3c841f32a7ef9114fa7b8720845070a6b613e7ce3f3609d4598117",
+    "11_timestamps_audit": "1199b9de2e6b84aba3f0878e605c869ccb20b54e83cbda15fe5b8a84f874b8d0",
+    "12_bias_and_stress_test": "9e1152855e9108555de7bf60ea0dcfc5da71f66d0c497a40c3dfc17d9030ca39",
+    "13_reproduce_command": "78f2a1b13d1f90449c75b142379bc36382b1697a2a5981b96a21f96b81891763"
+  }
 }

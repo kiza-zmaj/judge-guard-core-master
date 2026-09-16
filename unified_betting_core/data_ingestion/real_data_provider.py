@@ -43,15 +43,25 @@ class RealDataProvider:
     def get_real_historical_dataset(self, force_refresh: bool = False) -> Tuple[pd.DataFrame, DataQualityState]:
         """
         Retrieves the verified real historical match dataset.
-        Checks local cache first; if missing or force_refresh is True, downloads
-        from authoritative historical repositories.
+        Checks local cache first; if missing, stale, lacking provenance columns,
+        or force_refresh is True, downloads from authoritative historical repositories.
         """
         if not force_refresh and os.path.exists(self.cache_file):
             try:
                 df = pd.read_csv(self.cache_file)
-                if len(df) >= 380 and "closing_home_odds" in df.columns:
-                    logger.info(f"Loaded {len(df)} verified real matches from cache: {self.cache_file}")
-                    return df, DataQualityState.CACHED
+                if len(df) >= 380 and "closing_home_odds" in df.columns and "pinnacle_open_home" in df.columns:
+                    # Data integrity check on cached dataset
+                    h_shorten = (df["home_odds"] > df["closing_home_odds"]).mean()
+                    a_shorten = (df["away_odds"] > df["closing_away_odds"]).mean()
+                    state = DataQualityState.CACHED
+                    if h_shorten > 0.85 or a_shorten > 0.85:
+                        logger.warning(
+                            f"DATA_QUALITY_WARNING: Abnormal odds shortening rate in cache "
+                            f"(Home: {h_shorten:.1%}, Away: {a_shorten:.1%}). Marking DEGRADED."
+                        )
+                        state = DataQualityState.DEGRADED
+                    logger.info(f"Loaded {len(df)} verified real matches from cache: {self.cache_file} (State: {state.value})")
+                    return df, state
             except Exception as e:
                 logger.warning(f"Failed to read cache {self.cache_file}: {e}. Refreshing...")
 
@@ -68,7 +78,7 @@ class RealDataProvider:
     def fetch_and_build_dataset(self) -> Tuple[pd.DataFrame, DataQualityState]:
         """
         Fetches historical match data across multiple seasons from football-data.co.uk.
-        Extracts real opening odds (Bet365 / Market Max) and real Pinnacle closing odds (PSH, PSD, PSA).
+        Extracts real opening odds (Bet365 / Market Max) and real Pinnacle closing odds (PSCH, PSCD, PSCA).
         Computes chronological rolling attack/defense metrics strictly prior to each match.
         """
         all_season_dfs = []
@@ -116,6 +126,18 @@ class RealDataProvider:
         """
         Extracts and standardizes verified columns:
         Date, Teams, Result, Opening Odds, and Pinnacle Closing Odds.
+        
+        DATA PROVENANCE SPECIFICATION (football-data.co.uk):
+        ----------------------------------------------------
+        1. Pre-Closing Opening / Market Odds:
+           - B365H, B365D, B365A: Bet365 initial odds posted early mid-week.
+           - MaxH, MaxD, MaxA: Market maximum odds available across surveyed bookmakers.
+           - PSH, PSD, PSA: Pinnacle initial / pre-closing opening odds.
+        2. Post-Closing / Kickoff Odds:
+           - PSCH, PSCD, PSCA: Pinnacle CLOSING odds (recorded immediately prior to kickoff).
+             This is the definitive sharp benchmark line used in academic and professional CLV research.
+           - B365CH, B365CD, B365CA: Bet365 closing odds.
+           - AvgCH, AvgCD, AvgCA: Market average closing odds across all bookmakers.
         """
         # Required core fields
         if "HomeTeam" not in df.columns or "AwayTeam" not in df.columns or "FTR" not in df.columns:
@@ -152,7 +174,7 @@ class RealDataProvider:
             else:
                 continue
 
-            # Real Opening / Market Odds (Bet365 / Market Max)
+            # Real Opening / Market Odds (Bet365 / Market Max / Pinnacle Opening)
             b365_h = float(row.get("B365H", 0.0) or 0.0)
             b365_d = float(row.get("B365D", 0.0) or 0.0)
             b365_a = float(row.get("B365A", 0.0) or 0.0)
@@ -161,33 +183,47 @@ class RealDataProvider:
             max_d = float(row.get("MaxD", b365_d) or b365_d)
             max_a = float(row.get("MaxA", b365_a) or b365_a)
 
-            # Opening odds proxy (Best available opening price)
+            ps_open_h = float(row.get("PSH", 0.0) or 0.0)
+            ps_open_d = float(row.get("PSD", 0.0) or 0.0)
+            ps_open_a = float(row.get("PSA", 0.0) or 0.0)
+
+            # Placed odds proxy: Best market opening odds available
             open_h = max_h if max_h > 1.01 else b365_h
             open_d = max_d if max_d > 1.01 else b365_d
             open_a = max_a if max_a > 1.01 else b365_a
 
-            # Real Closing Odds: Pinnacle (PSH, PSD, PSA)
-            ps_h = float(row.get("PSH", 0.0) or 0.0)
-            ps_d = float(row.get("PSD", 0.0) or 0.0)
-            ps_a = float(row.get("PSA", 0.0) or 0.0)
+            # Real Pinnacle Closing Odds: PSCH, PSCD, PSCA
+            # In football-data.co.uk schema:
+            # PSH/PSD/PSA = Pinnacle Pre-closing (Opening)
+            # PSCH/PSCD/PSCA = Pinnacle Closing (At Kickoff)
+            ps_close_h = float(row.get("PSCH", 0.0) or 0.0)
+            ps_close_d = float(row.get("PSCD", 0.0) or 0.0)
+            ps_close_a = float(row.get("PSCA", 0.0) or 0.0)
 
-            # Fallback to Bet365 Closing (B365CH, B365CD, B365CA) if Pinnacle is missing
-            if ps_h <= 1.01:
-                ps_h = float(row.get("B365CH", open_h) or open_h)
-            if ps_d <= 1.01:
-                ps_d = float(row.get("B365CD", open_d) or open_d)
-            if ps_a <= 1.01:
-                ps_a = float(row.get("B365CA", open_a) or open_a)
+            # Fallback 1: Bet365 Closing (B365CH, B365CD, B365CA) if Pinnacle Closing missing
+            if ps_close_h <= 1.01:
+                ps_close_h = float(row.get("B365CH", 0.0) or 0.0)
+            if ps_close_d <= 1.01:
+                ps_close_d = float(row.get("B365CD", 0.0) or 0.0)
+            if ps_close_a <= 1.01:
+                ps_close_a = float(row.get("B365CA", 0.0) or 0.0)
 
-            # Market Average Closing (AvgCH, AvgCD, AvgCA)
-            avg_ch = float(row.get("AvgCH", ps_h) or ps_h)
-            avg_cd = float(row.get("AvgCD", ps_d) or ps_d)
-            avg_ca = float(row.get("AvgCA", ps_a) or ps_a)
+            # Fallback 2: Market Average Closing (AvgCH, AvgCD, AvgCA)
+            avg_ch = float(row.get("AvgCH", ps_close_h) or ps_close_h)
+            avg_cd = float(row.get("AvgCD", ps_close_d) or ps_close_d)
+            avg_ca = float(row.get("AvgCA", ps_close_a) or ps_close_a)
+
+            if ps_close_h <= 1.01:
+                ps_close_h = avg_ch
+            if ps_close_d <= 1.01:
+                ps_close_d = avg_cd
+            if ps_close_a <= 1.01:
+                ps_close_a = avg_ca
 
             # Validate that odds are physically plausible
             if open_h <= 1.01 or open_d <= 1.01 or open_a <= 1.01:
                 continue
-            if ps_h <= 1.01 or ps_d <= 1.01 or ps_a <= 1.01:
+            if ps_close_h <= 1.01 or ps_close_d <= 1.01 or ps_close_a <= 1.01:
                 continue
 
             rows.append({
@@ -199,15 +235,23 @@ class RealDataProvider:
                 "home_goals": fthg,
                 "away_goals": ftag,
                 "result": result,
-                # Real pre-match available odds
+                # Real pre-match available opening odds (Market Max)
                 "home_odds": round(open_h, 3),
                 "draw_odds": round(open_d, 3),
                 "away_odds": round(open_a, 3),
-                # Real Pinnacle closing odds
-                "closing_home_odds": round(ps_h, 3),
-                "closing_draw_odds": round(ps_d, 3),
-                "closing_away_odds": round(ps_a, 3),
-                # Real Average closing odds
+                # Genuine Pinnacle Closing Odds (PSCH, PSCD, PSCA)
+                "closing_home_odds": round(ps_close_h, 3),
+                "closing_draw_odds": round(ps_close_d, 3),
+                "closing_away_odds": round(ps_close_a, 3),
+                # Real Pinnacle Opening Odds (PSH, PSD, PSA)
+                "pinnacle_open_home": round(ps_open_h, 3) if ps_open_h > 1.01 else round(open_h, 3),
+                "pinnacle_open_draw": round(ps_open_d, 3) if ps_open_d > 1.01 else round(open_d, 3),
+                "pinnacle_open_away": round(ps_open_a, 3) if ps_open_a > 1.01 else round(open_a, 3),
+                # Real Bet365 Opening Odds
+                "b365_open_home": round(b365_h, 3) if b365_h > 1.01 else round(open_h, 3),
+                "b365_open_draw": round(b365_d, 3) if b365_d > 1.01 else round(open_d, 3),
+                "b365_open_away": round(b365_a, 3) if b365_a > 1.01 else round(open_a, 3),
+                # Real Average Closing Odds
                 "closing_avg_home": round(avg_ch, 3),
                 "closing_avg_draw": round(avg_cd, 3),
                 "closing_avg_away": round(avg_ca, 3),

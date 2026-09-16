@@ -1,0 +1,129 @@
+{
+  "status": "COMPLETED",
+  "verdict": "FAILED_STRESS_TEST (Tail sensitive: removing top 3 bets flips ROI negative)",
+  "total_bets": 205,
+  "baseline_pnl": 77.24,
+  "baseline_roi_pct": 3.91,
+  "is_tail_sensitive": true,
+  "roi_flip_k": 3,
+  "is_away_biased": true,
+  "outcome_breakdown": {
+    "home": {
+      "bet_count": 57,
+      "bet_share_pct": 27.8,
+      "wins": 23,
+      "win_rate_pct": 40.35,
+      "total_stakes": 550.15,
+      "total_pnl": -62.75,
+      "roi_pct": -11.41
+    },
+    "draw": {
+      "bet_count": 11,
+      "bet_share_pct": 5.37,
+      "wins": 2,
+      "win_rate_pct": 18.18,
+      "total_stakes": 107.21,
+      "total_pnl": -30.21,
+      "roi_pct": -28.18
+    },
+    "away": {
+      "bet_count": 137,
+      "bet_share_pct": 66.83,
+      "wins": 67,
+      "win_rate_pct": 48.91,
+      "total_stakes": 1317.38,
+      "total_pnl": 170.2,
+      "roi_pct": 12.92
+    }
+  },
+  "top_5_outliers": [
+    {
+      "date": "2025-04-06",
+      "match": "Brentford vs Chelsea",
+      "outcome": "draw",
+      "placed_odds": 3.85,
+      "closing_odds": 3.65,
+      "fair_clv": 0.0207,
+      "stake": 10.38,
+      "pnl": 29.58
+    },
+    {
+      "date": "2025-04-20",
+      "match": "Manchester United vs Wolverhampton Wanderers",
+      "outcome": "away",
+      "placed_odds": 3.85,
+      "closing_odds": 2.8,
+      "fair_clv": 0.3396,
+      "stake": 10.24,
+      "pnl": 29.18
+    },
+    {
+      "date": "2023-12-24",
+      "match": "Wolverhampton Wanderers vs Chelsea",
+      "outcome": "home",
+      "placed_odds": 3.91,
+      "closing_odds": 3.34,
+      "fair_clv": 0.134,
+      "stake": 9.8,
+      "pnl": 28.52
+    },
+    {
+      "date": "2024-12-26",
+      "match": "Bournemouth vs Crystal Palace",
+      "outcome": "draw",
+      "placed_odds": 3.92,
+      "closing_odds": 3.66,
+      "fair_clv": 0.034,
+      "stake": 9.45,
+      "pnl": 27.59
+    },
+    {
+      "date": "2025-02-02",
+      "match": "Manchester United vs Crystal Palace",
+      "outcome": "away",
+      "placed_odds": 3.85,
+      "closing_odds": 4.97,
+      "fair_clv": -0.2637,
+      "stake": 9.63,
+      "pnl": 27.45
+    }
+  ],
+  "leave_k_out_sensitivity": {
+    "leave_1_out": {
+      "excluded_top_bets": 1,
+      "remaining_bets": 204,
+      "remaining_pnl": 47.66,
+      "remaining_stakes": 1964.36,
+      "remaining_roi_pct": 2.43
+    },
+    "leave_2_out": {
+      "excluded_top_bets": 2,
+      "remaining_bets": 203,
+      "remaining_pnl": 18.48,
+      "remaining_stakes": 1954.12,
+      "remaining_roi_pct": 0.95
+    },
+    "leave_3_out": {
+      "excluded_top_bets": 3,
+      "remaining_bets": 202,
+      "remaining_pnl": -10.04,
+      "remaining_stakes": 1944.32,
+      "remaining_roi_pct": -0.52
+    },
+    "leave_4_out": {
+      "excluded_top_bets": 4,
+      "remaining_bets": 201,
+      "remaining_pnl": -37.63,
+      "remaining_stakes": 1934.87,
+      "remaining_roi_pct": -1.94
+    },
+    "leave_5_out": {
+      "excluded_top_bets": 5,
+      "remaining_bets": 200,
+      "remaining_pnl": -65.08,
+      "remaining_stakes": 1925.24,
+      "remaining_roi_pct": -3.38
+    }
+  },
+  "audit_summary": "Baseline ROI: 3.91% across 205 bets. Removing top 3 bets flips aggregate ROI negative. Away bets account for 66.8% of volume and \u20ac170.20 P&L while Home bets lost \u20ac62.75."
+}

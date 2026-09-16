@@ -7,5 +7,18 @@
   "oos_start_date": "2023-08-11",
   "oos_end_date": "2025-05-25",
   "data_source": "Football-Data.co.uk Premier League (2022/23 - 2024/25)",
-  "odds_source": "Opening: Bet365 / Average, Closing: Pinnacle (PSH, PSD, PSA)"
+  "data_provenance": {
+    "source_repository": "https://www.football-data.co.uk",
+    "seasons": [
+      "2022/23 (2223)",
+      "2023/24 (2324)",
+      "2024/25 (2425)"
+    ],
+    "opening_placed_odds": "home_odds, draw_odds, away_odds (Market maximum available early lines)",
+    "closing_benchmark_odds": "closing_home_odds, closing_draw_odds, closing_away_odds (Pinnacle Closing: PSCH, PSCD, PSCA recorded at kickoff)",
+    "pinnacle_opening_odds": "pinnacle_open_home, pinnacle_open_draw, pinnacle_open_away (Pinnacle Opening: PSH, PSD, PSA recorded mid-week)",
+    "bet365_opening_odds": "b365_open_home, b365_open_draw, b365_open_away (Bet365 Opening: B365H, B365D, B365A)",
+    "average_closing_odds": "closing_avg_home, closing_avg_draw, closing_avg_away (Market Average Closing: AvgCH, AvgCD, AvgCA)"
+  },
+  "provenance_forensic_note": "Previous v1 release incorrectly mapped PSH/PSD/PSA as closing odds. In football-data.co.uk data dictionary, PSH/PSD/PSA are Pinnacle pre-closing (opening) lines, while PSCH/PSCD/PSCA are Pinnacle closing lines recorded at kickoff. Corrected in v2 release to eliminate artificial margin bias."
 }

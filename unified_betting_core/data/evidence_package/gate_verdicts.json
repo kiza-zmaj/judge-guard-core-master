@@ -1,8 +1,8 @@
 {
-  "final_status": "EMPIRICALLY_SUPPORTED_EV",
-  "is_empirically_supported": true,
-  "is_executable": true,
-  "summary": "ALL THREE GATES PASSED. Calibration ECE=3.79% | CLV=3.58% | ROI=2.35% [-8.05%, 12.75%]",
+  "final_status": "MARKET_ALPHA_FAILED",
+  "is_empirically_supported": false,
+  "is_executable": false,
+  "summary": "BLOCKED at Gate B (Market Alpha/CLV). Gate B FAILED: Mean fair CLV is non-positive (-0.88%). Strategy fails to beat fair closing line.",
   "gate_a": {
     "status": "CALIBRATION_PASS",
     "passed": true,
@@ -14,26 +14,56 @@
     "failure_reasons": []
   },
   "gate_b": {
-    "status": "MARKET_ALPHA_PASS",
-    "passed": true,
-    "candidate_count": 809,
-    "settled_count": 809,
-    "avg_raw_clv_pct": 3.58,
-    "avg_fair_clv_pct": 0.58,
-    "beat_closing_rate_pct": 100.0,
-    "ci_95_lower_pct": 3.45,
-    "ci_95_upper_pct": 3.71,
-    "failure_reasons": []
+    "status": "MARKET_ALPHA_FAILED",
+    "passed": false,
+    "candidate_count": 214,
+    "settled_count": 214,
+    "avg_raw_clv_pct": -0.88,
+    "avg_fair_clv_pct": -0.88,
+    "beat_closing_rate_pct": 57.94,
+    "ci_95_lower_pct": -1.99,
+    "ci_95_upper_pct": 0.24,
+    "failure_reasons": [
+      "Mean fair CLV is non-positive (-0.88%). Strategy fails to beat fair closing line."
+    ]
   },
   "gate_c": {
-    "status": "ECONOMIC_PASS",
-    "passed": true,
-    "total_bets": 568,
-    "roi_pct": 2.35,
-    "yield_pct": 2.35,
-    "roi_ci_lower_pct": -8.05,
-    "roi_ci_upper_pct": 12.75,
-    "max_drawdown_pct": 27.09,
-    "failure_reasons": []
+    "status": "ECONOMIC_VALIDATION_FAILED",
+    "passed": false,
+    "total_bets": 205,
+    "roi_pct": 3.91,
+    "yield_pct": 3.91,
+    "roi_ci_lower_pct": -13.36,
+    "roi_ci_upper_pct": 21.18,
+    "max_drawdown_pct": 18.1,
+    "failure_reasons": [
+      "ROI 95% CI lower bound (-13.36%) is below safety floor (-2.00%). Statistical edge cannot be distinguished from random noise."
+    ],
+    "pnl_by_outcome": {
+      "home": {
+        "bets": 57,
+        "wins": 23,
+        "win_rate_pct": 40.35,
+        "total_pnl": -62.75,
+        "total_stakes": 550.15,
+        "roi_pct": -11.41
+      },
+      "draw": {
+        "bets": 11,
+        "wins": 2,
+        "win_rate_pct": 18.18,
+        "total_pnl": -30.21,
+        "total_stakes": 107.21,
+        "roi_pct": -28.18
+      },
+      "away": {
+        "bets": 137,
+        "wins": 67,
+        "win_rate_pct": 48.91,
+        "total_pnl": 170.2,
+        "total_stakes": 1317.38,
+        "roi_pct": 12.92
+      }
+    }
   }
 }
