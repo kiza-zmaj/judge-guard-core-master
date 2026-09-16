@@ -24,68 +24,87 @@ class ConsoleReporter:
     def print_11_step_pipeline_audit(audited_bets: List[Dict[str, Any]], bankroll: float):
         """
         Renders the complete 11-step quantitative audit table for all analyzed fixtures.
+        Separates live in-play matches and scheduled upcoming matches into distinct high-visibility sections.
         """
         if not audited_bets:
             print("\n  🔍 Nema analiziranih mečeva.")
             return
 
-        print(f"\n📋 [KORACI 1-8 & 11] PREGLED 11-STEP AUDITA OPKLADA (Bankroll: €{bankroll:,.2f})")
-        print("=" * 144)
-        header = (
-            f"{'Meč':<36} | {'Tip':<4} | {'P_mod':<6} | {'O_fair':<6} | {'P_dvg':<6} | "
-            f"{'O_best':<6} | {'O_cls':<6} | {'CLV%':<8} | {'RawEV%':<7} | {'CalEV%':<7} | "
-            f"{'Ulog (€)':<9} | {'Status Detekcije':<20}"
-        )
-        print(header)
-        print("-" * 144)
-
-        for b in audited_bets:
-            match = b.get("match", "N/A")[:35]
-            tip = str(b.get("outcome", b.get("bet_on", "-"))).upper()[:4]
-            p_mod = f"{b.get('p_model', 0.0)*100:.1f}%"
-            o_fair = f"{b.get('model_fair_odds', 0.0):.2f}"
-            p_dvg = f"{b.get('p_devig', 0.0)*100:.1f}%"
-            o_best = f"{b.get('best_odds', b.get('odds', 0.0)):.2f}"
-
-            # Closing line display
-            cls_val = b.get("closing_odds")
-            o_cls = f"{cls_val:.2f}" if cls_val is not None else "PENDING"
-
-            clv_val = b.get("raw_clv_pct")
-            clv_str = f"{clv_val:+.1f}%" if clv_val is not None else "PENDING"
-
-            raw_ev = f"{b.get('raw_ev_pct', 0.0):+.1f}%"
-            cal_ev = f"{b.get('calibrated_ev_pct', b.get('true_ev_pct', 0.0)):+.1f}%"
-            stake = f"€{b.get('stake', 0.0):.2f}"
-            status = b.get("status", "UNKNOWN")
-
-            # Evidence-based Status Formatting
-            if status == "EXECUTABLE_EV":
-                status_display = "🎯 EXECUTABLE_EV"
-            elif status == "EMPIRICALLY_SUPPORTED_EV":
-                status_display = "✅ EMPIRICAL_EV"
-            elif status == "CALIBRATED_EV":
-                status_display = "🔷 CALIBRATED_EV"
-            elif status == "FAKE_EV":
-                status_display = "🚨 FAKE_EV (Odbijeno)"
-            elif status == "MARGINAL_EV":
-                status_display = "⚪ MARGINAL_EV"
-            elif status == "CALIBRATION_FAILED":
-                status_display = "❌ CALIB_FAILED"
-            elif status == "INSUFFICIENT_EVIDENCE":
-                status_display = "⚠️ NEDOVOLJNO_DOKAZA"
-            elif status == "DATA_DEGRADED":
-                status_display = "🛑 DATA_DEGRADED"
-            else:
-                status_display = f"⚪ {status}"
-
-            print(
-                f"{match:<28} | {tip:<4} | {p_mod:<6} | {o_fair:<6} | {p_dvg:<6} | "
-                f"{o_best:<6} | {o_cls:<6} | {clv_str:<8} | {raw_ev:<7} | {cal_ev:<7} | "
-                f"{stake:<9} | {status_display:<20}"
+        def _render_subtable(title: str, bets: List[Dict[str, Any]]):
+            if not bets:
+                return
+            print(f"\n{title} (Bankroll: €{bankroll:,.2f})")
+            print("=" * 144)
+            header = (
+                f"{'Meč':<36} | {'Tip':<4} | {'P_mod':<6} | {'O_fair':<6} | {'P_dvg':<6} | "
+                f"{'O_best':<6} | {'O_cls':<6} | {'CLV%':<8} | {'RawEV%':<7} | {'CalEV%':<7} | "
+                f"{'Ulog (€)':<9} | {'Status Detekcije':<20}"
             )
+            print(header)
+            print("-" * 144)
 
-        print("=" * 136)
+            for b in bets:
+                match = b.get("match", "N/A")[:35]
+                tip = str(b.get("outcome", b.get("bet_on", "-"))).upper()[:4]
+                p_mod = f"{b.get('p_model', 0.0)*100:.1f}%"
+                o_fair = f"{b.get('model_fair_odds', 0.0):.2f}"
+                p_dvg = f"{b.get('p_devig', 0.0)*100:.1f}%"
+                o_best = f"{b.get('best_odds', b.get('odds', 0.0)):.2f}"
+
+                # Closing line display
+                cls_val = b.get("closing_odds")
+                o_cls = f"{cls_val:.2f}" if cls_val is not None else "PENDING"
+
+                clv_val = b.get("raw_clv_pct")
+                clv_str = f"{clv_val:+.1f}%" if clv_val is not None else "PENDING"
+
+                raw_ev = f"{b.get('raw_ev_pct', 0.0):+.1f}%"
+                cal_ev = f"{b.get('calibrated_ev_pct', b.get('true_ev_pct', 0.0)):+.1f}%"
+                stake = f"€{b.get('stake', 0.0):.2f}"
+                status = b.get("status", "UNKNOWN")
+
+                # Evidence-based Status Formatting
+                if status == "EXECUTABLE_EV":
+                    status_display = "🎯 EXECUTABLE_EV"
+                elif status == "EMPIRICALLY_SUPPORTED_EV":
+                    status_display = "✅ EMPIRICAL_EV"
+                elif status == "CALIBRATED_EV":
+                    status_display = "🔷 CALIBRATED_EV"
+                elif status == "FAKE_EV":
+                    status_display = "🚨 FAKE_EV (Odbijeno)"
+                elif status == "MARGINAL_EV":
+                    status_display = "⚪ MARGINAL_EV"
+                elif status == "CALIBRATION_FAILED":
+                    status_display = "❌ CALIB_FAILED"
+                elif status == "INSUFFICIENT_EVIDENCE":
+                    status_display = "⚠️ NEDOVOLJNO_DOKAZA"
+                elif status == "DATA_DEGRADED":
+                    status_display = "🛑 DATA_DEGRADED"
+                else:
+                    status_display = f"⚪ {status}"
+
+                print(
+                    f"{match:<36} | {tip:<4} | {p_mod:<6} | {o_fair:<6} | {p_dvg:<6} | "
+                    f"{o_best:<6} | {o_cls:<6} | {clv_str:<8} | {raw_ev:<7} | {cal_ev:<7} | "
+                    f"{stake:<9} | {status_display:<20}"
+                )
+            print("=" * 144)
+
+        live_bets = [b for b in audited_bets if b.get("is_live")]
+        upcoming_bets = [b for b in audited_bets if not b.get("is_live")]
+
+        if live_bets:
+            _render_subtable("🔴 [UŽIVO U TOKU: IN-PLAY REAL-TIME PREDVIĐANJA]", live_bets)
+
+        if upcoming_bets:
+            _render_subtable("⏳ [PREDSTOJEĆI DANAŠNJI MEČEVI: KONSENZUS & MODEL]", upcoming_bets)
+
+        # Re-print compact live summary at the end if upcoming was printed so live is never buried
+        if live_bets and upcoming_bets:
+            print(f"\n⚡ [BRZI PREGLED AKTIVNIH UŽIVO MEČEVA ({len(live_bets)//3} meč/a)]: ")
+            for lb in live_bets:
+                print(f"   {lb.get('match'):<32} | Tip: {lb.get('outcome').upper():<4} | P_mod: {lb.get('p_model', 0)*100:4.1f}% | P_dvg: {lb.get('p_devig', 0)*100:4.1f}% | Kvota: {lb.get('best_odds'):5.2f} | RawEV: {lb.get('raw_ev_pct'):+5.1f}% | Status: {lb.get('status')}")
+
 
     @staticmethod
     def print_verified_bets(verified_bets: List[Dict[str, Any]], bankroll: float):

@@ -144,9 +144,22 @@ class OddsFetcher:
                 logger.debug(f"ESPN fetch error for {league_code}: {e}")
                 return []
 
+        leagues_to_fetch = dict(ESPN_SOCCER_LEAGUES)
+        try:
+            h_url = "https://site.web.api.espn.com/apis/v2/scoreboard/header?sport=soccer"
+            h_res = requests.get(h_url, timeout=4)
+            if h_res.ok:
+                for lg in h_res.json().get("sports", [{}])[0].get("leagues", []):
+                    slug = lg.get("slug")
+                    name = lg.get("name")
+                    if slug and name and slug not in leagues_to_fetch:
+                        leagues_to_fetch[slug] = name
+        except Exception as e:
+            logger.debug(f"Dynamic league discovery note: {e}")
+
         all_fixtures: List[Dict[str, Any]] = []
-        with ThreadPoolExecutor(max_workers=6) as executor:
-            futures = [executor.submit(_fetch_league, code, name) for code, name in ESPN_SOCCER_LEAGUES.items()]
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(_fetch_league, code, name) for code, name in leagues_to_fetch.items()]
             for f in futures:
                 try:
                     res = f.result()
@@ -154,7 +167,7 @@ class OddsFetcher:
                 except Exception as e:
                     logger.debug(f"League future exception: {e}")
 
-        logger.info(f"Retrieved {len(all_fixtures)} live/today fixtures from ESPN Scoreboard Feed.")
+        logger.info(f"Retrieved {len(all_fixtures)} live/today fixtures across {len(leagues_to_fetch)} leagues from ESPN Scoreboard Feed.")
         return all_fixtures
 
     def fetch_the_odds_api_fixtures(self) -> List[Dict[str, Any]]:
