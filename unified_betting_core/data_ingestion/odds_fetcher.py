@@ -234,7 +234,8 @@ class OddsFetcher:
                     logger.debug(f"League future exception: {e}")
 
         logger.info(
-            f"Retrieved {len(all_fixtures)} live/today fixtures across {len(leagues_to_fetch)} leagues from ESPN Scoreboard Feed."
+            f"Retrieved {len(all_fixtures)} live/today fixtures across "
+            f"{len(leagues_to_fetch)} leagues from ESPN Scoreboard Feed."
         )
         return all_fixtures
 
@@ -246,7 +247,8 @@ class OddsFetcher:
         if not self.the_odds_api_key:
             return []
 
-        url = f"https://api.the-odds-api.com/v4/sports/soccer_epl/odds?regions=eu&markets=h2h&apiKey={self.the_odds_api_key}"
+        base_url = "https://api.the-odds-api.com/v4/sports/soccer_epl/odds"
+        url = f"{base_url}?regions=eu&markets=h2h&apiKey={self.the_odds_api_key}"
         try:
             res = requests.get(url, timeout=4)
             if res.status_code == 401 or res.status_code == 429:
@@ -442,7 +444,8 @@ class OddsFetcher:
                     logger.debug(f"Pre-match league future error: {e}")
 
         logger.info(
-            f"fetch_upcoming_pre_match (ESPN fallback): {len(all_fixtures)} pre-match fixtures across {len(ESPN_SOCCER_LEAGUES)} leagues."
+            f"fetch_upcoming_pre_match (ESPN fallback): {len(all_fixtures)} "
+            f"pre-match fixtures across {len(ESPN_SOCCER_LEAGUES)} leagues."
         )
         return all_fixtures
 

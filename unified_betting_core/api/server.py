@@ -4,6 +4,16 @@ Provides HTTP JSON endpoints for AnythingLLM plugins, Web UIs, and external scri
 Exposes the complete 11-step empirical sharp betting and out-of-sample validation pipeline.
 """
 
+import os
+import sys
+from pathlib import Path
+
+# Ensure package root is available when executed directly
+_pkg_root = Path(__file__).resolve().parent.parent.parent
+if str(_pkg_root) not in sys.path:
+    sys.path.insert(0, str(_pkg_root))
+
+
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
@@ -18,10 +28,14 @@ from unified_betting_core.decision_engine.devig_engine import DevigEngine
 from unified_betting_core.decision_engine.empirical_gate import (
     EmpiricalDecisionGate,
 )
-from unified_betting_core.decision_engine.kelly_criterion import KellyCriterion
+from unified_betting_core.decision_engine.kelly_criterion import (
+    KellyCriterion,
+)
 from unified_betting_core.models.llm_sharp_agent import LLMSharpAgent
 from unified_betting_core.models.poisson_model import PoissonEngine
-from unified_betting_core.models.walk_forward_engine import WalkForwardEngine
+from unified_betting_core.models.walk_forward_engine import (
+    WalkForwardEngine,
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -280,7 +294,9 @@ def get_empirical_report():
     return jsonify(report)
 
 
-def run_server(host: str = "0.0.0.0", port: int = 5055):
+def run_server(host: str = "0.0.0.0", port: int | None = None):
+    if port is None:
+        port = int(os.environ.get("PORT", 5055))
     print(f"Starting SharpBet Core API server on http://{host}:{port} ...")
     app.run(host=host, port=port, debug=False)
 

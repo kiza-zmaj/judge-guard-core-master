@@ -75,8 +75,10 @@ class WalkForwardEngine:
             )
             return {"status": "FAILED", "error": "Insufficient real match data"}
 
+        n_oos = len(df) - self.burn_in_matches
         logger.info(
-            f"Starting Walk-Forward on {len(df)} real matches (Burn-in: {self.burn_in_matches}, OOS: {len(df) - self.burn_in_matches})."
+            f"Starting Walk-Forward on {len(df)} real matches "
+            f"(Burn-in: {self.burn_in_matches}, OOS: {n_oos})."
         )
 
         # Strict chronological ordering
@@ -143,8 +145,8 @@ class WalkForwardEngine:
                 continue
 
             # 2. Out-of-Sample Calibration (Temperature Scaling fit on strictly past window)
-            recent_dists = past_raw_dists[-self.calib_window :]
-            recent_acts = past_actuals[-self.calib_window :]
+            recent_dists = past_raw_dists[-self.calib_window:]
+            recent_acts = past_actuals[-self.calib_window:]
             temp_scaler = TemperatureScaler()
             temp_scaler.fit(recent_dists, recent_acts)
             calibrated_model_probs = temp_scaler.scale(raw_model_probs)
@@ -315,7 +317,8 @@ class WalkForwardEngine:
 
             if mean_raw_clv <= 0.0:
                 gate_b_failures.append(
-                    f"Mean fair CLV is non-positive ({mean_raw_clv * 100:.2f}%). Strategy fails to beat fair closing line."
+                    f"Mean fair CLV is non-positive ({mean_raw_clv * 100:.2f}%). "
+                    f"Strategy fails to beat fair closing line."
                 )
             if ci_clv_upper <= 0.0:
                 gate_b_failures.append(

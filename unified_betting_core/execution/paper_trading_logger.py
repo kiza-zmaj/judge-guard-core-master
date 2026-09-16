@@ -116,7 +116,7 @@ class PaperTradingLogger:
         """Summarizes current paper trading audit trail."""
         logs = self.read_all_logs()
         total = len(logs)
-        settled = sum(1 for l in logs if l.get("settled"))
+        settled = sum(1 for record in logs if record.get("settled"))
         return {
             "log_path": self.log_path,
             "total_records": total,

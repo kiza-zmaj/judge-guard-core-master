@@ -31,12 +31,20 @@ from unified_betting_core.api.server import run_server
 from unified_betting_core.config import DEFAULT_BANKROLL, MIN_EDGE
 from unified_betting_core.data.audit_trail import AuditTrail
 from unified_betting_core.data_ingestion.data_pipeline import DataPipeline
-from unified_betting_core.data_ingestion.real_data_provider import DataQualityState
+from unified_betting_core.data_ingestion.real_data_provider import (
+    DataQualityState,
+)
 from unified_betting_core.decision_engine.devig_engine import DevigEngine
-from unified_betting_core.decision_engine.empirical_gate import EmpiricalDecisionGate
-from unified_betting_core.decision_engine.kelly_criterion import KellyCriterion
+from unified_betting_core.decision_engine.empirical_gate import (
+    EmpiricalDecisionGate,
+)
+from unified_betting_core.decision_engine.kelly_criterion import (
+    KellyCriterion,
+)
 from unified_betting_core.models.poisson_model import PoissonEngine
-from unified_betting_core.models.walk_forward_engine import WalkForwardEngine
+from unified_betting_core.models.walk_forward_engine import (
+    WalkForwardEngine,
+)
 from unified_betting_core.output.console_reporter import ConsoleReporter
 from unified_betting_core.output.telegram_notifier import TelegramNotifier
 
@@ -71,9 +79,9 @@ def run_pipeline(
         df = pipeline.get_unified_dataset()
 
     if live_only and not df.empty and "is_live" in df.columns:
-        df = df[df["is_live"] == True].reset_index(drop=True)
+        df = df[df["is_live"]].reset_index(drop=True)
 
-    n_live = len(df[df["is_live"] == True]) if "is_live" in df.columns else 0
+    n_live = len(df[df["is_live"]]) if "is_live" in df.columns else 0
     n_upcoming = len(df) - n_live
     logger.info(
         f"Loaded {len(df)} real fixtures for analysis ({n_live} LIVE in-play, {n_upcoming} upcoming today)."
@@ -281,9 +289,15 @@ def evaluate_walk_forward(bankroll: float = DEFAULT_BANKROLL) -> dict[str, Any]:
         "verdict_reasons": [
             "Out-of-sample Brier score: 0.5936 (prikazuje umerenu bazičnu moć diskriminacije).",
             "Sistem je automatski blokirao 167 FAKE_EV opklada (ekstremne deluzije u repovima).",
-            "Sistem je automatski blokirao 376 CALIBRATION_FAILED opklada jer samostalni Poisson model nema statistički potvrđenu kalibraciju na zatvaranju.",
-            "FAIL-CLOSED ZAKLJUČAK: Model u trenutnom obliku NE poseduje empirijski dokazan trajni betting edge protiv Pinnacle closing linija.",
-            "Bankroll je 100% zaštićen (€1,000.00 ostaje netaknuto) zahvaljujući striktnim kapijama.",
+            (
+                "Sistem je automatski blokirao 376 CALIBRATION_FAILED opklada jer samostalni "
+                "Poisson model nema statistički potvrđenu kalibraciju na zatvaranju."
+            ),
+            (
+                "FAIL-CLOSED ZAKLJUČAK: Model u trenutnom obliku NE poseduje empirijski dokazan "
+                "trajni betting edge protiv Pinnacle closing linija."
+            ),
+            "Bankroll je 100% zaštićen (\u20ac1,000.00 ostaje netaknuto) zahvaljujući striktnim kapijama.",
         ]
         if not results["has_empirical_proof"]
         else ["Empirijski dokazan trajni edge na out-of-sample podacima."],

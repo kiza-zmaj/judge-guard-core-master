@@ -142,7 +142,8 @@ class FakeEVDetector:
                 status = "FAKE_EV"
                 is_valid_bet = False
                 reasons.append(
-                    f"Model delusion detected: Raw EV is +{raw_ev_pct}%, but true EV after market shrinkage is {true_ev_pct}%."
+                    f"Model delusion detected: Raw EV is +{raw_ev_pct}%, "
+                    f"but true EV after market shrinkage is {true_ev_pct}%."
                 )
             elif true_ev < self.min_edge:
                 status = "MARGINAL_EV"
@@ -154,7 +155,8 @@ class FakeEVDetector:
                 status = "REJECTED_LONGSHOT"
                 is_valid_bet = False
                 reasons.append(
-                    f"Extreme underdog odds ({best_odds:.2f}) with high divergence ({abs_divergence * 100:.1f}%) rejected by risk guard."
+                    f"Extreme underdog odds ({best_odds:.2f}) with high "
+                    f"divergence ({abs_divergence * 100:.1f}%) rejected by risk guard."
                 )
             elif high_divergence:
                 status = "HIGH_DIVERGENCE_WARNING"
