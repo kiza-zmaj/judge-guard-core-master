@@ -1,17 +1,27 @@
-# JudgeGuard + SharpBet Core - Full Dependencies
-python-dotenv>=1.0.0
-requests>=2.31.0
+# ==============================================================================
+# JudgeGuard + SharpBet Core Monorepo Dependencies
+# For isolated profiles, see:
+#   - requirements-judgeguard.txt (AI Agent Security & Auth0 Token Vault)
+#   - requirements-sharpbet.txt   (SharpBet Quantitative Analytics & REST API)
+# ==============================================================================
+
+# --- [Profile 1] JudgeGuard AI Agent Security ---
 google-generativeai>=0.7.0
 PyJWT>=2.8.0
+fastapi>=0.100.0
+uvicorn>=0.23.0
+pydantic>=2.0.0
 
-# SharpBet Core - Quantitative Pipeline
+# --- [Profile 2] SharpBet Core Quantitative Engine ---
 pandas>=2.0.0
 numpy>=1.26.0
 scipy>=1.11.0
 scikit-learn>=1.4.0
-
-# API Server
 flask>=3.0.0
+flask-cors>=4.0.0
 
-# Utilities
+# --- Shared Utilities & Testing ---
+python-dotenv>=1.0.0
+requests>=2.31.0
 python-dateutil>=2.9.0
+pytest>=7.0.0
