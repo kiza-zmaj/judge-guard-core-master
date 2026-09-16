@@ -47,6 +47,9 @@ class FinalStatus(Enum):
     RAW_EV                = "RAW_EV"
     CALIBRATED_EV         = "CALIBRATED_EV"
 
+# Alias for backwards compatibility
+DecisionStatus = FinalStatus
+
 
 # ─── Three-Gate Verdict ────────────────────────────────────────────────────────
 
@@ -271,12 +274,14 @@ class EmpiricalDecisionGate:
         p_devig: float,
         best_odds: float,
         data_quality: DataQualityState = DataQualityState.CACHED,
+        out_of_sample_calibration_passed: bool = False,
+        historical_clv_demonstrated: bool = False,
+        historical_sample_size: int = 0,
+        three_gate_passed: bool = False
     ) -> GateEvaluationResult:
         """
         Per-bet anti-delusion audit.
-        NOTE: three_gate_verdict (portfolio-level empirical proof) is evaluated
-        separately in WalkForwardEngine and passed as a flag here.
-        This method only checks per-bet mathematical validity.
+        Checks data integrity -> probability validity -> market de-vig -> fake EV -> marginal EV -> three-gate governance.
         """
         notes = []
         verdicts = {
@@ -331,11 +336,24 @@ class EmpiricalDecisionGate:
         verdicts["anti_delusion_gate"] = True
         notes.append(f"Anti-delusion passed: calibrated EV +{cal_ev_pct}%")
 
-        # Per-bet status: CALIBRATED_EV (portfolio gates evaluated separately)
+        # Three-Gate Governance Verification
+        has_empirical_proof = three_gate_passed or (out_of_sample_calibration_passed and historical_clv_demonstrated)
+        if has_empirical_proof:
+            status = FinalStatus.EXECUTABLE_EV
+            is_exe = True
+            is_emp = True
+            notes.append("Approved: Passed all Three Empirical Gates (A, B, C)")
+        else:
+            status = FinalStatus.ECONOMIC_FAILED
+            is_exe = False
+            is_emp = False
+            notes.append("Blocked: Failed Gate C (Economic Validation) on historical out-of-sample data")
+
         return self._result(
-            FinalStatus.CALIBRATED_EV, p_model, p_devig, p_calib, best_odds,
-            raw_ev_pct, cal_ev_pct, verdicts, notes
+            status, p_model, p_devig, p_calib, best_odds,
+            raw_ev_pct, cal_ev_pct, verdicts, notes, exe=is_exe, emp=is_emp
         )
+
 
     def _result(self, status, p_model, p_devig, p_calib, best_odds, raw_ev_pct, cal_ev_pct, verdicts, notes, exe=False, emp=False):
         mfo = round(1.0/p_model, 3) if p_model > 0 else 999.0

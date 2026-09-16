@@ -1,14 +1,14 @@
 {
   "status": "ECONOMIC_VALIDATION_FAILED",
   "passed": false,
-  "total_bets": 372,
-  "roi_pct": -25.36,
-  "yield_pct": -25.36,
-  "roi_ci_lower_pct": -42.38,
-  "roi_ci_upper_pct": -8.34,
-  "max_drawdown_pct": 78.11,
+  "total_bets": 0,
+  "roi_pct": 0.0,
+  "yield_pct": 0.0,
+  "roi_ci_lower_pct": 0.0,
+  "roi_ci_upper_pct": 0.0,
+  "max_drawdown_pct": 0.0,
   "failure_reasons": [
-    "Realized ROI is non-positive (-25.36%).",
-    "Maximum drawdown (78.11%) exceeds safety threshold of 35.0%."
+    "Insufficient total bets for economic significance: 0 (min 30).",
+    "Realized ROI is non-positive (0.00%)."
   ]
 }

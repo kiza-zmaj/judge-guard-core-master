@@ -46,16 +46,27 @@ from unified_betting_core.api.server import run_server
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("SharpBet.Main")
 
-def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False) -> List[Dict[str, Any]]:
+def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False, live_only: bool = False) -> List[Dict[str, Any]]:
     """
-    Executes the live 11-step sharp betting and empirical gate pipeline for upcoming fixtures.
+    Executes the live 11-step sharp betting and empirical gate pipeline for real matches.
+    Pulls live in-play matches and today's upcoming matches directly from The-Odds-API (Pinnacle/sharp feeds).
+    Zero mock, zero simulation.
     """
     ConsoleReporter.print_banner()
 
     logger.info("Initializing Data Ingestion & Live Feeds...")
     pipeline = DataPipeline()
-    df = pipeline.get_unified_dataset()
-    logger.info(f"Loaded {len(df)} upcoming fixtures for analysis.")
+    df = pipeline.get_live_and_today_dataset()
+    if df.empty:
+        logger.info("No live/today matches returned from multi-competition feed. Falling back to default upcoming fixtures...")
+        df = pipeline.get_unified_dataset()
+
+    if live_only and not df.empty and "is_live" in df.columns:
+        df = df[df["is_live"] == True].reset_index(drop=True)
+
+    n_live = len(df[df["is_live"] == True]) if "is_live" in df.columns else 0
+    n_upcoming = len(df) - n_live
+    logger.info(f"Loaded {len(df)} real fixtures for analysis ({n_live} LIVE in-play, {n_upcoming} upcoming today).")
 
     poisson_engine = PoissonEngine()
     empirical_gate = EmpiricalDecisionGate(min_edge=MIN_EDGE)
@@ -79,12 +90,31 @@ def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False) -> Li
     for _, row in df.iterrows():
         home_team = row["home_team"]
         away_team = row["away_team"]
-        match_title = f"{home_team} vs {away_team}"
+        is_live = bool(row.get("is_live", False))
+        current_score = row.get("current_score", {})
+        elapsed_min = float(row.get("elapsed_minutes", 0.0))
+        league = row.get("league", "Soccer")
 
         # 1. Model Probability (P_model)
         h_xg = float(row.get("home_xg", 1.4))
         a_xg = float(row.get("away_xg", 1.1))
-        model_probs = poisson_engine.predict_match(home_team, away_team, h_xg, a_xg)
+
+        if is_live and current_score:
+            h_score = int(current_score.get(home_team, current_score.get(row.get("home_team_raw", ""), 0)))
+            a_score = int(current_score.get(away_team, current_score.get(row.get("away_team_raw", ""), 0)))
+            match_title = f"🔴 [{h_score}-{a_score}] {home_team} vs {away_team}"
+            model_probs = poisson_engine.predict_in_play(
+                home_team=home_team,
+                away_team=away_team,
+                current_home_score=h_score,
+                current_away_score=a_score,
+                elapsed_minutes=elapsed_min,
+                home_xg=h_xg,
+                away_xg=a_xg
+            )
+        else:
+            match_title = f"⏳ {home_team} vs {away_team}"
+            model_probs = poisson_engine.predict_match(home_team, away_team, h_xg, a_xg)
 
         # 3. Market De-vig Probability (P_devig)
         market_odds_raw = {
@@ -103,8 +133,7 @@ def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False) -> Li
         ]
 
         for outcome, p_model, p_devig, best_odds in outcomes_to_evaluate:
-            # 5. Closing Odds & 6. CLV: For upcoming matches, closing odds have NOT occurred.
-            # Real CLV is pending kickoff; NO SIMULATION ALLOWED.
+            # 5. Closing Odds & 6. CLV: For in-play and upcoming matches, closing odds have not occurred or are pending
             clv_info = CLVCalculator.calculate_clv(placed_odds=best_odds, closing_odds=None)
 
             # 7. Calibrated EV & 11. Empirical Decision Gate
@@ -126,13 +155,17 @@ def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False) -> Li
 
             audit_record = {
                 "match": match_title,
-                "date": row.get("date", "Upcoming"),
+                "league": league,
+                "date": row.get("date", "Live/Today"),
+                "is_live": is_live,
+                "current_score": current_score,
                 "outcome": outcome,
                 "p_model": gate_eval.p_model,
                 "model_fair_odds": gate_eval.model_fair_odds,
                 "p_devig": gate_eval.p_devig,
                 "market_fair_odds": gate_eval.market_fair_odds,
                 "best_odds": gate_eval.best_odds,
+                "bookmaker": row.get("bookmaker", "Market Average"),
                 "closing_odds": None,
                 "raw_clv_pct": None,
                 "raw_ev_pct": gate_eval.raw_ev_pct,
@@ -149,7 +182,7 @@ def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False) -> Li
             # Record in append-only immutable audit trail
             audit_trail.record_prediction(
                 match=match_title,
-                match_date=str(row.get("date", "Upcoming")),
+                match_date=str(row.get("date", "Live/Today")),
                 outcome=outcome,
                 p_model=gate_eval.p_model,
                 p_devig=gate_eval.p_devig,
@@ -216,6 +249,7 @@ def evaluate_walk_forward(bankroll: float = DEFAULT_BANKROLL) -> Dict[str, Any]:
 def main():
     parser = argparse.ArgumentParser(description="SharpBet Core - Production Quantitative Sharp Betting Engine")
     parser.add_argument("--run-pipeline", action="store_true", help="Run the live 11-step prediction & empirical audit pipeline")
+    parser.add_argument("--live", action="store_true", help="Filter strictly to in-play live matches currently in progress")
     parser.add_argument("--walk-forward", action="store_true", help="Execute chronological walk-forward out-of-sample validation on 1,140 real matches")
     parser.add_argument("--evaluate", action="store_true", help="Alias for --walk-forward")
     parser.add_argument("--report", action="store_true", help="Generate and print the Phase 14 Empirical Evidence Report")
@@ -230,11 +264,14 @@ def main():
         evaluate_walk_forward(bankroll=args.bankroll)
     elif args.serve_api:
         run_server(port=args.port)
+    elif args.live:
+        run_pipeline(bankroll=args.bankroll, notify=args.telegram, live_only=True)
     elif args.run_pipeline:
-        run_pipeline(bankroll=args.bankroll, notify=args.telegram)
+        run_pipeline(bankroll=args.bankroll, notify=args.telegram, live_only=False)
     else:
         # Default behavior: run live 11-step empirical pipeline
-        run_pipeline(bankroll=args.bankroll, notify=args.telegram)
+        run_pipeline(bankroll=args.bankroll, notify=args.telegram, live_only=False)
 
 if __name__ == "__main__":
     main()
+

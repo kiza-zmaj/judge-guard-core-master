@@ -30,17 +30,17 @@ class ConsoleReporter:
             return
 
         print(f"\n📋 [KORACI 1-8 & 11] PREGLED 11-STEP AUDITA OPKLADA (Bankroll: €{bankroll:,.2f})")
-        print("=" * 136)
+        print("=" * 144)
         header = (
-            f"{'Meč':<28} | {'Tip':<4} | {'P_mod':<6} | {'O_fair':<6} | {'P_dvg':<6} | "
+            f"{'Meč':<36} | {'Tip':<4} | {'P_mod':<6} | {'O_fair':<6} | {'P_dvg':<6} | "
             f"{'O_best':<6} | {'O_cls':<6} | {'CLV%':<8} | {'RawEV%':<7} | {'CalEV%':<7} | "
             f"{'Ulog (€)':<9} | {'Status Detekcije':<20}"
         )
         print(header)
-        print("-" * 136)
+        print("-" * 144)
 
         for b in audited_bets:
-            match = b.get("match", "N/A")[:27]
+            match = b.get("match", "N/A")[:35]
             tip = str(b.get("outcome", b.get("bet_on", "-"))).upper()[:4]
             p_mod = f"{b.get('p_model', 0.0)*100:.1f}%"
             o_fair = f"{b.get('model_fair_odds', 0.0):.2f}"

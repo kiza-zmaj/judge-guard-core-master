@@ -1,12 +1,15 @@
 {
-  "status": "MARKET_ALPHA_PASS",
-  "passed": true,
-  "candidate_count": 376,
-  "settled_count": 376,
-  "avg_raw_clv_pct": 4.24,
-  "avg_fair_clv_pct": -1.52,
-  "beat_closing_rate_pct": 97.87,
-  "ci_95_lower_pct": 3.88,
-  "ci_95_upper_pct": 4.6,
-  "failure_reasons": []
+  "status": "MARKET_ALPHA_FAILED",
+  "passed": false,
+  "candidate_count": 0,
+  "settled_count": 0,
+  "avg_raw_clv_pct": 0.0,
+  "avg_fair_clv_pct": 0.0,
+  "beat_closing_rate_pct": 0.0,
+  "ci_95_lower_pct": 0.0,
+  "ci_95_upper_pct": 0.0,
+  "failure_reasons": [
+    "Insufficient candidate signals with closing odds: 0 (min 30).",
+    "Zero candidate signals generated."
+  ]
 }

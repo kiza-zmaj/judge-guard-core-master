@@ -120,3 +120,91 @@ class PoissonEngine:
             "home_xg": h_xg,
             "away_xg": a_xg
         }
+
+    def predict_in_play(
+        self,
+        home_team: str,
+        away_team: str,
+        current_home_score: int,
+        current_away_score: int,
+        elapsed_minutes: float,
+        home_xg: float,
+        away_xg: float
+    ) -> Dict[str, Any]:
+        """
+        Calculates in-play probabilities for match outcomes conditioning on current score and elapsed time.
+        Models remaining goals using Poisson with remaining expected goals adjusted for remaining time.
+        """
+        # Fraction of regular 90 minutes remaining
+        remaining_ratio = max(0.05, min(1.0, (90.0 - float(elapsed_minutes)) / 90.0))
+
+        h_xg = float(home_xg)
+        if h_xg > 8.0:
+            h_xg = h_xg / 38.0
+        a_xg = float(away_xg)
+        if a_xg > 8.0:
+            a_xg = a_xg / 38.0
+
+        h_xg = max(round(h_xg, 2), 0.2)
+        a_xg = max(round(a_xg, 2), 0.2)
+
+        # Remaining expected goals
+        rem_home_xg = max(0.01, h_xg * remaining_ratio)
+        rem_away_xg = max(0.01, a_xg * remaining_ratio)
+
+        home_probs = [poisson.pmf(i, rem_home_xg) for i in range(self.max_goals)]
+        away_probs = [poisson.pmf(i, rem_away_xg) for i in range(self.max_goals)]
+
+        prob_home = 0.0
+        prob_draw = 0.0
+        prob_away = 0.0
+        prob_over_2_5 = 0.0
+        prob_btts = 0.0
+
+        best_score_prob = -1.0
+        best_score = f"{current_home_score}-{current_away_score}"
+
+        for h in range(self.max_goals):
+            for a in range(self.max_goals):
+                p = home_probs[h] * away_probs[a]
+                final_h = current_home_score + h
+                final_a = current_away_score + a
+
+                if final_h > final_a:
+                    prob_home += p
+                elif final_h == final_a:
+                    prob_draw += p
+                else:
+                    prob_away += p
+
+                if (final_h + final_a) > 2.5:
+                    prob_over_2_5 += p
+
+                if final_h > 0 and final_a > 0:
+                    prob_btts += p
+
+                if p > best_score_prob:
+                    best_score_prob = p
+                    best_score = f"{final_h}-{final_a}"
+
+        total_1x2 = prob_home + prob_draw + prob_away
+        if total_1x2 > 0:
+            prob_home /= total_1x2
+            prob_draw /= total_1x2
+            prob_away /= total_1x2
+
+        return {
+            "home": round(prob_home, 4),
+            "draw": round(prob_draw, 4),
+            "away": round(prob_away, 4),
+            "over_2_5": round(prob_over_2_5, 4),
+            "under_2_5": round(1.0 - prob_over_2_5, 4),
+            "btts": round(prob_btts, 4),
+            "predicted_score": best_score,
+            "home_xg": rem_home_xg,
+            "away_xg": rem_away_xg,
+            "in_play": True,
+            "current_score": f"{current_home_score}-{current_away_score}",
+            "elapsed_minutes": elapsed_minutes
+        }
+
