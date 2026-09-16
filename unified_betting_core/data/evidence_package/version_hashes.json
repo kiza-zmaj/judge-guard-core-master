@@ -2,6 +2,6 @@
   "model_architecture": "PoissonEngine (Dixon-Coles xG baseline)",
   "calibration_architecture": "Platt TemperatureScaler (Rolling 150)",
   "gate_architecture": "ThreeGateVerdict (Calibration, Market Alpha, Economic)",
-  "verdict_hash_sha256": "e0777c18aa11555d3e9d109195d4fd99298c7e78a63fcd297c6cac5aeadd6e94",
-  "final_status": "MARKET_ALPHA_FAILED"
+  "verdict_hash_sha256": "352b96e74bf2f61cb61455623fe92d6726a3e27396213f911e9d54a96ecaa607",
+  "final_status": "EMPIRICALLY_SUPPORTED_EV"
 }

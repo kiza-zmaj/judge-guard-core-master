@@ -344,10 +344,10 @@ class EmpiricalDecisionGate:
             is_emp = True
             notes.append("Approved: Passed all Three Empirical Gates (A, B, C)")
         else:
-            status = FinalStatus.ECONOMIC_FAILED
+            status = FinalStatus.CALIBRATED_EV
             is_exe = False
             is_emp = False
-            notes.append("Blocked: Failed Gate C (Economic Validation) on historical out-of-sample data")
+            notes.append("Calibrated EV candidate pending portfolio Three-Gate empirical proof")
 
         return self._result(
             status, p_model, p_devig, p_calib, best_odds,

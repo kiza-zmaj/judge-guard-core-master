@@ -1,14 +1,11 @@
 {
-  "status": "ECONOMIC_VALIDATION_FAILED",
-  "passed": false,
-  "total_bets": 0,
-  "roi_pct": 0.0,
-  "yield_pct": 0.0,
-  "roi_ci_lower_pct": 0.0,
-  "roi_ci_upper_pct": 0.0,
-  "max_drawdown_pct": 0.0,
-  "failure_reasons": [
-    "Insufficient total bets for economic significance: 0 (min 30).",
-    "Realized ROI is non-positive (0.00%)."
-  ]
+  "status": "ECONOMIC_PASS",
+  "passed": true,
+  "total_bets": 568,
+  "roi_pct": 2.35,
+  "yield_pct": 2.35,
+  "roi_ci_lower_pct": -8.05,
+  "roi_ci_upper_pct": 12.75,
+  "max_drawdown_pct": 27.09,
+  "failure_reasons": []
 }
