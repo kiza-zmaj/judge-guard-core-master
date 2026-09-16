@@ -100,8 +100,8 @@ def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False, live_
         a_xg = float(row.get("away_xg", 1.1))
 
         if is_live and current_score:
-            h_score = int(current_score.get(home_team, current_score.get(row.get("home_team_raw", ""), 0)))
-            a_score = int(current_score.get(away_team, current_score.get(row.get("away_team_raw", ""), 0)))
+            h_score = int(current_score.get(home_team, current_score.get(row.get("home_team_raw", ""), current_score.get("home", 0))) or 0)
+            a_score = int(current_score.get(away_team, current_score.get(row.get("away_team_raw", ""), current_score.get("away", 0))) or 0)
             match_title = f"🔴 [{h_score}-{a_score}] {home_team} vs {away_team}"
             model_probs = poisson_engine.predict_in_play(
                 home_team=home_team,
