@@ -3,10 +3,12 @@ Data Pipeline & Team Name Normalization.
 Merges bookmaker fixtures with Understat xG metrics.
 """
 
+from typing import Any
+
 import pandas as pd
-from typing import List, Dict, Any, Optional
-from unified_betting_core.data_ingestion.understat_scraper import UnderstatScraper
+
 from unified_betting_core.data_ingestion.odds_fetcher import OddsFetcher
+from unified_betting_core.data_ingestion.understat_scraper import UnderstatScraper
 
 # Standardize names across Bookmakers, Understat, and Historical datasets
 TEAM_NAME_MAPPING = {
@@ -31,8 +33,9 @@ TEAM_NAME_MAPPING = {
     "sheffield utd": "Sheffield United",
     "sheffield united": "Sheffield United",
     "luton": "Luton Town",
-    "ipswich": "Ipswich Town"
+    "ipswich": "Ipswich Town",
 }
+
 
 def normalize_name(raw_name: str) -> str:
     """Normalizes team name to a canonical form."""
@@ -41,12 +44,15 @@ def normalize_name(raw_name: str) -> str:
     cleaned = raw_name.strip().lower()
     return TEAM_NAME_MAPPING.get(cleaned, raw_name.strip())
 
+
 class DataPipeline:
     def __init__(self):
         self.understat = UnderstatScraper()
         self.odds_fetcher = OddsFetcher()
 
-    def get_unified_dataset(self, fixtures: Optional[List[Dict[str, Any]]] = None) -> pd.DataFrame:
+    def get_unified_dataset(
+        self, fixtures: list[dict[str, Any]] | None = None
+    ) -> pd.DataFrame:
         """
         Gathers upcoming fixtures, normalizes team names,
         attaches home and away xG / xGA metrics, and returns a DataFrame.
@@ -80,29 +86,33 @@ class DataPipeline:
             final_home_xg = float(match.get("home_xg", est_home_xg))
             final_away_xg = float(match.get("away_xg", est_away_xg))
 
-            rows.append({
-                "id": match.get("id"),
-                "date": match.get("date", "Upcoming"),
-                "league": match.get("league", "EPL"),
-                "home_team": home,
-                "away_team": away,
-                "home_team_raw": home_raw,
-                "away_team_raw": away_raw,
-                "home_odds": float(match.get("home_odds", 2.0)),
-                "draw_odds": float(match.get("draw_odds", 3.2)),
-                "away_odds": float(match.get("away_odds", 3.5)),
-                "bookmaker": match.get("bookmaker", "Market Average"),
-                "home_xg": final_home_xg,
-                "away_xg": final_away_xg,
-                "is_live": match.get("is_live", False),
-                "current_score": match.get("current_score", {}),
-                "elapsed_minutes": match.get("elapsed_minutes", 0.0)
-            })
+            rows.append(
+                {
+                    "id": match.get("id"),
+                    "date": match.get("date", "Upcoming"),
+                    "league": match.get("league", "EPL"),
+                    "home_team": home,
+                    "away_team": away,
+                    "home_team_raw": home_raw,
+                    "away_team_raw": away_raw,
+                    "home_odds": float(match.get("home_odds", 2.0)),
+                    "draw_odds": float(match.get("draw_odds", 3.2)),
+                    "away_odds": float(match.get("away_odds", 3.5)),
+                    "bookmaker": match.get("bookmaker", "Market Average"),
+                    "home_xg": final_home_xg,
+                    "away_xg": final_away_xg,
+                    "is_live": match.get("is_live", False),
+                    "current_score": match.get("current_score", {}),
+                    "elapsed_minutes": match.get("elapsed_minutes", 0.0),
+                }
+            )
 
         df = pd.DataFrame(rows)
         return df
 
-    def get_live_and_today_dataset(self, sports: Optional[List[str]] = None) -> pd.DataFrame:
+    def get_live_and_today_dataset(
+        self, sports: list[str] | None = None
+    ) -> pd.DataFrame:
         """
         Gathers real-time in-play and today's matches directly from The-Odds-API.
         """
@@ -116,4 +126,3 @@ class DataPipeline:
         """
         fixtures = self.odds_fetcher.fetch_upcoming_pre_match()
         return self.get_unified_dataset(fixtures=fixtures)
-

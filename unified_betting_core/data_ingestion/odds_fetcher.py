@@ -4,14 +4,15 @@ Integrates ESPN Global Live Scoreboard & Market Feeds and The-Odds-API.
 Strict Zero-Mock / Zero-Synthetic Policy Enforced.
 """
 
-import os
-import logging
-import requests
 import datetime
-import pandas as pd
-from typing import List, Dict, Any, Optional
+import logging
+import os
 from concurrent.futures import ThreadPoolExecutor
-from unified_betting_core.config import ODDS_API_KEY, DATA_DIR
+from typing import Any
+
+import requests
+
+from unified_betting_core.config import DATA_DIR, ODDS_API_KEY
 
 logger = logging.getLogger("SharpBet.OddsFetcher")
 
@@ -41,10 +42,11 @@ ESPN_SOCCER_LEAGUES = {
     "conmebol.libertadores": "Copa Libertadores",
     "usa.1": "MLS",
     "aus.1": "A-League Men",
-    "jpn.1": "J1 League"
+    "jpn.1": "J1 League",
 }
 
-def american_to_decimal(am: Any) -> Optional[float]:
+
+def american_to_decimal(am: Any) -> float | None:
     """Converts American moneyline string/int (e.g. +360, -175) to European decimal odds."""
     if not am:
         return None
@@ -58,18 +60,20 @@ def american_to_decimal(am: Any) -> Optional[float]:
         return None
     return None
 
+
 class OddsFetcher:
-    def __init__(self, data_dir: Optional[str] = None):
+    def __init__(self, data_dir: str | None = None):
         self.data_dir = data_dir or str(DATA_DIR)
         self.the_odds_api_key = os.getenv("ODDS_API_KEY", ODDS_API_KEY)
 
-    def fetch_espn_live_fixtures(self) -> List[Dict[str, Any]]:
+    def fetch_espn_live_fixtures(self) -> list[dict[str, Any]]:
         """
         Fetches live in-play and scheduled matches from ESPN Official Scoreboard API.
         Extracts live clock, current scores, match period, and DraftKings/Consensus odds.
         Zero mock, zero simulation.
         """
-        def _fetch_league(league_code: str, league_name: str) -> List[Dict[str, Any]]:
+
+        def _fetch_league(league_code: str, league_name: str) -> list[dict[str, Any]]:
             url = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{league_code}/scoreboard"
             try:
                 res = requests.get(url, timeout=5)
@@ -83,9 +87,15 @@ class OddsFetcher:
                     date_str = ev.get("date")
                     status_obj = ev.get("status", {})
                     state = status_obj.get("type", {}).get("state")
-                    clock_str = status_obj.get("displayClock", "0").replace("'", "").replace("+", "")
+                    clock_str = (
+                        status_obj.get("displayClock", "0")
+                        .replace("'", "")
+                        .replace("+", "")
+                    )
                     try:
-                        elapsed_min = float(clock_str.split("+")[0]) if clock_str else 0.0
+                        elapsed_min = (
+                            float(clock_str.split("+")[0]) if clock_str else 0.0
+                        )
                     except Exception:
                         elapsed_min = 0.0
 
@@ -94,13 +104,47 @@ class OddsFetcher:
                         continue
 
                     comp = ev.get("competitions", [{}])[0]
-                    home = next((c["team"]["displayName"] for c in comp.get("competitors", []) if c.get("homeAway") == "home"), None)
-                    away = next((c["team"]["displayName"] for c in comp.get("competitors", []) if c.get("homeAway") == "away"), None)
+                    home = next(
+                        (
+                            c["team"]["displayName"]
+                            for c in comp.get("competitors", [])
+                            if c.get("homeAway") == "home"
+                        ),
+                        None,
+                    )
+                    away = next(
+                        (
+                            c["team"]["displayName"]
+                            for c in comp.get("competitors", [])
+                            if c.get("homeAway") == "away"
+                        ),
+                        None,
+                    )
                     if not home or not away:
                         continue
 
-                    h_sc = int(next((c.get("score") for c in comp.get("competitors", []) if c.get("homeAway") == "home"), 0) or 0)
-                    a_sc = int(next((c.get("score") for c in comp.get("competitors", []) if c.get("homeAway") == "away"), 0) or 0)
+                    h_sc = int(
+                        next(
+                            (
+                                c.get("score")
+                                for c in comp.get("competitors", [])
+                                if c.get("homeAway") == "home"
+                            ),
+                            0,
+                        )
+                        or 0
+                    )
+                    a_sc = int(
+                        next(
+                            (
+                                c.get("score")
+                                for c in comp.get("competitors", [])
+                                if c.get("homeAway") == "away"
+                            ),
+                            0,
+                        )
+                        or 0
+                    )
 
                     odds_list = comp.get("odds", [])
                     h_odds, d_odds, a_odds = None, None, None
@@ -108,11 +152,19 @@ class OddsFetcher:
 
                     if odds_list:
                         o0 = odds_list[0]
-                        bookmaker_name = o0.get("provider", {}).get("name", bookmaker_name)
+                        bookmaker_name = o0.get("provider", {}).get(
+                            "name", bookmaker_name
+                        )
                         ml = o0.get("moneyline", {})
-                        h_am = ml.get("home", {}).get("current", {}).get("odds") or ml.get("home", {}).get("close", {}).get("odds")
-                        d_am = ml.get("draw", {}).get("current", {}).get("odds") or ml.get("draw", {}).get("close", {}).get("odds")
-                        a_am = ml.get("away", {}).get("current", {}).get("odds") or ml.get("away", {}).get("close", {}).get("odds")
+                        h_am = ml.get("home", {}).get("current", {}).get(
+                            "odds"
+                        ) or ml.get("home", {}).get("close", {}).get("odds")
+                        d_am = ml.get("draw", {}).get("current", {}).get(
+                            "odds"
+                        ) or ml.get("draw", {}).get("close", {}).get("odds")
+                        a_am = ml.get("away", {}).get("current", {}).get(
+                            "odds"
+                        ) or ml.get("away", {}).get("close", {}).get("odds")
 
                         if not d_am and "drawOdds" in o0:
                             d_am = o0["drawOdds"].get("moneyLine")
@@ -124,21 +176,30 @@ class OddsFetcher:
                     if not (h_odds and d_odds and a_odds):
                         continue
 
-                    is_live = (state == "in")
-                    league_fixtures.append({
-                        "id": f"espn_{ev_id}",
-                        "league": league_name,
-                        "date": date_str,
-                        "home_team": home,
-                        "away_team": away,
-                        "is_live": is_live,
-                        "current_score": {home: h_sc, away: a_sc, "home": h_sc, "away": a_sc} if is_live else {},
-                        "elapsed_minutes": elapsed_min if is_live else 0.0,
-                        "bookmaker": bookmaker_name,
-                        "home_odds": float(h_odds),
-                        "draw_odds": float(d_odds),
-                        "away_odds": float(a_odds)
-                    })
+                    is_live = state == "in"
+                    league_fixtures.append(
+                        {
+                            "id": f"espn_{ev_id}",
+                            "league": league_name,
+                            "date": date_str,
+                            "home_team": home,
+                            "away_team": away,
+                            "is_live": is_live,
+                            "current_score": {
+                                home: h_sc,
+                                away: a_sc,
+                                "home": h_sc,
+                                "away": a_sc,
+                            }
+                            if is_live
+                            else {},
+                            "elapsed_minutes": elapsed_min if is_live else 0.0,
+                            "bookmaker": bookmaker_name,
+                            "home_odds": float(h_odds),
+                            "draw_odds": float(d_odds),
+                            "away_odds": float(a_odds),
+                        }
+                    )
                 return league_fixtures
             except Exception as e:
                 logger.debug(f"ESPN fetch error for {league_code}: {e}")
@@ -146,7 +207,9 @@ class OddsFetcher:
 
         leagues_to_fetch = dict(ESPN_SOCCER_LEAGUES)
         try:
-            h_url = "https://site.web.api.espn.com/apis/v2/scoreboard/header?sport=soccer"
+            h_url = (
+                "https://site.web.api.espn.com/apis/v2/scoreboard/header?sport=soccer"
+            )
             h_res = requests.get(h_url, timeout=4)
             if h_res.ok:
                 for lg in h_res.json().get("sports", [{}])[0].get("leagues", []):
@@ -157,9 +220,12 @@ class OddsFetcher:
         except Exception as e:
             logger.debug(f"Dynamic league discovery note: {e}")
 
-        all_fixtures: List[Dict[str, Any]] = []
+        all_fixtures: list[dict[str, Any]] = []
         with ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(_fetch_league, code, name) for code, name in leagues_to_fetch.items()]
+            futures = [
+                executor.submit(_fetch_league, code, name)
+                for code, name in leagues_to_fetch.items()
+            ]
             for f in futures:
                 try:
                     res = f.result()
@@ -167,10 +233,12 @@ class OddsFetcher:
                 except Exception as e:
                     logger.debug(f"League future exception: {e}")
 
-        logger.info(f"Retrieved {len(all_fixtures)} live/today fixtures across {len(leagues_to_fetch)} leagues from ESPN Scoreboard Feed.")
+        logger.info(
+            f"Retrieved {len(all_fixtures)} live/today fixtures across {len(leagues_to_fetch)} leagues from ESPN Scoreboard Feed."
+        )
         return all_fixtures
 
-    def fetch_the_odds_api_fixtures(self) -> List[Dict[str, Any]]:
+    def fetch_the_odds_api_fixtures(self) -> list[dict[str, Any]]:
         """
         Attempts to fetch live odds from The-Odds-API if credits are available.
         Skips gracefully if credits are exhausted (HTTP 401/429).
@@ -182,7 +250,9 @@ class OddsFetcher:
         try:
             res = requests.get(url, timeout=4)
             if res.status_code == 401 or res.status_code == 429:
-                logger.warning("The-Odds-API credit quota reached. Proceeding with ESPN live feeds.")
+                logger.warning(
+                    "The-Odds-API credit quota reached. Proceeding with ESPN live feeds."
+                )
                 return []
             if res.ok:
                 events = res.json()
@@ -193,43 +263,52 @@ class OddsFetcher:
                     bookmakers = ev.get("bookmakers", [])
                     if not bookmakers:
                         continue
-                    b = next((x for x in bookmakers if x.get("key") == "pinnacle"), bookmakers[0])
+                    b = next(
+                        (x for x in bookmakers if x.get("key") == "pinnacle"),
+                        bookmakers[0],
+                    )
                     markets = b.get("markets", [])
                     if not markets:
                         continue
                     h2h = markets[0].get("outcomes", [])
                     h_odds = next((o["price"] for o in h2h if o["name"] == home), None)
                     a_odds = next((o["price"] for o in h2h if o["name"] == away), None)
-                    d_odds = next((o["price"] for o in h2h if o["name"].lower() == "draw"), None)
+                    d_odds = next(
+                        (o["price"] for o in h2h if o["name"].lower() == "draw"), None
+                    )
                     if h_odds and d_odds and a_odds:
-                        parsed.append({
-                            "id": f"toa_{ev.get('id')}",
-                            "league": "Premier League",
-                            "date": ev.get("commence_time"),
-                            "home_team": home,
-                            "away_team": away,
-                            "is_live": False,
-                            "current_score": {},
-                            "elapsed_minutes": 0.0,
-                            "bookmaker": b.get("title", "Pinnacle"),
-                            "home_odds": float(h_odds),
-                            "draw_odds": float(d_odds),
-                            "away_odds": float(a_odds)
-                        })
+                        parsed.append(
+                            {
+                                "id": f"toa_{ev.get('id')}",
+                                "league": "Premier League",
+                                "date": ev.get("commence_time"),
+                                "home_team": home,
+                                "away_team": away,
+                                "is_live": False,
+                                "current_score": {},
+                                "elapsed_minutes": 0.0,
+                                "bookmaker": b.get("title", "Pinnacle"),
+                                "home_odds": float(h_odds),
+                                "draw_odds": float(d_odds),
+                                "away_odds": float(a_odds),
+                            }
+                        )
                 return parsed
         except Exception as e:
             logger.debug(f"The-Odds-API attempt failed: {e}")
             return []
         return []
 
-    def fetch_live_and_today_fixtures(self, sports: Optional[Any] = None) -> List[Dict[str, Any]]:
+    def fetch_live_and_today_fixtures(
+        self, sports: Any | None = None
+    ) -> list[dict[str, Any]]:
         """
         Master method: Fetches real-time in-play and today's matches from active live systems.
         Prioritizes ESPN's high-frequency live scoreboard, complemented by bookmaker lines.
         Enforces strict ZERO-MOCK policy: never falls back to static placeholder CSVs.
         """
         fixtures = self.fetch_espn_live_fixtures()
-        
+
         # Merge any complementary feeds if available
         toa_fixtures = self.fetch_the_odds_api_fixtures()
         seen_pairs = {(f["home_team"], f["away_team"]) for f in fixtures}
@@ -240,10 +319,12 @@ class OddsFetcher:
                 seen_pairs.add(pair)
 
         if not fixtures:
-            logger.warning("No live or upcoming fixtures available from real endpoints. Zero-mock enforced.")
+            logger.warning(
+                "No live or upcoming fixtures available from real endpoints. Zero-mock enforced."
+            )
         return fixtures
 
-    def fetch_upcoming_pre_match(self) -> List[Dict[str, Any]]:
+    def fetch_upcoming_pre_match(self) -> list[dict[str, Any]]:
         """
         Fetches ONLY pre-match (not in-play) fixtures from ESPN and The-Odds-API.
         Explicitly excludes any fixture where state == 'in' (live in-play).
@@ -252,11 +333,15 @@ class OddsFetcher:
         # 1. Try The-Odds-API first (native pre-match feed, already is_live=False)
         toa = self.fetch_the_odds_api_fixtures()
         if toa:
-            logger.info(f"fetch_upcoming_pre_match: {len(toa)} fixtures from The-Odds-API.")
+            logger.info(
+                f"fetch_upcoming_pre_match: {len(toa)} fixtures from The-Odds-API."
+            )
             return toa
 
         # 2. Fallback: ESPN scoreboard, filter to pre-match state only
-        def _fetch_league_pre(league_code: str, league_name: str) -> List[Dict[str, Any]]:
+        def _fetch_league_pre(
+            league_code: str, league_name: str
+        ) -> list[dict[str, Any]]:
             url = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{league_code}/scoreboard"
             try:
                 res = requests.get(url, timeout=5)
@@ -279,8 +364,14 @@ class OddsFetcher:
                     competitors = comp.get("competitors", [])
                     if len(competitors) < 2:
                         continue
-                    home_comp = next((c for c in competitors if c.get("homeAway") == "home"), competitors[0])
-                    away_comp = next((c for c in competitors if c.get("homeAway") == "away"), competitors[1])
+                    home_comp = next(
+                        (c for c in competitors if c.get("homeAway") == "home"),
+                        competitors[0],
+                    )
+                    away_comp = next(
+                        (c for c in competitors if c.get("homeAway") == "away"),
+                        competitors[1],
+                    )
                     home = home_comp.get("team", {}).get("displayName", "")
                     away = away_comp.get("team", {}).get("displayName", "")
                     if not home or not away:
@@ -295,11 +386,19 @@ class OddsFetcher:
                     bookmaker_name = "ESPN Consensus"
                     if odds_list:
                         o0 = odds_list[0]
-                        bookmaker_name = o0.get("provider", {}).get("name", bookmaker_name)
+                        bookmaker_name = o0.get("provider", {}).get(
+                            "name", bookmaker_name
+                        )
                         ml = o0.get("moneyline", {})
-                        h_am = ml.get("home", {}).get("current", {}).get("odds") or ml.get("home", {}).get("close", {}).get("odds")
-                        d_am = ml.get("draw", {}).get("current", {}).get("odds") or ml.get("draw", {}).get("close", {}).get("odds")
-                        a_am = ml.get("away", {}).get("current", {}).get("odds") or ml.get("away", {}).get("close", {}).get("odds")
+                        h_am = ml.get("home", {}).get("current", {}).get(
+                            "odds"
+                        ) or ml.get("home", {}).get("close", {}).get("odds")
+                        d_am = ml.get("draw", {}).get("current", {}).get(
+                            "odds"
+                        ) or ml.get("draw", {}).get("close", {}).get("odds")
+                        a_am = ml.get("away", {}).get("current", {}).get(
+                            "odds"
+                        ) or ml.get("away", {}).get("close", {}).get("odds")
                         if not d_am and "drawOdds" in o0:
                             d_am = o0["drawOdds"].get("moneyLine")
                         h_odds = american_to_decimal(h_am)
@@ -309,37 +408,44 @@ class OddsFetcher:
                     if not (h_odds and d_odds and a_odds):
                         continue
 
-                    league_fixtures.append({
-                        "id": f"espn_{ev_id}",
-                        "league": league_name,
-                        "date": date_str,
-                        "home_team": home,
-                        "away_team": away,
-                        "is_live": False,
-                        "current_score": {},
-                        "elapsed_minutes": 0.0,
-                        "bookmaker": bookmaker_name,
-                        "home_odds": float(h_odds),
-                        "draw_odds": float(d_odds),
-                        "away_odds": float(a_odds)
-                    })
+                    league_fixtures.append(
+                        {
+                            "id": f"espn_{ev_id}",
+                            "league": league_name,
+                            "date": date_str,
+                            "home_team": home,
+                            "away_team": away,
+                            "is_live": False,
+                            "current_score": {},
+                            "elapsed_minutes": 0.0,
+                            "bookmaker": bookmaker_name,
+                            "home_odds": float(h_odds),
+                            "draw_odds": float(d_odds),
+                            "away_odds": float(a_odds),
+                        }
+                    )
                 return league_fixtures
             except Exception as e:
                 logger.debug(f"ESPN pre-match fetch error for {league_code}: {e}")
                 return []
 
-        all_fixtures: List[Dict[str, Any]] = []
+        all_fixtures: list[dict[str, Any]] = []
         with ThreadPoolExecutor(max_workers=10) as executor:
-            futures = [executor.submit(_fetch_league_pre, code, name) for code, name in ESPN_SOCCER_LEAGUES.items()]
+            futures = [
+                executor.submit(_fetch_league_pre, code, name)
+                for code, name in ESPN_SOCCER_LEAGUES.items()
+            ]
             for fut in futures:
                 try:
                     all_fixtures.extend(fut.result())
                 except Exception as e:
                     logger.debug(f"Pre-match league future error: {e}")
 
-        logger.info(f"fetch_upcoming_pre_match (ESPN fallback): {len(all_fixtures)} pre-match fixtures across {len(ESPN_SOCCER_LEAGUES)} leagues.")
+        logger.info(
+            f"fetch_upcoming_pre_match (ESPN fallback): {len(all_fixtures)} pre-match fixtures across {len(ESPN_SOCCER_LEAGUES)} leagues."
+        )
         return all_fixtures
 
-    def fetch_upcoming_fixtures(self) -> List[Dict[str, Any]]:
+    def fetch_upcoming_fixtures(self) -> list[dict[str, Any]]:
         """Canonical entry point for upcoming (pre-match only) fixtures. Zero mock."""
         return self.fetch_upcoming_pre_match()

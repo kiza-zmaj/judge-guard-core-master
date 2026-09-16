@@ -9,23 +9,25 @@ Strictly separates training, calibration, and out-of-sample evaluation.
 """
 
 import math
+from dataclasses import dataclass
+from typing import Any
+
 import numpy as np
 from scipy.optimize import minimize_scalar
-from dataclasses import dataclass
-from typing import Dict, Any, List, Tuple, Optional
+
 
 @dataclass
 class CalibrationGateVerdict:
     passed: bool
     brier_score: float
     # ECE is Optional[float] — None means EMPTY_INPUT, not a valid measurement
-    ece_pct: Optional[float]
-    mce_pct: Optional[float]
+    ece_pct: float | None
+    mce_pct: float | None
     sample_size: int
     is_drift_detected: bool
     status: str
-    failure_reasons: List[str]
-    reliability_table: List[Dict[str, Any]]
+    failure_reasons: list[str]
+    reliability_table: list[dict[str, Any]]
 
 
 class TemperatureScaler:
@@ -33,12 +35,17 @@ class TemperatureScaler:
     Platt-style Temperature Scaling for multi-class probabilities (Home/Draw/Away).
     MUST be fitted strictly on PAST window data only — never on OOS evaluation data.
     """
+
     def __init__(self, default_temp: float = 1.05):
         self.temperature = default_temp
         self.is_fitted = False
 
-    def fit(self, prob_distributions: List[Dict[str, float]], actual_results: List[str]) -> float:
-        if len(prob_distributions) < 30 or len(prob_distributions) != len(actual_results):
+    def fit(
+        self, prob_distributions: list[dict[str, float]], actual_results: list[str]
+    ) -> float:
+        if len(prob_distributions) < 30 or len(prob_distributions) != len(
+            actual_results
+        ):
             return self.temperature
 
         outcomes = ["home", "draw", "away"]
@@ -64,7 +71,9 @@ class TemperatureScaler:
             logits = np.log(probs_np) / temp
             exp_logits = np.exp(logits - np.max(logits, axis=1, keepdims=True))
             softmax_probs = exp_logits / np.sum(exp_logits, axis=1, keepdims=True)
-            return -np.mean(np.log(softmax_probs[np.arange(len(labels_np)), labels_np] + 1e-12))
+            return -np.mean(
+                np.log(softmax_probs[np.arange(len(labels_np)), labels_np] + 1e-12)
+            )
 
         res = minimize_scalar(nll, bounds=(0.5, 3.0), method="bounded")
         if res.success:
@@ -73,9 +82,11 @@ class TemperatureScaler:
 
         return self.temperature
 
-    def scale(self, probs: Dict[str, float]) -> Dict[str, float]:
+    def scale(self, probs: dict[str, float]) -> dict[str, float]:
         outcomes = ["home", "draw", "away"]
-        logits = [math.log(max(probs.get(o, 0.0), 1e-6)) / self.temperature for o in outcomes]
+        logits = [
+            math.log(max(probs.get(o, 0.0), 1e-6)) / self.temperature for o in outcomes
+        ]
         max_l = max(logits)
         exp_l = [math.exp(l - max_l) for l in logits]
         sum_exp = sum(exp_l)
@@ -92,16 +103,19 @@ class ModelCalibration:
 
     @staticmethod
     def calculate_brier_score(
-        predictions: List[Dict[str, float]],
-        actuals: List[str]
-    ) -> Dict[str, Any]:
+        predictions: list[dict[str, float]], actuals: list[str]
+    ) -> dict[str, Any]:
         """
         Multi-class Brier Score: BS = (1/N) * sum_i sum_k (p_ik - y_ik)^2
         Baseline (uniform 33/33/33) = 0.667. Lower is better.
         Returns sample_size=0 and score=0.6667 for empty/invalid input.
         """
         if not predictions or not actuals or len(predictions) != len(actuals):
-            return {"brier_score": 0.6667, "sample_size": 0, "error": "EMPTY_OR_MISMATCHED_INPUT"}
+            return {
+                "brier_score": 0.6667,
+                "sample_size": 0,
+                "error": "EMPTY_OR_MISMATCHED_INPUT",
+            }
 
         outcomes = ["home", "draw", "away"]
         total_sq_error = 0.0
@@ -123,15 +137,13 @@ class ModelCalibration:
             "brier_home": round(per_outcome["home"] / n, 5),
             "brier_draw": round(per_outcome["draw"] / n, 5),
             "brier_away": round(per_outcome["away"] / n, 5),
-            "sample_size": n
+            "sample_size": n,
         }
 
     @staticmethod
     def calculate_ece(
-        predicted_probs: List[float],
-        true_labels: List[int],
-        num_bins: int = 10
-    ) -> Dict[str, Any]:
+        predicted_probs: list[float], true_labels: list[int], num_bins: int = 10
+    ) -> dict[str, Any]:
         """
         Binary ECE for a single outcome class (use as part of multiclass OvR).
         Returns ece=None (not 0.0) for empty input — distinguishes missing data
@@ -148,7 +160,7 @@ class ModelCalibration:
                 "mce_pct": None,
                 "bins": [],
                 "sample_size": 0,
-                "error": "EMPTY_INPUT — ECE not measurable"
+                "error": "EMPTY_INPUT — ECE not measurable",
             }
 
         probs = np.array(predicted_probs, dtype=float)
@@ -163,7 +175,11 @@ class ModelCalibration:
         for i in range(num_bins):
             lo = bin_boundaries[i]
             hi = bin_boundaries[i + 1]
-            in_bin = (probs >= lo) & (probs < hi) if i < num_bins - 1 else (probs >= lo) & (probs <= hi)
+            in_bin = (
+                (probs >= lo) & (probs < hi)
+                if i < num_bins - 1
+                else (probs >= lo) & (probs <= hi)
+            )
             bin_size = int(np.sum(in_bin))
 
             if bin_size > 0:
@@ -172,13 +188,15 @@ class ModelCalibration:
                 gap = abs(acc - conf)
                 ece += (bin_size / n) * gap
                 mce = max(mce, gap)
-                bin_details.append({
-                    "bin_range": f"{lo:.2f}-{hi:.2f}",
-                    "count": bin_size,
-                    "mean_predicted_prob": round(conf, 4),
-                    "empirical_frequency": round(acc, 4),
-                    "abs_error": round(gap, 4)
-                })
+                bin_details.append(
+                    {
+                        "bin_range": f"{lo:.2f}-{hi:.2f}",
+                        "count": bin_size,
+                        "mean_predicted_prob": round(conf, 4),
+                        "empirical_frequency": round(acc, 4),
+                        "abs_error": round(gap, 4),
+                    }
+                )
 
         return {
             "ece": round(float(ece), 4),
@@ -186,16 +204,16 @@ class ModelCalibration:
             "mce": round(float(mce), 4),
             "mce_pct": round(float(mce) * 100, 2),
             "bins": bin_details,
-            "sample_size": n
+            "sample_size": n,
         }
 
     @staticmethod
     def calculate_multiclass_ece(
-        predicted_distributions: List[Dict[str, float]],
-        actual_results: List[str],
-        outcomes: List[str] = None,
-        num_bins: int = 10
-    ) -> Dict[str, Any]:
+        predicted_distributions: list[dict[str, float]],
+        actual_results: list[str],
+        outcomes: list[str] | None = None,
+        num_bins: int = 10,
+    ) -> dict[str, Any]:
         """
         Multiclass ECE via One-vs-Rest (OvR) decomposition.
         For each outcome class, treats it as a binary problem and computes ECE.
@@ -216,7 +234,7 @@ class ModelCalibration:
                 "per_class_ece": {},
                 "bins_per_class": {},
                 "sample_size": 0,
-                "error": "EMPTY_INPUT — ECE not measurable"
+                "error": "EMPTY_INPUT — ECE not measurable",
             }
 
         per_class_results = {}
@@ -236,7 +254,7 @@ class ModelCalibration:
                 "ece_pct": None,
                 "per_class_ece": per_class_results,
                 "sample_size": len(predicted_distributions),
-                "error": "ECE_COMPUTATION_FAILED"
+                "error": "ECE_COMPUTATION_FAILED",
             }
 
         macro_ece = float(np.mean(ece_values))
@@ -247,21 +265,23 @@ class ModelCalibration:
                 o: {
                     "ece_pct": per_class_results[o].get("ece_pct"),
                     "mce_pct": per_class_results[o].get("mce_pct"),
-                    "sample_size": per_class_results[o].get("sample_size", 0)
+                    "sample_size": per_class_results[o].get("sample_size", 0),
                 }
                 for o in outcomes
             },
-            "bins_per_class": {o: per_class_results[o].get("bins", []) for o in outcomes},
-            "sample_size": len(predicted_distributions)
+            "bins_per_class": {
+                o: per_class_results[o].get("bins", []) for o in outcomes
+            },
+            "sample_size": len(predicted_distributions),
         }
 
     @staticmethod
     def produce_reliability_table(
-        predicted_distributions: List[Dict[str, float]],
-        actual_results: List[str],
+        predicted_distributions: list[dict[str, float]],
+        actual_results: list[str],
         outcome: str = "home",
-        num_bins: int = 10
-    ) -> List[Dict[str, Any]]:
+        num_bins: int = 10,
+    ) -> list[dict[str, Any]]:
         """
         Returns an inspectable reliability table for a single outcome class.
         Format: bin | count | mean_predicted_prob | empirical_frequency | abs_error
@@ -275,11 +295,11 @@ class ModelCalibration:
     @classmethod
     def evaluate_out_of_sample_gate(
         cls,
-        predicted_prob_distributions: List[Dict[str, float]],
-        actual_results: List[str],
+        predicted_prob_distributions: list[dict[str, float]],
+        actual_results: list[str],
         min_sample_size: int = 100,
         max_ece_pct: float = 6.0,
-        max_brier: float = 0.65
+        max_brier: float = 0.65,
     ) -> CalibrationGateVerdict:
         """
         GATE A: CALIBRATION GATE.
@@ -305,12 +325,12 @@ class ModelCalibration:
             )
 
         # 2. Brier Score
-        brier_metrics = cls.calculate_brier_score(predicted_prob_distributions, actual_results)
+        brier_metrics = cls.calculate_brier_score(
+            predicted_prob_distributions, actual_results
+        )
         brier = brier_metrics.get("brier_score", 1.0)
         if brier > max_brier:
-            failure_reasons.append(
-                f"Brier {brier:.4f} > threshold {max_brier:.4f}."
-            )
+            failure_reasons.append(f"Brier {brier:.4f} > threshold {max_brier:.4f}.")
 
         # 3. Multiclass ECE (OvR) — over ALL OOS predictions
         ece_metrics = cls.calculate_multiclass_ece(
@@ -320,7 +340,9 @@ class ModelCalibration:
         mce_pct = None
 
         if ece_pct is None:
-            failure_reasons.append("ECE could not be computed — empty OOS prediction set.")
+            failure_reasons.append(
+                "ECE could not be computed — empty OOS prediction set."
+            )
         elif ece_pct > max_ece_pct:
             failure_reasons.append(
                 f"ECE {ece_pct:.2f}% > threshold {max_ece_pct:.2f}%."
@@ -328,7 +350,9 @@ class ModelCalibration:
 
         # MCE: worst class
         per_class = ece_metrics.get("per_class_ece", {})
-        mce_values = [v.get("mce_pct") for v in per_class.values() if v.get("mce_pct") is not None]
+        mce_values = [
+            v.get("mce_pct") for v in per_class.values() if v.get("mce_pct") is not None
+        ]
         if mce_values:
             mce_pct = round(max(mce_values), 2)
 
@@ -366,5 +390,5 @@ class ModelCalibration:
             is_drift_detected=is_drift,
             status="CALIBRATION_PASS" if passed else "CALIBRATION_FAILED",
             failure_reasons=failure_reasons,
-            reliability_table=reliability_table
+            reliability_table=reliability_table,
         )

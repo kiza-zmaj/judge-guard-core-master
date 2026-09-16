@@ -3,27 +3,28 @@ Understat xG Scraper & Historical Fallback Loader.
 Extracts expected goals (xG) and expected goals against (xGA) per team.
 """
 
-import os
-import json
 import logging
+import os
+
 import pandas as pd
-from typing import Dict, Any, Optional
+
 from unified_betting_core.config import DATA_DIR, DEFAULT_LEAGUE, DEFAULT_SEASON
 
 logger = logging.getLogger("SharpBet.Understat")
 
-class UnderstatScraper:
-    def __init__(self, data_dir: Optional[str] = None):
-        self.data_dir = data_dir or str(DATA_DIR)
-        self.team_stats: Dict[str, Dict[str, float]] = {}
 
-    def get_team_stats(self) -> Dict[str, Dict[str, float]]:
+class UnderstatScraper:
+    def __init__(self, data_dir: str | None = None):
+        self.data_dir = data_dir or str(DATA_DIR)
+        self.team_stats: dict[str, dict[str, float]] = {}
+
+    def get_team_stats(self) -> dict[str, dict[str, float]]:
         """Returns the dictionary of loaded or scraped team xG stats."""
         if not self.team_stats:
             self.load_or_scrape()
         return self.team_stats
 
-    def load_or_scrape(self) -> Dict[str, Dict[str, float]]:
+    def load_or_scrape(self) -> dict[str, dict[str, float]]:
         """
         Attempts to scrape live stats from Understat.
         Falls back seamlessly to local historical dataset if network is unavailable.
@@ -31,11 +32,14 @@ class UnderstatScraper:
         try:
             return self._scrape_live()
         except Exception as e:
-            logger.warning(f"Live Understat scraping unavailable ({e}). Falling back to local historical data.")
+            logger.warning(
+                f"Live Understat scraping unavailable ({e}). Falling back to local historical data."
+            )
             return self._load_from_local()
 
-    def _scrape_live(self) -> Dict[str, Dict[str, float]]:
+    def _scrape_live(self) -> dict[str, dict[str, float]]:
         import asyncio
+
         import aiohttp
         from understat import Understat
 
@@ -56,7 +60,7 @@ class UnderstatScraper:
                             "xGA": round(total_xga / matches_count, 3),
                             "total_xG": round(total_xg, 2),
                             "total_xGA": round(total_xga, 2),
-                            "matches": matches_count
+                            "matches": matches_count,
                         }
                 return stats
 
@@ -67,7 +71,7 @@ class UnderstatScraper:
         logger.info(f"Scraped live Understat data for {len(stats)} teams.")
         return stats
 
-    def _load_from_local(self) -> Dict[str, Dict[str, float]]:
+    def _load_from_local(self) -> dict[str, dict[str, float]]:
         """Computes aggregate xG & xGA per match from historical_matches.csv."""
         hist_path = os.path.join(self.data_dir, "historical_matches.csv")
         if not os.path.exists(hist_path):
@@ -75,7 +79,7 @@ class UnderstatScraper:
             return {}
 
         df = pd.read_csv(hist_path)
-        stats: Dict[str, Dict[str, float]] = {}
+        stats: dict[str, dict[str, float]] = {}
 
         for _, row in df.iterrows():
             home = str(row.get("home_team", "")).strip()
@@ -103,7 +107,7 @@ class UnderstatScraper:
                 "xGA": round(data["xGA_sum"] / cnt, 3),
                 "total_xG": round(data["xG_sum"], 2),
                 "total_xGA": round(data["xGA_sum"], 2),
-                "matches": cnt
+                "matches": cnt,
             }
 
         self.team_stats = res

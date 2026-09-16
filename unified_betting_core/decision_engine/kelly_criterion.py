@@ -4,31 +4,35 @@ Enforces fractional Kelly betting (Half-Kelly) and maximum exposure caps.
 """
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 from unified_betting_core.config import (
+    DEFAULT_BANKROLL,
     KELLY_FRACTION,
-    MIN_EDGE,
     MAX_BANKROLL_PCT,
-    DEFAULT_BANKROLL
+    MIN_EDGE,
 )
 
 logger = logging.getLogger("SharpBet.KellyCriterion")
+
 
 class KellyCriterion:
     def __init__(
         self,
         fraction: float = KELLY_FRACTION,
         min_edge: float = MIN_EDGE,
-        max_bankroll_pct: float = MAX_BANKROLL_PCT
+        max_bankroll_pct: float = MAX_BANKROLL_PCT,
     ):
         self.fraction = fraction
         self.min_edge = min_edge
         self.max_bankroll_pct = max_bankroll_pct
 
-    def calculate_stake(self, model_prob: float, market_odds: float, bankroll: float = DEFAULT_BANKROLL) -> float:
+    def calculate_stake(
+        self, model_prob: float, market_odds: float, bankroll: float = DEFAULT_BANKROLL
+    ) -> float:
         """
         Calculates optimal stake using Fractional Kelly Criterion.
-        
+
         Formula:
             b = market_odds - 1 (net profit per unit)
             q = 1 - model_prob
@@ -54,14 +58,16 @@ class KellyCriterion:
 
         return round(max(final_stake, 0.0), 2)
 
-    def allocate_portfolio(self, value_bets: List[Dict[str, Any]], bankroll: float = DEFAULT_BANKROLL) -> List[Dict[str, Any]]:
+    def allocate_portfolio(
+        self, value_bets: list[dict[str, Any]], bankroll: float = DEFAULT_BANKROLL
+    ) -> list[dict[str, Any]]:
         """
         Allocates stakes across multiple value bets simultaneously.
         Enforces total portfolio exposure cap (e.g., max 30% of bankroll across concurrent wagers).
         """
         allocated = []
         total_staked = 0.0
-        portfolio_cap = bankroll * 0.35 # Max 35% total portfolio risk
+        portfolio_cap = bankroll * 0.35  # Max 35% total portfolio risk
 
         for bet in value_bets:
             prob = bet.get("model_prob", 0.0)

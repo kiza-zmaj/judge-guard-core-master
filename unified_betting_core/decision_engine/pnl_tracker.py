@@ -4,10 +4,12 @@ Tracks actual settled bets, ROI / Yield, Max Drawdown, Profit Factor,
 and correlation between Closing Line Value (CLV) and Realized Profit.
 """
 
-import math
+from typing import Any
+
 import numpy as np
-from typing import Dict, Any, List, Optional
+
 from unified_betting_core.config import DEFAULT_BANKROLL
+
 
 class PnLTracker:
     """
@@ -18,8 +20,8 @@ class PnLTracker:
         self.initial_bankroll = initial_bankroll
         self.current_bankroll = initial_bankroll
         self.peak_bankroll = initial_bankroll
-        self.bets: List[Dict[str, Any]] = []
-        self.equity_curve: List[Dict[str, Any]] = [
+        self.bets: list[dict[str, Any]] = []
+        self.equity_curve: list[dict[str, Any]] = [
             {"bet_num": 0, "bankroll": initial_bankroll, "pnl": 0.0}
         ]
 
@@ -30,10 +32,10 @@ class PnLTracker:
         placed_odds: float,
         stake: float,
         actual_result: str,
-        closing_odds: Optional[float] = None,
-        closing_fair_odds: Optional[float] = None,
-        date: Optional[str] = None
-    ) -> Dict[str, Any]:
+        closing_odds: float | None = None,
+        closing_fair_odds: float | None = None,
+        date: str | None = None,
+    ) -> dict[str, Any]:
         """
         Records and settles a single wager.
         Result is evaluated: 'won' if outcome matches actual_result, else 'lost'.
@@ -41,22 +43,25 @@ class PnLTracker:
         if stake <= 0 or placed_odds <= 1.0:
             return {}
 
-        is_win = (outcome.lower().strip() == actual_result.lower().strip())
+        is_win = outcome.lower().strip() == actual_result.lower().strip()
         profit = (stake * placed_odds - stake) if is_win else -stake
 
         self.current_bankroll += profit
-        if self.current_bankroll > self.peak_bankroll:
-            self.peak_bankroll = self.current_bankroll
+        self.peak_bankroll = max(self.peak_bankroll, self.current_bankroll)
 
         # CLV calculation if closing odds provided
         clv_info = {}
         if closing_odds and closing_odds > 1.0:
             raw_clv = (placed_odds / closing_odds) - 1.0
-            fair_clv = (placed_odds / closing_fair_odds) - 1.0 if closing_fair_odds else raw_clv
+            fair_clv = (
+                (placed_odds / closing_fair_odds) - 1.0
+                if closing_fair_odds
+                else raw_clv
+            )
             clv_info = {
                 "closing_odds": closing_odds,
                 "raw_clv": round(raw_clv, 4),
-                "fair_clv": round(fair_clv, 4)
+                "fair_clv": round(fair_clv, 4),
             }
 
         bet_entry = {
@@ -70,19 +75,21 @@ class PnLTracker:
             "is_win": is_win,
             "pnl": round(profit, 2),
             "bankroll_after": round(self.current_bankroll, 2),
-            **clv_info
+            **clv_info,
         }
 
         self.bets.append(bet_entry)
-        self.equity_curve.append({
-            "bet_num": len(self.bets),
-            "bankroll": round(self.current_bankroll, 2),
-            "pnl": round(self.current_bankroll - self.initial_bankroll, 2)
-        })
+        self.equity_curve.append(
+            {
+                "bet_num": len(self.bets),
+                "bankroll": round(self.current_bankroll, 2),
+                "pnl": round(self.current_bankroll - self.initial_bankroll, 2),
+            }
+        )
 
         return bet_entry
 
-    def get_summary_metrics(self) -> Dict[str, Any]:
+    def get_summary_metrics(self) -> dict[str, Any]:
         """
         Generates full quantitative summary of performance.
         """
@@ -98,7 +105,7 @@ class PnLTracker:
                 "max_drawdown_eur": 0.0,
                 "max_drawdown_pct": 0.0,
                 "profit_factor": 0.0,
-                "clv_pnl_correlation": 0.0
+                "clv_pnl_correlation": 0.0,
             }
 
         total_bets = len(self.bets)
@@ -111,7 +118,7 @@ class PnLTracker:
 
         gross_wins = sum(b["pnl"] for b in self.bets if b["pnl"] > 0)
         gross_losses = abs(sum(b["pnl"] for b in self.bets if b["pnl"] < 0))
-        profit_factor = (gross_wins / max(gross_losses, 0.01))
+        profit_factor = gross_wins / max(gross_losses, 0.01)
 
         # Max Drawdown computation
         peak = self.initial_bankroll
@@ -120,14 +127,11 @@ class PnLTracker:
 
         for point in self.equity_curve:
             b_val = point["bankroll"]
-            if b_val > peak:
-                peak = b_val
+            peak = max(peak, b_val)
             dd = peak - b_val
             dd_pct = (dd / peak) * 100.0 if peak > 0 else 0.0
-            if dd > max_dd_eur:
-                max_dd_eur = dd
-            if dd_pct > max_dd_pct:
-                max_dd_pct = dd_pct
+            max_dd_eur = max(max_dd_eur, dd)
+            max_dd_pct = max(max_dd_pct, dd_pct)
 
         # Correlation between CLV and individual bet return
         clv_list = []
@@ -139,7 +143,11 @@ class PnLTracker:
                 return_list.append(b["pnl"] / max(b["stake"], 0.01))
 
         clv_corr = 0.0
-        if len(clv_list) >= 5 and np.std(clv_list) > 1e-6 and np.std(return_list) > 1e-6:
+        if (
+            len(clv_list) >= 5
+            and np.std(clv_list) > 1e-6
+            and np.std(return_list) > 1e-6
+        ):
             clv_corr = float(np.corrcoef(clv_list, return_list)[0, 1])
 
         return {
@@ -155,5 +163,5 @@ class PnLTracker:
             "max_drawdown_eur": round(max_dd_eur, 2),
             "max_drawdown_pct": round(max_dd_pct, 2),
             "profit_factor": round(profit_factor, 2),
-            "clv_pnl_correlation": round(clv_corr, 3)
+            "clv_pnl_correlation": round(clv_corr, 3),
         }

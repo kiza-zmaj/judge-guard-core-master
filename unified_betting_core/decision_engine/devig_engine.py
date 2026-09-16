@@ -5,12 +5,13 @@ Supports Multiplicative and Power / Logarithmic de-vig methods.
 """
 
 import math
-from typing import Dict, Any, List, Tuple
+
 from scipy.optimize import brentq
+
 
 class DevigEngine:
     @staticmethod
-    def calculate_overround(odds_dict: Dict[str, float]) -> Tuple[float, float]:
+    def calculate_overround(odds_dict: dict[str, float]) -> tuple[float, float]:
         """
         Calculates total implied probability (sum of inverses) and bookmaker overround / margin.
         Example: 1.95 / 1.95 -> sum = 1.0256 -> margin = 2.56%
@@ -24,7 +25,7 @@ class DevigEngine:
         return round(inv_sum, 5), round(margin, 5)
 
     @staticmethod
-    def devig_multiplicative(odds_dict: Dict[str, float]) -> Dict[str, float]:
+    def devig_multiplicative(odds_dict: dict[str, float]) -> dict[str, float]:
         """
         Basic proportional de-vig: P_i = (1 / O_i) / sum(1 / O_j).
         Fast, but assumes bookmaker spreads vig equally across all outcomes.
@@ -43,7 +44,7 @@ class DevigEngine:
         return devigged
 
     @staticmethod
-    def devig_power(odds_dict: Dict[str, float]) -> Dict[str, float]:
+    def devig_power(odds_dict: dict[str, float]) -> dict[str, float]:
         """
         Power Method / Logarithmic De-vig (Standard in Sharp Sports Analytics).
         Solves for exponent k such that sum((1 / O_i)^k) = 1.0.
@@ -62,7 +63,7 @@ class DevigEngine:
         try:
             # k is typically between 1.0 and 4.0 for normal margins
             k_star = brentq(f, 0.5, 6.0)
-        except Exception:
+        except (ValueError, RuntimeError):
             # Fallback to multiplicative if solver fails
             return DevigEngine.devig_multiplicative(odds_dict)
 
@@ -77,7 +78,7 @@ class DevigEngine:
         return {k: round(v / total, 5) for k, v in devigged.items()}
 
     @staticmethod
-    def fair_odds(devig_probs: Dict[str, float]) -> Dict[str, float]:
+    def fair_odds(devig_probs: dict[str, float]) -> dict[str, float]:
         """
         Converts true de-vigged probabilities into fair (zero-vig) decimal odds.
         Fair Odds = 1 / P_true

@@ -17,18 +17,21 @@ Generates the 13 required forensic validation artifacts:
 13. reproduce_command.sh: Exact shell command to reproduce all artifacts
 """
 
-import os
-import json
 import hashlib
+import json
+import os
+from typing import Any
+
 import numpy as np
 import pandas as pd
-from typing import Dict, Any
+
 from unified_betting_core.config import DATA_DIR
 from unified_betting_core.validation.leakage_tests import LeakageAuditor
 
 
 class _NumpySafeEncoder(json.JSONEncoder):
     """Handles numpy scalar types that the default JSON encoder cannot serialize."""
+
     def default(self, obj):
         if isinstance(obj, (np.bool_,)):
             return bool(obj)
@@ -49,13 +52,15 @@ class EvidencePackageGenerator:
     Generates and persists the complete 14-artifact forensic evidence package.
     """
 
-    def __init__(self, output_dir: str = None):
+    def __init__(self, output_dir: str | None = None):
         if output_dir is None:
             output_dir = os.path.join(DATA_DIR, "evidence_package")
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
 
-    def generate_package(self, wf_result: Dict[str, Any], raw_df: pd.DataFrame) -> Dict[str, str]:
+    def generate_package(
+        self, wf_result: dict[str, Any], raw_df: pd.DataFrame
+    ) -> dict[str, str]:
         """
         Builds all 14 artifacts from walk-forward results and saves to disk.
         Returns a dictionary mapping artifact name to its absolute file path.
@@ -144,14 +149,14 @@ class EvidencePackageGenerator:
                 "closing_benchmark_odds": "closing_home_odds, closing_draw_odds, closing_away_odds (Pinnacle Closing: PSCH, PSCD, PSCA recorded at kickoff)",
                 "pinnacle_opening_odds": "pinnacle_open_home, pinnacle_open_draw, pinnacle_open_away (Pinnacle Opening: PSH, PSD, PSA recorded mid-week)",
                 "bet365_opening_odds": "b365_open_home, b365_open_draw, b365_open_away (Bet365 Opening: B365H, B365D, B365A)",
-                "average_closing_odds": "closing_avg_home, closing_avg_draw, closing_avg_away (Market Average Closing: AvgCH, AvgCD, AvgCA)"
+                "average_closing_odds": "closing_avg_home, closing_avg_draw, closing_avg_away (Market Average Closing: AvgCH, AvgCD, AvgCA)",
             },
             "provenance_forensic_note": (
                 "Previous v1 release incorrectly mapped PSH/PSD/PSA as closing odds. "
                 "In football-data.co.uk data dictionary, PSH/PSD/PSA are Pinnacle pre-closing (opening) lines, "
                 "while PSCH/PSCD/PSCA are Pinnacle closing lines recorded at kickoff. "
                 "Corrected in v2 release to eliminate artificial margin bias."
-            )
+            ),
         }
         p11 = os.path.join(self.output_dir, "timestamps_audit.json")
         with open(p11, "w") as f:
@@ -170,7 +175,9 @@ class EvidencePackageGenerator:
         with open(p13, "w") as f:
             f.write("#!/bin/bash\n")
             f.write("# SharpBet Core Forensic Validation Reproduction Script\n")
-            f.write("cd /home/kizamladjanijebac/Documents/jude\\ guard/judge-guard-core-master\n")
+            f.write(
+                "cd /home/kizamladjanijebac/Documents/jude\\ guard/judge-guard-core-master\n"
+            )
             f.write("python3 -m unified_betting_core.main --walk-forward\n")
         os.chmod(p13, 0o755)
         paths["13_reproduce_command"] = p13
@@ -195,7 +202,7 @@ class EvidencePackageGenerator:
             "operational_recommendation": {
                 "status": "RESEARCH_ONLY",
                 "authorized_stake_eur": 0.00,
-                "reason": "Gate B (Market Alpha/CLV) and Gate C (Economic ROI CI) failed. Model has demonstrated tail sensitivity."
+                "reason": "Gate B (Market Alpha/CLV) and Gate C (Economic ROI CI) failed. Model has demonstrated tail sensitivity.",
             },
             "brier_score_audit": {
                 "previous_package_brier": 0.5936,
@@ -206,9 +213,9 @@ class EvidencePackageGenerator:
                     "Brier score: (1/N) * sum_{i=1}^N sum_{c=1}^3 (p_{ic} - y_{ic})^2 / 3. "
                     "The 0.00151 variance from the previous package (0.5936) was caused by a slight boundary difference "
                     "in the initial rolling calibration warm-up window."
-                )
+                ),
             },
-            "artifact_checksums_sha256": artifact_checksums
+            "artifact_checksums_sha256": artifact_checksums,
         }
         p14 = os.path.join(self.output_dir, "version_hashes.json")
         with open(p14, "w") as f:

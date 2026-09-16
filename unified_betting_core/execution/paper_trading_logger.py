@@ -6,11 +6,12 @@ ensuring an unalterable audit trail before any live capital execution can be aut
 STRICTLY ENFORCES STAKE = €0.00 WHILE SYSTEM IS IN RESEARCH-ONLY / PAPER TRADING STATUS.
 """
 
-import os
-import json
 import hashlib
-from typing import Dict, Any, Optional, List
+import json
+import os
 from datetime import datetime, timezone
+from typing import Any
+
 from unified_betting_core.config import DATA_DIR
 
 PAPER_LOG_FILE = os.path.join(DATA_DIR, "paper_trading_log.jsonl")
@@ -21,12 +22,12 @@ class PaperTradingLogger:
     Append-only audit logger for paper trading fixtures and bets.
     """
 
-    def __init__(self, log_path: Optional[str] = None):
+    def __init__(self, log_path: str | None = None):
         self.log_path = log_path or PAPER_LOG_FILE
         os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
 
     @staticmethod
-    def compute_input_hash(data: Dict[str, Any]) -> str:
+    def compute_input_hash(data: dict[str, Any]) -> str:
         """Computes deterministic SHA-256 hash of fixture inputs and odds."""
         serialized = json.dumps(data, sort_keys=True, default=str)
         return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
@@ -37,28 +38,31 @@ class PaperTradingLogger:
         match: str,
         outcome: str,
         odds: float,
-        prediction: Dict[str, float],
+        prediction: dict[str, float],
         ev_pct: float,
         ece_at_time: float,
         bookmaker: str = "MarketMax",
         model_version: str = "PoissonEngine-v2.0-TempScaled",
         data_status: str = "CACHED",
-        rejection_reason: Optional[str] = None,
+        rejection_reason: str | None = None,
         is_executable: bool = False,
-        raw_input_data: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        raw_input_data: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Appends an immutable record to the paper trading audit log.
         Forces recommended stake to €0.00 if system has not achieved verified production status.
         """
         now_utc = datetime.now(timezone.utc).isoformat()
-        input_hash = self.compute_input_hash(raw_input_data or {
-            "event_id": event_id,
-            "match": match,
-            "outcome": outcome,
-            "odds": odds,
-            "bookmaker": bookmaker
-        })
+        input_hash = self.compute_input_hash(
+            raw_input_data
+            or {
+                "event_id": event_id,
+                "match": match,
+                "outcome": outcome,
+                "odds": odds,
+                "bookmaker": bookmaker,
+            }
+        )
 
         # SAFETY LAW: Stake MUST be €0.00 while in Paper Trading / Research-Only mode
         stake_recommended = 0.00
@@ -84,7 +88,7 @@ class PaperTradingLogger:
             "actual_result": None,
             "closing_odds": None,
             "realized_clv": None,
-            "realized_pnl": None
+            "realized_pnl": None,
         }
 
         # Append to jsonl
@@ -93,7 +97,7 @@ class PaperTradingLogger:
 
         return entry
 
-    def read_all_logs(self) -> List[Dict[str, Any]]:
+    def read_all_logs(self) -> list[dict[str, Any]]:
         """Reads all historical paper trading entries."""
         if not os.path.exists(self.log_path):
             return []
@@ -108,7 +112,7 @@ class PaperTradingLogger:
                         continue
         return entries
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Summarizes current paper trading audit trail."""
         logs = self.read_all_logs()
         total = len(logs)
@@ -119,5 +123,5 @@ class PaperTradingLogger:
             "settled_records": settled,
             "pending_records": total - settled,
             "operational_status": "RESEARCH_ONLY_PAPER_TRADING",
-            "stake_limit_eur": 0.00
+            "stake_limit_eur": 0.00,
         }
