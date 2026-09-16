@@ -215,3 +215,52 @@ def test_zero_future_leakage_in_walk_forward_data():
 
     df["dt"] = pd.to_datetime(df["date"])
     assert df["dt"].is_monotonic_increasing
+
+
+# =====================================================================
+# 5. PAPER TRADING & BIAS STRESS TESTS (PHASE 0-8)
+# =====================================================================
+
+def test_paper_trading_logger_enforces_zero_stake(tmp_path):
+    """Verify that PaperTradingLogger strictly records €0.00 stake in research mode."""
+    from unified_betting_core.execution.paper_trading_logger import PaperTradingLogger
+    log_file = tmp_path / "paper_test.jsonl"
+    logger = PaperTradingLogger(log_path=str(log_file))
+
+    entry = logger.log_bet_candidate(
+        event_id="2026-09-20_Arsenal_Chelsea_home",
+        match="Arsenal vs Chelsea",
+        outcome="home",
+        odds=2.10,
+        prediction={"home": 0.52, "draw": 0.26, "away": 0.22},
+        ev_pct=9.2,
+        ece_at_time=3.79
+    )
+
+    assert entry["stake_recommended"] == 0.00
+    assert entry["operational_mode"] == "PAPER_TRADING_RESEARCH_ONLY"
+    assert entry["input_hash"] is not None
+
+    logs = logger.read_all_logs()
+    assert len(logs) == 1
+    assert logs[0]["event_id"] == "2026-09-20_Arsenal_Chelsea_home"
+
+
+def test_bias_stress_auditor_detects_tail_sensitivity():
+    """Verify that BiasStressAuditor correctly identifies tail sensitivity when few bets flip ROI."""
+    from unified_betting_core.validation.bias_analysis import BiasStressAuditor
+
+    # Simulated 20 bets: 1 big outlier win (+50.0), 19 losses (-2.0 each = -38.0). Total PnL = +12.0
+    mock_bets = [
+        {"date": "2025-01-01", "match": "A vs B", "outcome": "away", "placed_odds": 6.0, "closing_odds": 4.0, "fair_clv": 0.35, "stake": 10.0, "pnl": 50.0}
+    ] + [
+        {"date": f"2025-01-{i:02d}", "match": f"T{i} vs T{i+1}", "outcome": "home", "placed_odds": 2.0, "closing_odds": 2.0, "fair_clv": 0.0, "stake": 2.0, "pnl": -2.0}
+        for i in range(2, 21)
+    ]
+
+    audit = BiasStressAuditor.audit_bias_and_stress(mock_bets)
+    assert audit["status"] == "COMPLETED"
+    assert audit["is_tail_sensitive"] is True
+    assert audit["roi_flip_k"] == 1  # Removing just the 1 top bet flips ROI negative
+    assert "FAILED_STRESS_TEST" in audit["verdict"]
+

@@ -95,6 +95,7 @@ class GateCResult:
     max_drawdown_pct: float
     final_bankroll: float
     failure_reasons: List[str]
+    pnl_by_outcome: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -148,7 +149,8 @@ class ThreeGateVerdict:
                 "roi_ci_lower_pct": self.gate_c.roi_ci_lower_pct,
                 "roi_ci_upper_pct": self.gate_c.roi_ci_upper_pct,
                 "max_drawdown_pct": self.gate_c.max_drawdown_pct,
-                "failure_reasons": self.gate_c.failure_reasons
+                "failure_reasons": self.gate_c.failure_reasons,
+                "pnl_by_outcome": self.gate_c.pnl_by_outcome
             }
         }
 
@@ -337,7 +339,15 @@ class EmpiricalDecisionGate:
         notes.append(f"Anti-delusion passed: calibrated EV +{cal_ev_pct}%")
 
         # Three-Gate Governance Verification
-        has_empirical_proof = three_gate_passed or (out_of_sample_calibration_passed and historical_clv_demonstrated)
+        if out_of_sample_calibration_passed is False:
+            notes.append("Rejected: Out-of-sample calibration gate failed")
+            return self._reject(FinalStatus.CALIBRATION_FAILED, p_model, p_devig, best_odds, verdicts, notes)
+
+        if (historical_sample_size < 100 or not historical_clv_demonstrated) and not three_gate_passed:
+            notes.append(f"Rejected: Insufficient empirical evidence (sample={historical_sample_size}, clv_demo={historical_clv_demonstrated})")
+            return self._reject(FinalStatus.INSUFFICIENT_EVIDENCE, p_model, p_devig, best_odds, verdicts, notes)
+
+        has_empirical_proof = three_gate_passed or (out_of_sample_calibration_passed and historical_clv_demonstrated and historical_sample_size >= 100)
         if has_empirical_proof:
             status = FinalStatus.EXECUTABLE_EV
             is_exe = True

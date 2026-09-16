@@ -211,10 +211,12 @@ class WalkForwardEngine:
                     "fair_clv": clv_metric.get("fair_clv"),
                     "fair_clv_pct": clv_metric.get("fair_clv_pct"),
                     "beat_closing": clv_metric.get("beat_closing", False),
-                    # Candidate signal: FAIR CLV >= 2.0% (de-vigged closing odds).
-                    # fair_clv_pct eliminates ~3% margin artifact from MaxH vs Pinnacle.
+                    # Candidate signal: PRE-MATCH DETERMINATION (strictly before kickoff)
+                    # Candidate signal is generated when model identifies positive calibrated EV
+                    # and odds are within tradeable range (<= 4.0), WITHOUT ANY LOOKAHEAD to closing lines.
                     "is_candidate_signal": (
-                        ((clv_metric.get("fair_clv_pct") or 0.0) >= 2.0) and (b_odds <= 4.0)
+                        (gate_eval.status.value in ["CALIBRATED_EV", "EXECUTABLE_EV"] or gate_eval.calibrated_ev_pct >= 1.0)
+                        and (b_odds <= 4.0)
                     )
                 }
                 candidate_warehouse.append(candidate_record)
@@ -317,14 +319,15 @@ class WalkForwardEngine:
         pnl_tracker = PnLTracker(initial_bankroll=self.initial_bankroll)
         placed_bets: List[Dict[str, Any]] = []
 
-        # Group candidates by match and pick best EV candidate per match
+        # Group candidates by match and pick best PRE-MATCH EV candidate per match (No CLV lookahead)
         candidates_by_match: Dict[str, List[Dict[str, Any]]] = {}
         for c in candidate_signals:
             m_key = f"{c['date']}_{c['match']}"
             candidates_by_match.setdefault(m_key, []).append(c)
 
         for m_key, match_cands in candidates_by_match.items():
-            best_cand = max(match_cands, key=lambda x: (x.get("fair_clv_pct") or 0.0))
+            # Pre-match decision: choose candidate with highest calibrated EV (strictly pre-kickoff)
+            best_cand = max(match_cands, key=lambda x: (x.get("calibrated_ev_pct") or 0.0))
             # Safe proportional unit stake (1.0% bankroll) for empirical evidence gate
             stake = round(pnl_tracker.current_bankroll * 0.01, 2)
             if stake > 0:
@@ -347,6 +350,11 @@ class WalkForwardEngine:
         roi_pct = pnl_summary["roi_yield_pct"]
         max_dd_pct = pnl_summary["max_drawdown_pct"]
 
+        # Gate C Thresholds (Frozen pre-evaluation, as specified in approved implementation plan)
+        GATE_C_CI_LOWER_FLOOR = -2.0   # Lower 95% CI bound must not be worse than -2.0%
+        GATE_C_MIN_BETS = 100          # Statistical sample size requirement
+        GATE_C_MAX_DRAWDOWN = 35.0
+
         # Confidence interval for ROI
         if total_bets >= 10:
             returns = [(b["pnl"] / max(b["stake"], 0.01)) for b in pnl_tracker.bets]
@@ -356,12 +364,36 @@ class WalkForwardEngine:
         else:
             roi_ci_lower = roi_pct
             roi_ci_upper = roi_pct
-            gate_c_failures.append(f"Insufficient total bets for economic significance: {total_bets} (min 30).")
 
+        if total_bets < GATE_C_MIN_BETS:
+            gate_c_failures.append(f"Insufficient total bets for economic significance: {total_bets} (min {GATE_C_MIN_BETS}).")
         if roi_pct <= 0.0:
             gate_c_failures.append(f"Realized ROI is non-positive ({roi_pct:.2f}%).")
-        if max_dd_pct > 35.0:
-            gate_c_failures.append(f"Maximum drawdown ({max_dd_pct:.2f}%) exceeds safety threshold of 35.0%.")
+        if roi_ci_lower < GATE_C_CI_LOWER_FLOOR:
+            gate_c_failures.append(
+                f"ROI 95% CI lower bound ({roi_ci_lower:.2f}%) is below safety floor ({GATE_C_CI_LOWER_FLOOR:.2f}%). "
+                f"Statistical edge cannot be distinguished from random noise."
+            )
+        if max_dd_pct > GATE_C_MAX_DRAWDOWN:
+            gate_c_failures.append(f"Maximum drawdown ({max_dd_pct:.2f}%) exceeds safety threshold of {GATE_C_MAX_DRAWDOWN:.2f}%.")
+
+        # Per-outcome P&L breakdown
+        pnl_by_outcome = {}
+        for out in ["home", "draw", "away"]:
+            out_bets = [b for b in pnl_tracker.bets if b["outcome"].lower() == out]
+            out_count = len(out_bets)
+            out_pnl = sum(b["pnl"] for b in out_bets)
+            out_stakes = sum(b["stake"] for b in out_bets)
+            out_roi = (out_pnl / out_stakes * 100.0) if out_stakes > 0 else 0.0
+            out_wins = sum(1 for b in out_bets if b.get("is_win") or (b["pnl"] > 0))
+            pnl_by_outcome[out] = {
+                "bets": out_count,
+                "wins": out_wins,
+                "win_rate_pct": round(out_wins / max(out_count, 1) * 100.0, 2),
+                "total_pnl": round(out_pnl, 2),
+                "total_stakes": round(out_stakes, 2),
+                "roi_pct": round(out_roi, 2)
+            }
 
         gate_c_passed = (len(gate_c_failures) == 0)
         gate_c = GateCResult(
@@ -374,7 +406,8 @@ class WalkForwardEngine:
             roi_ci_upper_pct=round(roi_ci_upper, 2),
             max_drawdown_pct=max_dd_pct,
             final_bankroll=pnl_summary["current_bankroll"],
-            failure_reasons=gate_c_failures
+            failure_reasons=gate_c_failures,
+            pnl_by_outcome=pnl_by_outcome
         )
 
         # ─────────────────────────────────────────────────────────────────────

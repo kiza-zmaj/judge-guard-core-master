@@ -43,12 +43,12 @@
     },
     "odds_state_independence_test": {
       "passed": true,
-      "evidence": "Opening and closing odds are independently recorded market states: 95.8% of home odds moved between opening and closing line.",
+      "evidence": "Opening and closing odds are independently recorded market states: 96.6% of home odds moved between opening and closing line.",
       "details": {
         "total_matches": 1140,
-        "home_odds_moved": 1092,
-        "away_odds_moved": 1093,
-        "pct_home_odds_moved": 95.79
+        "home_odds_moved": 1101,
+        "away_odds_moved": 1115,
+        "pct_home_odds_moved": 96.58
       }
     },
     "candidate_isolation_test": {
