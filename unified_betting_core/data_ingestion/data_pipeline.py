@@ -46,12 +46,13 @@ class DataPipeline:
         self.understat = UnderstatScraper()
         self.odds_fetcher = OddsFetcher()
 
-    def get_unified_dataset(self) -> pd.DataFrame:
+    def get_unified_dataset(self, fixtures: Optional[List[Dict[str, Any]]] = None) -> pd.DataFrame:
         """
         Gathers upcoming fixtures, normalizes team names,
         attaches home and away xG / xGA metrics, and returns a DataFrame.
         """
-        fixtures = self.odds_fetcher.fetch_upcoming_fixtures()
+        if fixtures is None:
+            fixtures = self.odds_fetcher.fetch_upcoming_fixtures()
         team_stats = self.understat.get_team_stats()
 
         rows = []
@@ -75,11 +76,12 @@ class DataPipeline:
             opp_home_xga = h_stat.get("xGA", 1.2)
             est_away_xg = round((base_away_xg + opp_home_xga) / 2.0, 2)
 
-            # If the CSV already had specific match xG provided, preserve it
+            # If match has specific match xG provided, preserve it
             final_home_xg = float(match.get("home_xg", est_home_xg))
             final_away_xg = float(match.get("away_xg", est_away_xg))
 
             rows.append({
+                "id": match.get("id"),
                 "date": match.get("date", "Upcoming"),
                 "league": match.get("league", "EPL"),
                 "home_team": home,
@@ -87,9 +89,21 @@ class DataPipeline:
                 "home_odds": float(match.get("home_odds", 2.0)),
                 "draw_odds": float(match.get("draw_odds", 3.2)),
                 "away_odds": float(match.get("away_odds", 3.5)),
+                "bookmaker": match.get("bookmaker", "Market Average"),
                 "home_xg": final_home_xg,
-                "away_xg": final_away_xg
+                "away_xg": final_away_xg,
+                "is_live": match.get("is_live", False),
+                "current_score": match.get("current_score", {}),
+                "elapsed_minutes": match.get("elapsed_minutes", 0.0)
             })
 
         df = pd.DataFrame(rows)
         return df
+
+    def get_live_and_today_dataset(self, sports: Optional[List[str]] = None) -> pd.DataFrame:
+        """
+        Gathers real-time in-play and today's matches directly from The-Odds-API.
+        """
+        fixtures = self.odds_fetcher.fetch_live_and_today_fixtures(sports=sports)
+        return self.get_unified_dataset(fixtures=fixtures)
+
