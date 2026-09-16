@@ -1,6 +1,7 @@
 """
-Odds Fetcher & Bookmaker Feed Ingestion.
-Supports The-Odds-API, Pinnacle, and local upcoming fixtures fallback.
+Odds Fetcher & Live Multi-System Feed Ingestion.
+Integrates ESPN Global Live Scoreboard & Market Feeds and The-Odds-API.
+Strict Zero-Mock / Zero-Synthetic Policy Enforced.
 """
 
 import os
@@ -9,209 +10,226 @@ import requests
 import datetime
 import pandas as pd
 from typing import List, Dict, Any, Optional
-from unified_betting_core.config import ODDS_API_URL, ODDS_API_KEY, DATA_DIR
+from concurrent.futures import ThreadPoolExecutor
+from unified_betting_core.config import ODDS_API_KEY, DATA_DIR
 
 logger = logging.getLogger("SharpBet.OddsFetcher")
 
-DEFAULT_TARGET_SPORTS = [
-    "soccer_conmebol_copa_sudamericana",
-    "soccer_mexico_ligamx",
-    "soccer_england_efl_cup",
-    "soccer_uefa_europa_league",
-    "soccer_spain_la_liga",
-    "soccer_epl"
-]
+ESPN_SOCCER_LEAGUES = {
+    "mex.1": "Liga MX",
+    "uefa.europa": "UEFA Europa League",
+    "uefa.champions": "UEFA Champions League",
+    "uefa.europa.conf": "UEFA Conference League",
+    "eng.1": "Premier League",
+    "eng.2": "Championship",
+    "esp.1": "La Liga",
+    "esp.2": "Segunda División",
+    "ger.1": "Bundesliga",
+    "ger.2": "2. Bundesliga",
+    "ita.1": "Serie A",
+    "ita.2": "Serie B",
+    "fra.1": "Ligue 1",
+    "fra.2": "Ligue 2",
+    "ned.1": "Eredivisie",
+    "por.1": "Primeira Liga",
+    "tur.1": "Süper Lig",
+    "sau.1": "Saudi Pro League",
+    "arg.1": "Argentine Primera División",
+    "bra.1": "Campeonato Brasileiro Série A",
+    "col.1": "Categoría Primera A",
+    "conmebol.sudamericana": "Copa Sudamericana",
+    "conmebol.libertadores": "Copa Libertadores",
+    "usa.1": "MLS",
+    "aus.1": "A-League Men",
+    "jpn.1": "J1 League"
+}
+
+def american_to_decimal(am: Any) -> Optional[float]:
+    """Converts American moneyline string/int (e.g. +360, -175) to European decimal odds."""
+    if not am:
+        return None
+    try:
+        val = float(str(am).replace("+", ""))
+        if val > 0:
+            return round(1.0 + (val / 100.0), 2)
+        elif val < 0:
+            return round(1.0 + (100.0 / abs(val)), 2)
+    except Exception:
+        return None
+    return None
 
 class OddsFetcher:
     def __init__(self, data_dir: Optional[str] = None):
         self.data_dir = data_dir or str(DATA_DIR)
-        self.api_key = os.getenv("ODDS_API_KEY", ODDS_API_KEY)
+        self.the_odds_api_key = os.getenv("ODDS_API_KEY", ODDS_API_KEY)
 
-    def fetch_live_and_today_fixtures(self, sports: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+    def fetch_espn_live_fixtures(self) -> List[Dict[str, Any]]:
         """
-        Fetches real-time live in-play matches and today's upcoming fixtures across active competitions.
-        Extracts live scores from /scores/ and sharp Pinnacle odds from /odds/.
+        Fetches live in-play and scheduled matches from ESPN Official Scoreboard API.
+        Extracts live clock, current scores, match period, and DraftKings/Consensus odds.
         Zero mock, zero simulation.
         """
-        target_sports = sports or DEFAULT_TARGET_SPORTS
-        now = datetime.datetime.now(datetime.timezone.utc)
-        fixtures: List[Dict[str, Any]] = []
-
-        for s in target_sports:
+        def _fetch_league(league_code: str, league_name: str) -> List[Dict[str, Any]]:
+            url = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{league_code}/scoreboard"
             try:
-                # 1. Fetch live scores endpoint
-                scores_map = {}
-                try:
-                    scores_res = requests.get(
-                        f"https://api.the-odds-api.com/v4/sports/{s}/scores/?daysFrom=1&apiKey={self.api_key}",
-                        timeout=5
-                    )
-                    if scores_res.status_code == 200:
-                        for item in scores_res.json():
-                            scores_map[item.get("id")] = item
-                except Exception as e:
-                    logger.debug(f"Scores fetch error for {s}: {e}")
+                res = requests.get(url, timeout=5)
+                if not res.ok:
+                    return []
+                events = res.json().get("events", [])
+                league_fixtures = []
 
-                # 2. Fetch live odds endpoint
-                odds_res = requests.get(
-                    f"https://api.the-odds-api.com/v4/sports/{s}/odds?regions=eu,us&markets=h2h&apiKey={self.api_key}",
-                    timeout=5
-                )
-                if odds_res.status_code != 200:
-                    continue
-
-                events = odds_res.json()
                 for ev in events:
                     ev_id = ev.get("id")
-                    commence_str = ev.get("commence_time")
-                    if not commence_str:
+                    date_str = ev.get("date")
+                    status_obj = ev.get("status", {})
+                    state = status_obj.get("type", {}).get("state")
+                    clock_str = status_obj.get("displayClock", "0").replace("'", "").replace("+", "")
+                    try:
+                        elapsed_min = float(clock_str.split("+")[0]) if clock_str else 0.0
+                    except Exception:
+                        elapsed_min = 0.0
+
+                    # Only process in-play ("in") or upcoming today ("pre")
+                    if state not in ["in", "pre"]:
                         continue
 
-                    commence = datetime.datetime.fromisoformat(commence_str.replace("Z", "+00:00"))
-                    diff_hours = (commence - now).total_seconds() / 3600.0
-
-                    # Filter: in-play matches (-3.5h <= diff <= 0) or matches today (0 < diff <= 24h)
-                    if not (-3.5 <= diff_hours <= 24.0):
+                    comp = ev.get("competitions", [{}])[0]
+                    home = next((c["team"]["displayName"] for c in comp.get("competitors", []) if c.get("homeAway") == "home"), None)
+                    away = next((c["team"]["displayName"] for c in comp.get("competitors", []) if c.get("homeAway") == "away"), None)
+                    if not home or not away:
                         continue
 
-                    score_info = scores_map.get(ev_id, {})
-                    if score_info.get("completed", False):
+                    h_sc = int(next((c.get("score") for c in comp.get("competitors", []) if c.get("homeAway") == "home"), 0) or 0)
+                    a_sc = int(next((c.get("score") for c in comp.get("competitors", []) if c.get("homeAway") == "away"), 0) or 0)
+
+                    odds_list = comp.get("odds", [])
+                    h_odds, d_odds, a_odds = None, None, None
+                    bookmaker_name = "DraftKings / ESPN Consensus"
+
+                    if odds_list:
+                        o0 = odds_list[0]
+                        bookmaker_name = o0.get("provider", {}).get("name", bookmaker_name)
+                        ml = o0.get("moneyline", {})
+                        h_am = ml.get("home", {}).get("current", {}).get("odds") or ml.get("home", {}).get("close", {}).get("odds")
+                        d_am = ml.get("draw", {}).get("current", {}).get("odds") or ml.get("draw", {}).get("close", {}).get("odds")
+                        a_am = ml.get("away", {}).get("current", {}).get("odds") or ml.get("away", {}).get("close", {}).get("odds")
+
+                        if not d_am and "drawOdds" in o0:
+                            d_am = o0["drawOdds"].get("moneyLine")
+
+                        h_odds = american_to_decimal(h_am)
+                        d_odds = american_to_decimal(d_am)
+                        a_odds = american_to_decimal(a_am)
+
+                    if not (h_odds and d_odds and a_odds):
                         continue
 
-                    scores_list = score_info.get("scores")
-                    current_score = {}
-                    if scores_list:
-                        for sc in scores_list:
-                            current_score[sc["name"]] = int(sc["score"])
+                    is_live = (state == "in")
+                    league_fixtures.append({
+                        "id": f"espn_{ev_id}",
+                        "league": league_name,
+                        "date": date_str,
+                        "home_team": home,
+                        "away_team": away,
+                        "is_live": is_live,
+                        "current_score": {home: h_sc, away: a_sc, "home": h_sc, "away": a_sc} if is_live else {},
+                        "elapsed_minutes": elapsed_min if is_live else 0.0,
+                        "bookmaker": bookmaker_name,
+                        "home_odds": float(h_odds),
+                        "draw_odds": float(d_odds),
+                        "away_odds": float(a_odds)
+                    })
+                return league_fixtures
+            except Exception as e:
+                logger.debug(f"ESPN fetch error for {league_code}: {e}")
+                return []
 
-                    is_live = diff_hours <= 0.0
-                    elapsed_minutes = max(0.0, -diff_hours * 60.0) if is_live else 0.0
+        all_fixtures: List[Dict[str, Any]] = []
+        with ThreadPoolExecutor(max_workers=6) as executor:
+            futures = [executor.submit(_fetch_league, code, name) for code, name in ESPN_SOCCER_LEAGUES.items()]
+            for f in futures:
+                try:
+                    res = f.result()
+                    all_fixtures.extend(res)
+                except Exception as e:
+                    logger.debug(f"League future exception: {e}")
 
+        logger.info(f"Retrieved {len(all_fixtures)} live/today fixtures from ESPN Scoreboard Feed.")
+        return all_fixtures
+
+    def fetch_the_odds_api_fixtures(self) -> List[Dict[str, Any]]:
+        """
+        Attempts to fetch live odds from The-Odds-API if credits are available.
+        Skips gracefully if credits are exhausted (HTTP 401/429).
+        """
+        if not self.the_odds_api_key:
+            return []
+
+        url = f"https://api.the-odds-api.com/v4/sports/soccer_epl/odds?regions=eu&markets=h2h&apiKey={self.the_odds_api_key}"
+        try:
+            res = requests.get(url, timeout=4)
+            if res.status_code == 401 or res.status_code == 429:
+                logger.warning("The-Odds-API credit quota reached. Proceeding with ESPN live feeds.")
+                return []
+            if res.ok:
+                events = res.json()
+                parsed = []
+                for ev in events:
+                    home = ev.get("home_team")
+                    away = ev.get("away_team")
                     bookmakers = ev.get("bookmakers", [])
                     if not bookmakers:
                         continue
-
-                    # Sharp bookmaker selection hierarchy: Pinnacle -> Betfair -> Coolbet -> Unibet -> First
-                    sharp_keys = ["pinnacle", "betfair_ex_eu", "coolbet", "unibet_eu", "unibet_se", "leovegas_se", "sport888"]
-                    chosen_b = None
-                    for k in sharp_keys:
-                        for b in bookmakers:
-                            if b.get("key") == k:
-                                chosen_b = b
-                                break
-                        if chosen_b:
-                            break
-                    if not chosen_b:
-                        chosen_b = bookmakers[0]
-
-                    markets = chosen_b.get("markets", [])
+                    b = next((x for x in bookmakers if x.get("key") == "pinnacle"), bookmakers[0])
+                    markets = b.get("markets", [])
                     if not markets:
                         continue
-
                     h2h = markets[0].get("outcomes", [])
-                    home = ev.get("home_team")
-                    away = ev.get("away_team")
-
                     h_odds = next((o["price"] for o in h2h if o["name"] == home), None)
                     a_odds = next((o["price"] for o in h2h if o["name"] == away), None)
                     d_odds = next((o["price"] for o in h2h if o["name"].lower() == "draw"), None)
-
-                    if h_odds and a_odds and d_odds:
-                        fixtures.append({
-                            "id": ev_id,
-                            "sport": s,
-                            "league": ev.get("sport_title", s.replace("soccer_", "").upper()),
-                            "date": commence_str,
+                    if h_odds and d_odds and a_odds:
+                        parsed.append({
+                            "id": f"toa_{ev.get('id')}",
+                            "league": "Premier League",
+                            "date": ev.get("commence_time"),
                             "home_team": home,
                             "away_team": away,
-                            "is_live": is_live,
-                            "current_score": current_score,
-                            "elapsed_minutes": elapsed_minutes,
-                            "bookmaker": chosen_b.get("title", "Market Average"),
+                            "is_live": False,
+                            "current_score": {},
+                            "elapsed_minutes": 0.0,
+                            "bookmaker": b.get("title", "Pinnacle"),
                             "home_odds": float(h_odds),
                             "draw_odds": float(d_odds),
                             "away_odds": float(a_odds)
                         })
+                return parsed
+        except Exception as e:
+            logger.debug(f"The-Odds-API attempt failed: {e}")
+            return []
+        return []
 
-            except Exception as e:
-                logger.warning(f"Error fetching live fixtures for {s}: {e}")
+    def fetch_live_and_today_fixtures(self, sports: Optional[Any] = None) -> List[Dict[str, Any]]:
+        """
+        Master method: Fetches real-time in-play and today's matches from active live systems.
+        Prioritizes ESPN's high-frequency live scoreboard, complemented by bookmaker lines.
+        Enforces strict ZERO-MOCK policy: never falls back to static placeholder CSVs.
+        """
+        fixtures = self.fetch_espn_live_fixtures()
+        
+        # Merge any complementary feeds if available
+        toa_fixtures = self.fetch_the_odds_api_fixtures()
+        seen_pairs = {(f["home_team"], f["away_team"]) for f in fixtures}
+        for tf in toa_fixtures:
+            pair = (tf["home_team"], tf["away_team"])
+            if pair not in seen_pairs:
+                fixtures.append(tf)
+                seen_pairs.add(pair)
 
-        logger.info(f"Retrieved {len(fixtures)} live/today matches from The-Odds-API.")
+        if not fixtures:
+            logger.warning("No live or upcoming fixtures available from real endpoints. Zero-mock enforced.")
         return fixtures
 
     def fetch_upcoming_fixtures(self) -> List[Dict[str, Any]]:
-        """
-        Fetches upcoming matches with 1X2 market odds.
-        Attempts live multi-competition retrieval first; falls back to EPL or local CSV.
-        """
-        live_matches = self.fetch_live_and_today_fixtures()
-        if live_matches:
-            return live_matches
-
-        try:
-            res = requests.get(ODDS_API_URL, timeout=5)
-            if res.status_code == 200:
-                data = res.json()
-                parsed = self._parse_odds_api_response(data)
-                if parsed:
-                    logger.info(f"Retrieved {len(parsed)} live fixtures from The-Odds-API.")
-                    return parsed
-        except Exception as e:
-            logger.warning(f"Live odds API request failed: {e}. Falling back to local upcoming fixtures.")
-
-        return self._load_local_fixtures()
-
-    def _parse_odds_api_response(self, raw_matches: list) -> List[Dict[str, Any]]:
-        matches = []
-        for item in raw_matches:
-            home = item.get("home_team")
-            away = item.get("away_team")
-            commence = item.get("commence_time")
-
-            bookmakers = item.get("bookmakers", [])
-            if not bookmakers:
-                continue
-
-            # Prioritize sharp bookmaker Pinnacle if present
-            bookie = next((b for b in bookmakers if b.get("key") == "pinnacle"), bookmakers[0])
-            markets = bookie.get("markets", [])
-            if not markets:
-                continue
-
-            h2h = markets[0].get("outcomes", [])
-            home_odds = next((o["price"] for o in h2h if o["name"] == home), 2.0)
-            away_odds = next((o["price"] for o in h2h if o["name"] == away), 3.0)
-            draw_odds = next((o["price"] for o in h2h if o["name"].lower() == "draw"), 3.2)
-
-            matches.append({
-                "date": commence,
-                "league": "EPL",
-                "home_team": home,
-                "away_team": away,
-                "is_live": False,
-                "current_score": {},
-                "elapsed_minutes": 0.0,
-                "home_odds": float(home_odds),
-                "draw_odds": float(draw_odds),
-                "away_odds": float(away_odds),
-                "bookmaker": bookie.get("title", "Market Average")
-            })
-
-        return matches
-
-    def _load_local_fixtures(self) -> List[Dict[str, Any]]:
-        """Loads upcoming fixtures and odds from local CSV."""
-        path = os.path.join(self.data_dir, "upcoming_fixtures.csv")
-        if not os.path.exists(path):
-            logger.error(f"Local fixtures file not found at {path}")
-            return []
-
-        df = pd.read_csv(path)
-        records = df.to_dict(orient="records")
-        for r in records:
-            r["is_live"] = False
-            r["current_score"] = {}
-            r["elapsed_minutes"] = 0.0
-        logger.info(f"Loaded {len(records)} fixtures from local storage ({path}).")
-        return records
-
+        """Backwards-compatible wrapper. Calls live and today fixtures with zero mock."""
+        return self.fetch_live_and_today_fixtures()

@@ -86,6 +86,8 @@ class DataPipeline:
                 "league": match.get("league", "EPL"),
                 "home_team": home,
                 "away_team": away,
+                "home_team_raw": home_raw,
+                "away_team_raw": away_raw,
                 "home_odds": float(match.get("home_odds", 2.0)),
                 "draw_odds": float(match.get("draw_odds", 3.2)),
                 "away_odds": float(match.get("away_odds", 3.5)),
