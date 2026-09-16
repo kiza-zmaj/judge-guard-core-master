@@ -24,7 +24,7 @@ class GeminiClient:
     safety filters block the response).
     """
 
-    def __init__(self, model_name: str = "models/gemini-flash-latest", api_keys: Optional[str] = None):
+    def __init__(self, model_name: Optional[str] = None, api_keys: Optional[str] = None):
         """
         Initialize a GeminiClient, loading API keys, configuring mock mode when no keys are found, and preparing the client.
 
@@ -52,7 +52,7 @@ class GeminiClient:
             self.api_keys = [k.strip() for k in keys_env.split(",") if k.strip()]
 
         self.current_key_index = 0
-        self.model_name = model_name
+        self.model_name = os.getenv("GEMINI_MODEL", model_name or "gemini-2.5-flash")
         self._configure_client()
 
     def _configure_client(self):

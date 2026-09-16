@@ -150,3 +150,10 @@
 🟡 Starting Install missing dependencies
 🟡 Starting main.py dry run
 ✅ Completed main.py dependency fix and pipeline run
+🟡 Starting status rename TRUE_EV → MODEL_TRUE_EV + CLV fix + aiohttp install
+🟡 Starting Forensic Audit and Empirical Engine Architecture
+🟡 Starting Phase 2 Real Historical Data Provider
+🟡 Starting Mental Game Research: Real Historical Data Provider for SharpBet Core
+🟡 Starting Mental Game Research: Finalize SharpBet Core production validation and audit
+🟡 Starting Mental Game Research: Finalize SharpBet Core production validation and audit
+✅ Completed Mental Game Research: Finalize SharpBet Core production validation and audit

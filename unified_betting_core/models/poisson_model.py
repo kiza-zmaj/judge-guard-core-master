@@ -1,0 +1,122 @@
+"""
+Poisson Distribution Probability Engine for Football Match Outcomes.
+Simulates goal probabilities to derive 1X2, Over/Under, and BTTS probabilities.
+"""
+
+import os
+import pickle
+import logging
+from scipy.stats import poisson
+from typing import Dict, Any, Optional
+from unified_betting_core.config import MODELS_STORE_DIR
+
+logger = logging.getLogger("SharpBet.PoissonModel")
+
+class SimplePoissonModel:
+    """Trained weights container from historical matches."""
+    pass
+
+class _PoissonUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if name == "SimplePoissonModel":
+            return SimplePoissonModel
+        return super().find_class(module, name)
+
+class PoissonEngine:
+    def __init__(self, model_path: Optional[str] = None):
+        self.max_goals = 10
+        self.model_path = model_path or os.path.join(str(MODELS_STORE_DIR), "poisson_model.pkl")
+        self.external_model = None
+        self._try_load_pickle()
+
+    def _try_load_pickle(self):
+        """Loads trained pickled model weights if present."""
+        if os.path.exists(self.model_path):
+            try:
+                with open(self.model_path, "rb") as f:
+                    self.external_model = _PoissonUnpickler(f).load()
+                logger.info(f"Loaded trained Poisson model from {self.model_path}")
+            except Exception as e:
+                logger.warning(f"Could not unpickle {self.model_path}: {e}. Using direct Poisson PMF simulation.")
+
+    def predict_match(self, home_team: str, away_team: str, home_xg: float, away_xg: float) -> Dict[str, float]:
+        """
+        Calculates probabilities for match outcomes given home and away expected goals.
+        Returns:
+            home: probability of home win
+            draw: probability of draw
+            away: probability of away win
+            over_2_5: probability of over 2.5 goals
+            under_2_5: probability of under 2.5 goals
+            btts: probability both teams score
+            most_likely_score: (home_goals, away_goals)
+        """
+        # If external model implements predict_match, we can invoke it
+        if self.external_model and hasattr(self.external_model, "predict_match"):
+            try:
+                return self.external_model.predict_match(home_team, away_team, home_xg, away_xg)
+            except Exception:
+                pass
+
+        # Direct mathematical simulation using Poisson PMF
+        h_xg = float(home_xg)
+        if h_xg > 8.0:
+            h_xg = h_xg / 38.0 # Normalize season aggregate to single match
+        a_xg = float(away_xg)
+        if a_xg > 8.0:
+            a_xg = a_xg / 38.0 # Normalize season aggregate to single match
+
+        h_xg = max(round(h_xg, 2), 0.2)
+        a_xg = max(round(a_xg, 2), 0.2)
+
+        home_probs = [poisson.pmf(i, h_xg) for i in range(self.max_goals)]
+        away_probs = [poisson.pmf(i, a_xg) for i in range(self.max_goals)]
+
+        prob_home = 0.0
+        prob_draw = 0.0
+        prob_away = 0.0
+        prob_over_2_5 = 0.0
+        prob_btts = 0.0
+
+        best_score_prob = -1.0
+        best_score = "1-1"
+
+        for h in range(self.max_goals):
+            for a in range(self.max_goals):
+                p = home_probs[h] * away_probs[a]
+
+                if h > a:
+                    prob_home += p
+                elif h == a:
+                    prob_draw += p
+                else:
+                    prob_away += p
+
+                if (h + a) > 2.5:
+                    prob_over_2_5 += p
+
+                if h > 0 and a > 0:
+                    prob_btts += p
+
+                if p > best_score_prob:
+                    best_score_prob = p
+                    best_score = f"{h}-{a}"
+
+        # Normalize 1X2 sum to strictly 1.0
+        total_1x2 = prob_home + prob_draw + prob_away
+        if total_1x2 > 0:
+            prob_home /= total_1x2
+            prob_draw /= total_1x2
+            prob_away /= total_1x2
+
+        return {
+            "home": round(prob_home, 4),
+            "draw": round(prob_draw, 4),
+            "away": round(prob_away, 4),
+            "over_2_5": round(prob_over_2_5, 4),
+            "under_2_5": round(1.0 - prob_over_2_5, 4),
+            "btts": round(prob_btts, 4),
+            "predicted_score": best_score,
+            "home_xg": h_xg,
+            "away_xg": a_xg
+        }

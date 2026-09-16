@@ -452,12 +452,12 @@ class JudgeGuard:
 
         if is_write:
             criteria_parts.append(f"\n2. PROJECT ESSENCE (Semantic Drift Check):\n{_sanitize_for_judge(PROJECT_ESSENCE)}")
-            criteria_parts.append("\nTASK FOR WRITE OPERATION:\n- Ensure action aligns with Project Essence (no >20% drift).\n- Ensure strict adherence to Immutable Laws.")
+            criteria_parts.append("\nTASK FOR WRITE OPERATION:\n- The agent is executing the Pre-Action or Post-Action Verification Workflow.\n- Ensure the proposed action aligns with Project Essence (no >20% drift).\n- Ensure strict adherence to Immutable Laws (no destructive actions, user control respected).")
         else:
-            criteria_parts.append("\nTASK:\n- Ensure strict adherence to Immutable Laws.")
+            criteria_parts.append("\nTASK:\n- The agent is executing the Pre-Action or Post-Action Verification Workflow.\n- Ensure the proposed action adheres strictly to Immutable Laws (no destructive actions, user control respected).")
 
-        criteria_parts.append(f"\n3. CONTEXT:\n{_sanitize_for_judge(context[-5000:])}")
-        criteria_parts.append(f"\n4. ACTION:\n\"{_sanitize_for_judge(current_action)}\"")
+        criteria_parts.append(f"\n3. CONTEXT (Recent Work Log):\n{_sanitize_for_judge(context[-5000:])}")
+        criteria_parts.append(f"\n4. ACTION TO EVALUATE:\n\"{_sanitize_for_judge(current_action)}\"")
 
         criteria = "\n".join(criteria_parts)
         
