@@ -39,8 +39,10 @@ class LeakageAuditor:
         backwards_steps = diffs[diffs < pd.Timedelta(0)]
         passed = len(backwards_steps) == 0
 
+        min_date = df_sorted["dt"].min().date()
+        max_date = df_sorted["dt"].max().date()
         evidence = (
-            f"Verified {len(df)} matches chronologically from {df_sorted['dt'].min().date()} to {df_sorted['dt'].max().date()}."
+            f"Verified {len(df)} matches chronologically from {min_date} to {max_date}."
             if passed
             else f"VIOLATION: Found {len(backwards_steps)} instances where matches moved backwards in time!"
         )

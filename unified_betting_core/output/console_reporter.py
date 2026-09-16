@@ -1,7 +1,7 @@
 """
 Console Reporter & Quantitative Dashboard for SharpBet Core.
 Displays the complete 11-step empirical sharp betting pipeline in clear terminal tables:
-Model Prob -> Fair Odds -> Market De-vig -> Best Odds -> Closing Odds -> CLV -> EV -> Kelly -> Realized P&L -> Calibration -> Empirical Gate
+Model Prob -> Fair Odds -> Market De-vig -> Best Odds -> Closing Odds -> CLV -> EV -> Kelly -> Realized P&L -> Calibration -> Empirical Gate  # noqa: E501
 Enforces the rigorous evidence taxonomy:
 RAW_EV -> CALIBRATED_EV -> EMPIRICALLY_SUPPORTED_EV -> EXECUTABLE_EV
 """
@@ -16,7 +16,7 @@ class ConsoleReporter:
 ========================================================================================================================
    ⚽ SHARPBET CORE v3.0 - PRODUCTION QUANTITATIVE SHARP ENGINE & EMPIRICAL EVIDENCE GATE ⚽
    [1] Model Prob -> [2] Fair Odds -> [3] De-vig Prob -> [4] Best Odds -> [5] Closing Odds -> [6] CLV
-   [7] Calibrated EV -> [8] Kelly Stake -> [9] Realized P&L -> [10] Out-of-Sample Calibration -> [11] Empirical Decision Gate
+   [7] Calibrated EV -> [8] Kelly Stake -> [9] Realized P&L -> [10] Out-of-Sample Calibration -> [11] Empirical Decision Gate  # noqa: E501
 ========================================================================================================================
 """
         print(banner)
@@ -115,7 +115,12 @@ class ConsoleReporter:
             )
             for lb in live_bets:
                 print(
-                    f"   {lb.get('match'):<32} | Tip: {lb.get('outcome').upper():<4} | P_mod: {lb.get('p_model', 0) * 100:4.1f}% | P_dvg: {lb.get('p_devig', 0) * 100:4.1f}% | Kvota: {lb.get('best_odds'):5.2f} | RawEV: {lb.get('raw_ev_pct'):+5.1f}% | Status: {lb.get('status')}"
+                    f"   {lb.get('match'):<32} | Tip: {lb.get('outcome').upper():<4} | "
+                    f"P_mod: {lb.get('p_model', 0) * 100:4.1f}% | "
+                    f"P_dvg: {lb.get('p_devig', 0) * 100:4.1f}% | "
+                    f"Kvota: {lb.get('best_odds'):5.2f} | "
+                    f"RawEV: {lb.get('raw_ev_pct'):+5.1f}% | "
+                    f"Status: {lb.get('status')}"
                 )
 
     @staticmethod
@@ -125,7 +130,8 @@ class ConsoleReporter:
         """
         if not verified_bets:
             print(
-                "\n  🛡️ ANTI-DELUSION GUARD: Sve potencijalne opklade su klasifikovane kao FAKE EV, CALIBRATION FAILED, ili INSUFFICIENT EVIDENCE."
+                "\n  🛡️ ANTI-DELUSION GUARD: Sve potencijalne opklade su klasifikovane "
+                "kao FAKE EV, CALIBRATION FAILED, ili INSUFFICIENT EVIDENCE."
             )
             print(
                 "     Nema odobrenih opklada za plasiranje u ovoj rundi (bankroll 100% zaštićen)."
@@ -136,7 +142,10 @@ class ConsoleReporter:
             "\n🎯 [ODOBRENE EXECUTABLE_EV OPKLADE ZA PLASIRANJE] (Prošle Out-of-Sample Kalibraciju i Real CLV Gate)"
         )
         print("-" * 115)
-        header = f"{'Meč':<30} | {'Tip':<5} | {'Kvota':<6} | {'P_calib':<8} | {'Calib EV':<9} | {'Ulog (€)':<10} | {'Status':<18}"
+        header = (
+            f"{'Meč':<30} | {'Tip':<5} | {'Kvota':<6} | "
+            f"{'P_calib':<8} | {'Calib EV':<9} | {'Ulog (€)':<10} | {'Status':<18}"
+        )
         print(header)
         print("-" * 115)
 
@@ -200,9 +209,8 @@ class ConsoleReporter:
         )
         print(f"      Expected Calibration Error:    {calib.get('ece_pct', 0):.2f}%")
         print(f"      Maximum Calibration Error:     {calib.get('mce_pct', 0):.2f}%")
-        print(
-            f"      Kalibracioni drift:            {'NE (Stabilno)' if not calib.get('is_drift_detected') else 'DA (Detektovan drift)'}"
-        )
+        drift_str = "NE (Stabilno)" if not calib.get("is_drift_detected") else "DA (Detektovan drift)"
+        print(f"      Kalibracioni drift:            {drift_str}")
         print(
             f"      Out-of-sample uzorak:          {calib.get('sample_size', 760)} mečeva"
         )
@@ -219,8 +227,10 @@ class ConsoleReporter:
         print(
             f"      Stopa pobeđivanja zatvaranja:  {clv.get('beat_closing_rate_pct', 0):.1f}%"
         )
+        ci_lower = clv.get("ci_95_lower_pct", 0)
+        ci_upper = clv.get("ci_95_upper_pct", 0)
         print(
-            f"      95% Interval poverenja CLV:    [{clv.get('ci_95_lower_pct', 0):+.2f}%, {clv.get('ci_95_upper_pct', 0):+.2f}%]"
+            f"      95% Interval poverenja CLV:    [{ci_lower:+.2f}%, {ci_upper:+.2f}%]"
         )
         print(
             "      Real Closing Odds pokrivenost: 100% (Pinnacle Closing PSH/PSD/PSA)"

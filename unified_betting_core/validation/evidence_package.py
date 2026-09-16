@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 
 from unified_betting_core.config import DATA_DIR
+from unified_betting_core.validation.bias_analysis import BiasStressAuditor
 from unified_betting_core.validation.leakage_tests import LeakageAuditor
 
 
@@ -42,9 +43,6 @@ class _NumpySafeEncoder(json.JSONEncoder):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return super().default(obj)
-
-
-from unified_betting_core.validation.bias_analysis import BiasStressAuditor
 
 
 class EvidencePackageGenerator:
@@ -146,10 +144,22 @@ class EvidencePackageGenerator:
                 "source_repository": "https://www.football-data.co.uk",
                 "seasons": ["2022/23 (2223)", "2023/24 (2324)", "2024/25 (2425)"],
                 "opening_placed_odds": "home_odds, draw_odds, away_odds (Market maximum available early lines)",
-                "closing_benchmark_odds": "closing_home_odds, closing_draw_odds, closing_away_odds (Pinnacle Closing: PSCH, PSCD, PSCA recorded at kickoff)",
-                "pinnacle_opening_odds": "pinnacle_open_home, pinnacle_open_draw, pinnacle_open_away (Pinnacle Opening: PSH, PSD, PSA recorded mid-week)",
-                "bet365_opening_odds": "b365_open_home, b365_open_draw, b365_open_away (Bet365 Opening: B365H, B365D, B365A)",
-                "average_closing_odds": "closing_avg_home, closing_avg_draw, closing_avg_away (Market Average Closing: AvgCH, AvgCD, AvgCA)",
+                "closing_benchmark_odds": (
+                    "closing_home_odds, closing_draw_odds, closing_away_odds "
+                    "(Pinnacle Closing: PSCH, PSCD, PSCA recorded at kickoff)"
+                ),
+                "pinnacle_opening_odds": (
+                    "pinnacle_open_home, pinnacle_open_draw, pinnacle_open_away "
+                    "(Pinnacle Opening: PSH, PSD, PSA recorded mid-week)"
+                ),
+                "bet365_opening_odds": (
+                    "b365_open_home, b365_open_draw, b365_open_away "
+                    "(Bet365 Opening: B365H, B365D, B365A)"
+                ),
+                "average_closing_odds": (
+                    "closing_avg_home, closing_avg_draw, closing_avg_away "
+                    "(Market Average Closing: AvgCH, AvgCD, AvgCA)"
+                ),
             },
             "provenance_forensic_note": (
                 "Previous v1 release incorrectly mapped PSH/PSD/PSA as closing odds. "
@@ -202,17 +212,21 @@ class EvidencePackageGenerator:
             "operational_recommendation": {
                 "status": "RESEARCH_ONLY",
                 "authorized_stake_eur": 0.00,
-                "reason": "Gate B (Market Alpha/CLV) and Gate C (Economic ROI CI) failed. Model has demonstrated tail sensitivity.",
+                "reason": (
+                    "Gate B (Market Alpha/CLV) and Gate C (Economic ROI CI) failed. "
+                    "Model has demonstrated tail sensitivity."
+                ),
             },
             "brier_score_audit": {
                 "previous_package_brier": 0.5936,
                 "current_reproduced_brier": 0.59209,
                 "difference": -0.00151,
                 "explanation": (
-                    "0.59209 is independently verified across all 760 OOS predictions using standard multiclass One-vs-Rest "
-                    "Brier score: (1/N) * sum_{i=1}^N sum_{c=1}^3 (p_{ic} - y_{ic})^2 / 3. "
-                    "The 0.00151 variance from the previous package (0.5936) was caused by a slight boundary difference "
-                    "in the initial rolling calibration warm-up window."
+                    "0.59209 is independently verified across all 760 OOS predictions "
+                    "using standard multiclass One-vs-Rest Brier score: "
+                    "(1/N) * sum_{i=1}^N sum_{c=1}^3 (p_{ic} - y_{ic})^2 / 3. "
+                    "The 0.00151 variance from the previous package (0.5936) was caused by "
+                    "a slight boundary difference in the initial rolling calibration warm-up window."
                 ),
             },
             "artifact_checksums_sha256": artifact_checksums,

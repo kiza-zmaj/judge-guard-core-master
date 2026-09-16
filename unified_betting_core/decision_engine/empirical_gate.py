@@ -14,6 +14,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from unified_betting_core.config import MIN_EDGE
+from unified_betting_core.data_ingestion.real_data_provider import DataQualityState
+
 # ─── Status taxonomy per Do.md Phase 6 ────────────────────────────────────────
 
 
@@ -216,9 +219,6 @@ def evaluate_three_gate_verdict(
 
 # ─── Per-Bet Decision Gate (unchanged architecture) ───────────────────────────
 
-from unified_betting_core.config import MIN_EDGE
-from unified_betting_core.data_ingestion.real_data_provider import DataQualityState
-
 
 @dataclass
 class GateEvaluationResult:
@@ -295,7 +295,7 @@ class EmpiricalDecisionGate:
     ) -> GateEvaluationResult:
         """
         Per-bet anti-delusion audit.
-        Checks data integrity -> probability validity -> market de-vig -> fake EV -> marginal EV -> three-gate governance.
+        Checks data integrity -> probability validity -> market de-vig -> fake EV -> marginal EV -> three-gate governance.  # noqa: E501
         """
         notes = []
         verdicts = {
@@ -421,7 +421,9 @@ class EmpiricalDecisionGate:
             historical_sample_size < 100 or not historical_clv_demonstrated
         ) and not three_gate_passed:
             notes.append(
-                f"Rejected: Insufficient empirical evidence (sample={historical_sample_size}, clv_demo={historical_clv_demonstrated})"
+                f"Rejected: Insufficient empirical evidence "
+                f"(sample={historical_sample_size}, "
+                f"clv_demo={historical_clv_demonstrated})"
             )
             return self._reject(
                 FinalStatus.INSUFFICIENT_EVIDENCE,

@@ -87,10 +87,10 @@ class TemperatureScaler:
         logits = [
             math.log(max(probs.get(o, 0.0), 1e-6)) / self.temperature for o in outcomes
         ]
-        max_l = max(logits)
-        exp_l = [math.exp(l - max_l) for l in logits]
-        sum_exp = sum(exp_l)
-        return {outcomes[i]: round(exp_l[i] / sum_exp, 4) for i in range(len(outcomes))}
+        max_logit = max(logits)
+        exp_logits = [math.exp(logit_val - max_logit) for logit_val in logits]
+        sum_exp = sum(exp_logits)
+        return {outcomes[i]: round(exp_logits[i] / sum_exp, 4) for i in range(len(outcomes))}
 
 
 class ModelCalibration:
