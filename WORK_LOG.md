@@ -167,3 +167,5 @@
 ✅ Completed Mental Game Research: Dynamic Global In-Play Discovery and Live Odds Execution
 🟡 Starting Mental Game Research: Dixon-Coles Bivariate Adjustment and Market Steam Alpha Engine Implementation
 ✅ Completed Mental Game Research: Dixon-Coles Bivariate Adjustment and Market Steam Alpha Engine Implementation
+🟡 Starting CLV Methodology Fix + Upcoming Fixtures Engine
+✅ Completed CLV Methodology Fix + Upcoming Fixtures Engine

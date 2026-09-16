@@ -109,3 +109,11 @@ class DataPipeline:
         fixtures = self.odds_fetcher.fetch_live_and_today_fixtures(sports=sports)
         return self.get_unified_dataset(fixtures=fixtures)
 
+    def get_upcoming_pre_match_dataset(self) -> pd.DataFrame:
+        """
+        Gathers only pre-match (not in-play) upcoming fixtures.
+        Zero mock, zero simulation.
+        """
+        fixtures = self.odds_fetcher.fetch_upcoming_pre_match()
+        return self.get_unified_dataset(fixtures=fixtures)
+

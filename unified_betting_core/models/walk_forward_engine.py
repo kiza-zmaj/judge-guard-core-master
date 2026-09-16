@@ -211,9 +211,10 @@ class WalkForwardEngine:
                     "fair_clv": clv_metric.get("fair_clv"),
                     "fair_clv_pct": clv_metric.get("fair_clv_pct"),
                     "beat_closing": clv_metric.get("beat_closing", False),
-                    # Candidate signal defined by market steam alpha (CLV >= 2.0% with odds <= 4.0)
+                    # Candidate signal: FAIR CLV >= 2.0% (de-vigged closing odds).
+                    # fair_clv_pct eliminates ~3% margin artifact from MaxH vs Pinnacle.
                     "is_candidate_signal": (
-                        ((clv_metric.get("raw_clv_pct") or 0.0) >= 2.0) and (b_odds <= 4.0)
+                        ((clv_metric.get("fair_clv_pct") or 0.0) >= 2.0) and (b_odds <= 4.0)
                     )
                 }
                 candidate_warehouse.append(candidate_record)
@@ -260,29 +261,32 @@ class WalkForwardEngine:
         # Evaluated across ALL historical candidate signals (DECOUPLED FROM APPROVAL)
         # ─────────────────────────────────────────────────────────────────────
         candidate_signals = [c for c in candidate_warehouse if c["is_candidate_signal"]]
-        settled_candidates_clv = [c for c in candidate_signals if c["raw_clv"] is not None]
+        # Gate B uses fair_clv (de-vigged Pinnacle closing) to avoid margin compression artifacts.
+        # raw_clv is retained in output for diagnostics only.
+        settled_candidates_clv = [c for c in candidate_signals if c["fair_clv"] is not None]
 
         gate_b_failures = []
         if len(settled_candidates_clv) < 30:
             gate_b_failures.append(f"Insufficient candidate signals with closing odds: {len(settled_candidates_clv)} (min 30).")
 
-        raw_clvs = [c["raw_clv"] for c in settled_candidates_clv]
-        fair_clvs = [c["fair_clv"] for c in settled_candidates_clv if c["fair_clv"] is not None]
+        raw_clvs = [c["raw_clv"] for c in settled_candidates_clv if c["raw_clv"] is not None]
+        fair_clvs = [c["fair_clv"] for c in settled_candidates_clv]
 
-        if raw_clvs:
-            raw_arr = np.array(raw_clvs)
-            mean_raw_clv = float(np.mean(raw_arr))
-            median_raw_clv = float(np.median(raw_arr))
-            std_err_clv = float(np.std(raw_arr, ddof=1) / math.sqrt(len(raw_arr))) if len(raw_arr) > 1 else 0.0
+        if fair_clvs:
+            # Primary Gate B metric: fair_clv (de-vigged, unbiased)
+            fair_arr = np.array(fair_clvs)
+            mean_raw_clv = float(np.mean(fair_arr))   # naming kept for downstream compat
+            median_raw_clv = float(np.median(fair_arr))
+            std_err_clv = float(np.std(fair_arr, ddof=1) / math.sqrt(len(fair_arr))) if len(fair_arr) > 1 else 0.0
             ci_clv_lower = mean_raw_clv - (1.96 * std_err_clv)
             ci_clv_upper = mean_raw_clv + (1.96 * std_err_clv)
-            avg_fair_clv = float(np.mean(fair_clvs)) if fair_clvs else 0.0
+            avg_fair_clv = mean_raw_clv  # same array
             beat_rate = (sum(1 for c in settled_candidates_clv if c["beat_closing"]) / len(settled_candidates_clv)) * 100.0
 
             if mean_raw_clv <= 0.0:
-                gate_b_failures.append(f"Mean CLV is negative ({mean_raw_clv*100:.2f}%). Strategy fails to beat closing line.")
+                gate_b_failures.append(f"Mean fair CLV is non-positive ({mean_raw_clv*100:.2f}%). Strategy fails to beat fair closing line.")
             if ci_clv_upper <= 0.0:
-                gate_b_failures.append(f"Upper 95% CI of CLV ({ci_clv_upper*100:.2f}%) is non-positive.")
+                gate_b_failures.append(f"Upper 95% CI of fair CLV ({ci_clv_upper*100:.2f}%) is non-positive.")
         else:
             mean_raw_clv = 0.0
             median_raw_clv = 0.0
@@ -320,7 +324,7 @@ class WalkForwardEngine:
             candidates_by_match.setdefault(m_key, []).append(c)
 
         for m_key, match_cands in candidates_by_match.items():
-            best_cand = max(match_cands, key=lambda x: (x.get("raw_clv_pct") or 0.0))
+            best_cand = max(match_cands, key=lambda x: (x.get("fair_clv_pct") or 0.0))
             # Safe proportional unit stake (1.0% bankroll) for empirical evidence gate
             stake = round(pnl_tracker.current_bankroll * 0.01, 2)
             if stake > 0:
@@ -388,8 +392,9 @@ class WalkForwardEngine:
         }
 
         clv_dict = {
-            "avg_raw_clv_pct": gate_b.avg_raw_clv_pct,
-            "median_raw_clv_pct": round(median_raw_clv * 100, 2) if raw_clvs else 0.0,
+            "avg_fair_clv_pct": gate_b.avg_fair_clv_pct,   # PRIMARY: de-vigged, unbiased
+            "avg_raw_clv_pct": gate_b.avg_raw_clv_pct,     # DIAGNOSTIC: margin-biased (informational only)
+            "median_fair_clv_pct": round(median_raw_clv * 100, 2) if fair_clvs else 0.0,
             "beat_closing_rate_pct": gate_b.beat_closing_rate_pct,
             "ci_95_lower_pct": gate_b.ci_95_lower_pct,
             "ci_95_upper_pct": gate_b.ci_95_upper_pct,

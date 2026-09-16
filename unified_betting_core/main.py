@@ -56,9 +56,14 @@ def run_pipeline(bankroll: float = DEFAULT_BANKROLL, notify: bool = False, live_
 
     logger.info("Initializing Data Ingestion & Live Feeds...")
     pipeline = DataPipeline()
-    df = pipeline.get_live_and_today_dataset()
+    
+    if live_only:
+        df = pipeline.get_live_and_today_dataset()
+    else:
+        df = pipeline.get_upcoming_pre_match_dataset()
+        
     if df.empty:
-        logger.info("No live/today matches returned from multi-competition feed. Falling back to default upcoming fixtures...")
+        logger.info("No primary matches returned from feeds. Falling back to default upcoming fixtures...")
         df = pipeline.get_unified_dataset()
 
     if live_only and not df.empty and "is_live" in df.columns:
