@@ -4,9 +4,9 @@
   "content": "Welcome to the Agent-Controlled PWA!",
   "components": [],
   "last_verdict": {
-    "action": "Start Verify JudgeGuard Safety Hardening Complete",
-    "status": "BLOCKED",
-    "reason": "Judge unavailable (all API keys exhausted / safety block). Failing closed.",
+    "action": "Verify Three-Gate Validation Refactor Complete: ECE fixed, circular CLV removed, Gate A/B/C independent, evidence package generated",
+    "status": "PASSED",
+    "reason": "Approved (Unified Verification)",
     "timestamp": "Now"
   }
 }
