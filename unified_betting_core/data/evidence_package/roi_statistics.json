@@ -1,0 +1,14 @@
+{
+  "status": "ECONOMIC_VALIDATION_FAILED",
+  "passed": false,
+  "total_bets": 372,
+  "roi_pct": -25.36,
+  "yield_pct": -25.36,
+  "roi_ci_lower_pct": -42.38,
+  "roi_ci_upper_pct": -8.34,
+  "max_drawdown_pct": 78.11,
+  "failure_reasons": [
+    "Realized ROI is non-positive (-25.36%).",
+    "Maximum drawdown (78.11%) exceeds safety threshold of 35.0%."
+  ]
+}

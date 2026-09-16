@@ -1,0 +1,42 @@
+{
+  "final_status": "ECONOMIC_VALIDATION_FAILED",
+  "is_empirically_supported": false,
+  "is_executable": false,
+  "summary": "BLOCKED at Gate C (Economic P&L). Gate C FAILED: Realized ROI is non-positive (-25.36%).; Maximum drawdown (78.11%) exceeds safety threshold of 35.0%.",
+  "gate_a": {
+    "status": "CALIBRATION_PASS",
+    "passed": true,
+    "brier_score": 0.59355,
+    "ece_pct": 4.44,
+    "mce_pct": 16.81,
+    "sample_size": 760,
+    "drift_detected": false,
+    "failure_reasons": []
+  },
+  "gate_b": {
+    "status": "MARKET_ALPHA_PASS",
+    "passed": true,
+    "candidate_count": 376,
+    "settled_count": 376,
+    "avg_raw_clv_pct": 4.24,
+    "avg_fair_clv_pct": -1.52,
+    "beat_closing_rate_pct": 97.87,
+    "ci_95_lower_pct": 3.88,
+    "ci_95_upper_pct": 4.6,
+    "failure_reasons": []
+  },
+  "gate_c": {
+    "status": "ECONOMIC_VALIDATION_FAILED",
+    "passed": false,
+    "total_bets": 372,
+    "roi_pct": -25.36,
+    "yield_pct": -25.36,
+    "roi_ci_lower_pct": -42.38,
+    "roi_ci_upper_pct": -8.34,
+    "max_drawdown_pct": 78.11,
+    "failure_reasons": [
+      "Realized ROI is non-positive (-25.36%).",
+      "Maximum drawdown (78.11%) exceeds safety threshold of 35.0%."
+    ]
+  }
+}

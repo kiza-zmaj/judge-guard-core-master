@@ -1,0 +1,11 @@
+{
+  "total_matches": 1140,
+  "burn_in_matches": 380,
+  "oos_matches": 760,
+  "dataset_start_date": "2022-08-05",
+  "dataset_end_date": "2025-05-25",
+  "oos_start_date": "2023-08-11",
+  "oos_end_date": "2025-05-25",
+  "data_source": "Football-Data.co.uk Premier League (2022/23 - 2024/25)",
+  "odds_source": "Opening: Bet365 / Average, Closing: Pinnacle (PSH, PSD, PSA)"
+}

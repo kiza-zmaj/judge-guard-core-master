@@ -1,0 +1,65 @@
+{
+  "all_leakage_tests_passed": true,
+  "verdict": "PASS",
+  "tests": {
+    "chronological_ordering_test": {
+      "passed": true,
+      "evidence": "Verified 1140 matches chronologically from 2022-08-05 to 2025-05-25.",
+      "details": {
+        "total_records": 1140,
+        "earliest_date": "2022-08-05",
+        "latest_date": "2025-05-25",
+        "violations_count": 0
+      }
+    },
+    "calibration_past_only_test": {
+      "passed": true,
+      "evidence": "Mathematical invariant verified: For all OOS indices t in [380, N), calibration window max index is t-1 < t. Zero future observations in calibration fitting.",
+      "details": {
+        "sample_checks": [
+          {
+            "current_t": 380,
+            "window_max": 379,
+            "strictly_past": true
+          },
+          {
+            "current_t": 500,
+            "window_max": 499,
+            "strictly_past": true
+          },
+          {
+            "current_t": 750,
+            "window_max": 749,
+            "strictly_past": true
+          },
+          {
+            "current_t": 1139,
+            "window_max": 1138,
+            "strictly_past": true
+          }
+        ],
+        "calib_window_size": 150
+      }
+    },
+    "odds_state_independence_test": {
+      "passed": true,
+      "evidence": "Opening and closing odds are independently recorded market states: 95.8% of home odds moved between opening and closing line.",
+      "details": {
+        "total_matches": 1140,
+        "home_odds_moved": 1092,
+        "away_odds_moved": 1093,
+        "pct_home_odds_moved": 95.79
+      }
+    },
+    "candidate_isolation_test": {
+      "passed": true,
+      "evidence": "Candidate warehouse contains 2280 isolated candidate evaluations. All entries retain frozen decision-time odds and probabilities.",
+      "details": {
+        "total_candidates": 2280,
+        "valid_odds": true,
+        "valid_model_probs": true,
+        "valid_calib_probs": true
+      }
+    }
+  }
+}

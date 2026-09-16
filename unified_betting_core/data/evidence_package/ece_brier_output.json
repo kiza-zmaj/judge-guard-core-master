@@ -1,0 +1,10 @@
+{
+  "status": "CALIBRATION_PASS",
+  "passed": true,
+  "brier_score": 0.59355,
+  "ece_pct": 4.44,
+  "mce_pct": 16.81,
+  "sample_size": 760,
+  "drift_detected": false,
+  "failure_reasons": []
+}
