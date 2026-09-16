@@ -188,3 +188,13 @@
 ✅ Completed Deploy Cloudflare Worker judge-guard-edge-agent with Notion API Key Secret
 🟡 Starting /setup-tooluniverse na Antigravity IDE
 ✅ Completed /setup-tooluniverse na Antigravity IDE
+🟡 Starting Mental Game Research: Business Strategy - Beachhead Selection, Activity ROI and First Revenue Roadmap
+✅ Completed Mental Game Research: Business Strategy - Beachhead Selection, Activity ROI and First Revenue Roadmap
+🟡 Starting SharpBet Kaggle Pipeline End-to-End Refactor
+🟡 Starting Mental Game Research: SharpBet Core Kaggle Pipeline Empirical Audit and De-vig Calibration
+🟡 Starting SharpBet Kaggle Pipeline End-to-End Empirical Refactor v4
+✅ Completed SharpBet Kaggle Pipeline End-to-End Empirical Refactor v4
+🟡 Starting v5 SharpBet Pipeline Refactor
+🟡 Starting v5 SharpBet Pipeline Refactor - entry-only CLV, walk-forward folds, 10k bootstrap
+🟡 Starting [SharpBet ML Pipeline v5.0 Upgrade (Entry-Only, Walk-Forward, Zero-Leakage)]
+✅ Completed [SharpBet ML Pipeline v5.0 Upgrade (Entry-Only, Walk-Forward, Zero-Leakage)]
