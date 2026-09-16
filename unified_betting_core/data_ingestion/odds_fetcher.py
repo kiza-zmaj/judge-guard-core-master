@@ -243,6 +243,103 @@ class OddsFetcher:
             logger.warning("No live or upcoming fixtures available from real endpoints. Zero-mock enforced.")
         return fixtures
 
+    def fetch_upcoming_pre_match(self) -> List[Dict[str, Any]]:
+        """
+        Fetches ONLY pre-match (not in-play) fixtures from ESPN and The-Odds-API.
+        Explicitly excludes any fixture where state == 'in' (live in-play).
+        Zero mock, zero simulation. Returns empty list if no upcoming fixtures found.
+        """
+        # 1. Try The-Odds-API first (native pre-match feed, already is_live=False)
+        toa = self.fetch_the_odds_api_fixtures()
+        if toa:
+            logger.info(f"fetch_upcoming_pre_match: {len(toa)} fixtures from The-Odds-API.")
+            return toa
+
+        # 2. Fallback: ESPN scoreboard, filter to pre-match state only
+        def _fetch_league_pre(league_code: str, league_name: str) -> List[Dict[str, Any]]:
+            url = f"https://site.api.espn.com/apis/site/v2/sports/soccer/{league_code}/scoreboard"
+            try:
+                res = requests.get(url, timeout=5)
+                if not res.ok:
+                    return []
+                events = res.json().get("events", [])
+                league_fixtures = []
+                for ev in events:
+                    comps = ev.get("competitions", [{}])
+                    comp = comps[0] if comps else {}
+                    status = comp.get("status", {})
+                    state = status.get("type", {}).get("state", "pre")
+                    # STRICT: skip anything that is live / in-progress
+                    if state == "in":
+                        continue
+                    # Also skip finished matches (state == 'post')
+                    if state == "post":
+                        continue
+
+                    competitors = comp.get("competitors", [])
+                    if len(competitors) < 2:
+                        continue
+                    home_comp = next((c for c in competitors if c.get("homeAway") == "home"), competitors[0])
+                    away_comp = next((c for c in competitors if c.get("homeAway") == "away"), competitors[1])
+                    home = home_comp.get("team", {}).get("displayName", "")
+                    away = away_comp.get("team", {}).get("displayName", "")
+                    if not home or not away:
+                        continue
+
+                    date_str = comp.get("date", str(datetime.date.today()))
+                    ev_id = ev.get("id", "")
+
+                    # Extract odds if available
+                    odds_list = comp.get("odds", [])
+                    h_odds = d_odds = a_odds = None
+                    bookmaker_name = "ESPN Consensus"
+                    if odds_list:
+                        o0 = odds_list[0]
+                        bookmaker_name = o0.get("provider", {}).get("name", bookmaker_name)
+                        ml = o0.get("moneyline", {})
+                        h_am = ml.get("home", {}).get("current", {}).get("odds") or ml.get("home", {}).get("close", {}).get("odds")
+                        d_am = ml.get("draw", {}).get("current", {}).get("odds") or ml.get("draw", {}).get("close", {}).get("odds")
+                        a_am = ml.get("away", {}).get("current", {}).get("odds") or ml.get("away", {}).get("close", {}).get("odds")
+                        if not d_am and "drawOdds" in o0:
+                            d_am = o0["drawOdds"].get("moneyLine")
+                        h_odds = american_to_decimal(h_am)
+                        d_odds = american_to_decimal(d_am)
+                        a_odds = american_to_decimal(a_am)
+
+                    if not (h_odds and d_odds and a_odds):
+                        continue
+
+                    league_fixtures.append({
+                        "id": f"espn_{ev_id}",
+                        "league": league_name,
+                        "date": date_str,
+                        "home_team": home,
+                        "away_team": away,
+                        "is_live": False,
+                        "current_score": {},
+                        "elapsed_minutes": 0.0,
+                        "bookmaker": bookmaker_name,
+                        "home_odds": float(h_odds),
+                        "draw_odds": float(d_odds),
+                        "away_odds": float(a_odds)
+                    })
+                return league_fixtures
+            except Exception as e:
+                logger.debug(f"ESPN pre-match fetch error for {league_code}: {e}")
+                return []
+
+        all_fixtures: List[Dict[str, Any]] = []
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = [executor.submit(_fetch_league_pre, code, name) for code, name in ESPN_SOCCER_LEAGUES.items()]
+            for fut in futures:
+                try:
+                    all_fixtures.extend(fut.result())
+                except Exception as e:
+                    logger.debug(f"Pre-match league future error: {e}")
+
+        logger.info(f"fetch_upcoming_pre_match (ESPN fallback): {len(all_fixtures)} pre-match fixtures across {len(ESPN_SOCCER_LEAGUES)} leagues.")
+        return all_fixtures
+
     def fetch_upcoming_fixtures(self) -> List[Dict[str, Any]]:
-        """Backwards-compatible wrapper. Calls live and today fixtures with zero mock."""
-        return self.fetch_live_and_today_fixtures()
+        """Canonical entry point for upcoming (pre-match only) fixtures. Zero mock."""
+        return self.fetch_upcoming_pre_match()
