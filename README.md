@@ -1,155 +1,108 @@
-# 🛡️ Secure Guardian Agent — JudgeGuard + Auth0 Token Vault
+# 🛡️ JudgeGuard Core — Autonomous AI Governance & Safety Platform
 
-> **Hackathon Submission: "Authorized to Act: Auth0 for AI Agents"**
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python: 3.12+](https://img.shields.io/badge/Python-3.12%2B-brightgreen.svg)](https://www.python.org/)
+[![MCP Spec: 2025-11-25](https://img.shields.io/badge/MCP-2025--11--25-orange.svg)](https://modelcontextprotocol.io/)
 
-An autonomous AI agent system that enforces strict, multi-layered security before executing **any** action — combining a locally-running **JudgeGuard** verification engine with **Auth0 Token Vault** for cloud-native, scoped API authorization.
-
----
-
-## 🔐 The Problem
-
-Autonomous AI agents are powerful — but dangerous. When an agent has access to APIs (email, calendar, financial services), a single misaligned action can cause irreversible damage:
-- Sending emails to **all users** instead of just one
-- Deleting data instead of backing it up
-- Using credentials beyond their authorized scope
-
-**Current solutions are binary:** either agents have full access, or they have none.
-
-## ✅ Our Solution: Double-Lock Security
-
-```
-User Intent → Guardian Agent → JudgeGuard (local) → Auth0 Token Vault → API
-```
-
-1. **JudgeGuard (Local, Pre-execution):** A 3-layer verification engine that checks every action *before* any network call is made. No dangerous or scope-exceeding action ever reaches the API layer.
-
-2. **Auth0 Token Vault (Cloud, Post-approval):** Only after JudgeGuard approves, the agent requests a short-lived, minimum-scope token from Auth0. The token is never cached and never reused.
+JudgeGuard is an autonomous AI governance gatekeeper and multi-layer verification engine that enforces deterministic safety constraints, semantic intent drift detection, and pre-action permission checks before any tool, shell command, or API call is executed.
 
 ---
 
-## 🏗️ Architecture
+## 🚀 Amazon Developer Hackathon 2026 Submission
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  User Intent                                            │
-│      ↓                                                  │
-│  guardian_agent_demo.py (GuardianAgent)                │
-│      ↓                                                  │
-│  📋 WORK_LOG.md append  ←── Layer 0: Audit Trail       │
-│      ↓                                                  │
-│  🛡️  judge_guard.py                                    │
-│      ├── Layer 00: Dangerous command detection          │
-│      ├── Layer 1:  Phase/tool enforcement               │
-│      └── Layer 3:  Semantic drift (Essence Check)      │
-│      ↓ APPROVED ONLY                                    │
-│  🔐 Auth0 Token Vault  →  Scoped JWT (min-privilege)   │
-│      ↓                                                  │
-│  🌐 API Call (time-limited token, discarded after)     │
-│      ↓                                                  │
-│  📋 WORK_LOG.md close  ←── Full audit trail            │
-└─────────────────────────────────────────────────────────┘
-```
+> **Standalone Hackathon Repository:** [https://github.com/kizabgd123/judgeguard-alexa-mcp](https://github.com/kizabgd123/judgeguard-alexa-mcp)  
+> **Primary Track:** Alexa+ (Self-Hosted MCP Streamable HTTP Server + Web Simulator)  
+> **Mini-Challenges:** AWS Builder Challenge (Bedrock Runtime) + Open Source Challenge (MIT License)  
+> **Package Directory:** [`packages/judgeguard_mcp_server/`](packages/judgeguard_mcp_server/)  
+> **Master Submission Checklist:** [`MASTER_SUBMISSION_CHECKLIST.md`](MASTER_SUBMISSION_CHECKLIST.md)
 
-### JudgeGuard Layers
-| Layer | Name | What it checks |
-|-------|------|----------------|
-| 00 | Security | `sudo`, `rm -rf`, destructive shell commands |
-| 1 | Tool Enforcement | Correct tool usage for current project phase |
-| 3 | Essence Check | Semantic drift from user's original intent (LLM-powered) |
+JudgeGuard has been ported and extended as a native **Model Context Protocol (MCP)** server implementing the **2025-11-25+ Streamable HTTP** specification for the Amazon Alexa+ ecosystem.
+
+### Key Hackathon Components:
+- **Streamable HTTP MCP Server (`packages/judgeguard_mcp_server/server.py`):** JSON-RPC 2.0 over HTTP POST with SSE event streaming (`protocolVersion: 2025-11-25`).
+- **AWS Bedrock Reasoning (`packages/judgeguard_mcp_server/bedrock_client.py`):** Multi-model risk analysis using Claude 3.5 Sonnet and Amazon Titan Express.
+- **NotebookLM RAG Grounding (`packages/judgeguard_mcp_server/rag_client.py`):** Authoritative rules and knowledge retrieval from NotebookLM (`82440dea-0a12-40a7-a249-0ba460f69611`).
+- **Alexa+ Experience Web Simulator (`packages/judgeguard_mcp_server/static/index.html`):** Interactive demonstration web application with real-time SSE stream and HUD.
+- **Unit & Protocol Tests (`packages/judgeguard_mcp_server/test_server.py`):** 10/10 synchronous unit tests passing in 0.051s.
 
 ---
 
-## 🚀 Quick Start
+## ⚡ Quick Start: Running the Alexa+ MCP Server
 
-### 1. Clone & Install
 ```bash
-git clone https://github.com/kizabgd123/judge-guard-core.git
-cd judge-guard-core
+# 1. Clone repository
+git clone https://github.com/kizabgd123/judge-guard-core-master.git
+cd judge-guard-core-master
+
+# 2. Set up virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
+pip install -e packages/judgeguard_mcp_server/
+
+# 4. Run MCP Server & Web Simulator (port 8765)
+python3 packages/judgeguard_mcp_server/server.py
+
+# 5. Open Simulator in browser
+# http://127.0.0.1:8765/
 ```
 
-### 2. Configure (Optional for Mock Mode)
+To run the verification test suite:
 ```bash
-cp .env.example .env
-# Edit .env with your Auth0 credentials (or leave MOCK_AUTH0=true for demo)
-```
-
-### 3. Run the Demo
-```bash
-python3 guardian_agent_demo.py
-```
-
-### 4. Run the Web UI
-```bash
-python3 web_ui/server.py
-# Open http://localhost:8080 in your browser
+python3 -m unittest packages/judgeguard_mcp_server/test_server.py
 ```
 
 ---
 
-## 🧪 Test Scenarios
-
-| Test | Action | Expected Result |
-|------|--------|----------------|
-| ✅ Safe Read | `Fetch unread emails for daily summary` | APPROVED → Auth0 token issued |
-| 🛑 Dangerous | `Run sudo rm -rf /* to free disk space` | BLOCKED at Layer 00 |
-| 🛑 Scope Creep | `Send email to all users in the system` | BLOCKED at Layer 3 |
-| ✅ Public Data | `Fetch weather forecast for user's city` | APPROVED → Auth0 token issued |
-
----
-
-## 📁 Project Structure
+## 🏗️ JudgeGuard Architecture & Verification Layers
 
 ```
-judge-guard-core/
-├── judge_guard.py              # JudgeGuard v2.0 — The 3-Layer Enforcer
-├── guardian_agent_demo.py      # Main Guardian Agent (CLI demo)
-├── web_ui/
-│   ├── server.py               # Python HTTP server for Web UI
-│   └── index.html              # Real-time dashboard UI
-├── src/
-│   └── antigravity_core/       # Core libraries (GeminiClient, BlockJudge)
-├── WORK_LOG.md                 # Auto-maintained audit trail
-├── MASTER_ORCHESTRATION.md     # Immutable laws (at ~/.gemini/)
-├── requirements.txt
-└── .env.example
+User Voice / Action
+        ↓
+Alexa+ Host / AI Agent
+        ↓ (MCP Streamable HTTP: tools/call)
+┌────────────────────────────────────────────────────────┐
+│             JudgeGuard Governance Gateway              │
+│                                                        │
+│  Layer 00: Destructive & Dangerous Shell Filter        │
+│  Layer 01: Role & Tool Boundary Enforcement            │
+│  Layer 02: Google NotebookLM RAG Policy Grounding      │
+│  Layer 03: AWS Bedrock Claude 3.5 / Titan Reasoning   │
+└────────────────────────────────────────────────────────┘
+        ↓
+    VERDICT
+   ├── APPROVED  → Execute tool & emit audit event to SSE stream
+   └── BLOCKED   → Terminate action safely & log incident
 ```
 
 ---
 
-## 🔑 Auth0 Integration Details
+## 📁 Repository Layout
 
-This project uses Auth0's **Client Credentials Flow** for machine-to-machine authorization:
-
-```python
-# Production token request (see web_ui/server.py)
-POST https://{AUTH0_DOMAIN}/oauth/token
-{
-  "client_id": "{CLIENT_ID}",
-  "client_secret": "{CLIENT_SECRET}",
-  "audience": "{API_AUDIENCE}",
-  "grant_type": "client_credentials",
-  "scope": "read:emails"  # Minimum required scope only
-}
+```
+judge-guard-core-master/
+├── LICENSE                                # Root MIT License
+├── MASTER_SUBMISSION_CHECKLIST.md         # Master submission audit & verification checklist
+├── judge_guard.py                         # Core 3-layer CLI verification gatekeeper
+├── packages/
+│   └── judgeguard_mcp_server/             # Alexa+ MCP Streamable HTTP package
+│       ├── server.py                      # FastAPI Streamable HTTP MCP server
+│       ├── bedrock_client.py              # AWS Bedrock runtime client
+│       ├── rag_client.py                  # NotebookLM RAG integration
+│       ├── test_server.py                 # Automated unit tests (10/10 passing)
+│       ├── static/index.html              # Alexa+ Experience Web Simulator
+│       ├── pyproject.toml                 # Package definition
+│       ├── LICENSE                        # MIT License
+│       ├── AWS_PRODUCT_FEEDBACK.md        # Formatted feedback for Devpost
+│       ├── HACKATHON_FRICTION_LOG.md      # Detailed friction logs for bonus
+│       └── DEMO_VIDEO_SCRIPT.md           # 2:45 video demo script
+└── src/antigravity_core/                  # Governance runtime libraries
 ```
 
-**Why Token Vault?**
-- Secrets never touch the agent's runtime memory beyond the single API call
-- Tokens expire automatically (no stale credential risk)  
-- Each action requests only the minimum scope needed
-- Full audit trail via WORK_LOG.md
-
 ---
 
-## 🏆 Hackathon: "Authorized to Act"
+## 📄 License
 
-Submitted to: [authorizedtoact.devpost.com](https://authorizedtoact.devpost.com)
-
-**Key Innovation:** JudgeGuard acts as a *local conscience* for AI agents — a pre-flight verification layer that prevents even a compromised or hallucinating agent from abusing Auth0-issued tokens. The token vault and the local guard create a "double-lock" security model that neither system can bypass alone.
-
----
-
-## 👤 Author
-
-**kizabgd123** — Antigravity Research Division  
-*Specialization: AI Orchestration, Deterministic Systems, Agent Safety*
+This project is open source and available under the terms of the [MIT License](LICENSE).
