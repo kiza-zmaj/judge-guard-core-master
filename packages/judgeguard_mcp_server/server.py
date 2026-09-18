@@ -32,9 +32,11 @@ else:
 try:
     from packages.judgeguard_mcp_server.rag_client import NotebookLMRAGClient, DEFAULT_NOTEBOOK_ID
     from packages.judgeguard_mcp_server.bedrock_client import AWSBedrockSafetyClient
+    from packages.judgeguard_mcp_server.fail_closed_pipeline import FailClosedGovernancePipeline
 except (ImportError, ModuleNotFoundError):
     from rag_client import NotebookLMRAGClient, DEFAULT_NOTEBOOK_ID
     from bedrock_client import AWSBedrockSafetyClient
+    from fail_closed_pipeline import FailClosedGovernancePipeline
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("JudgeGuard.MCPServer")
@@ -55,6 +57,7 @@ app.add_middleware(
 
 rag_client = NotebookLMRAGClient(DEFAULT_NOTEBOOK_ID)
 bedrock_client = AWSBedrockSafetyClient()
+governance_pipeline = FailClosedGovernancePipeline(rag_client=rag_client, bedrock_client=bedrock_client)
 
 # Event subscribers for Streamable HTTP SSE
 subscribers: List[asyncio.Queue] = []
@@ -265,36 +268,32 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
 
         await broadcast_event("tool_call_started", {"tool": tool_name, "args": args})
 
-        # Tool 1: Pre-Action Verification
+        # Tool 1: Pre-Action Verification (4-Step Fail-Closed Governance Pipeline)
         if tool_name == "judgeguard_verify_action":
             action_desc = args.get("action", "")
             context = args.get("context", "")
+            model_id = args.get("model_id")
             
-            # Execute verification logic
-            try:
-                # Direct check via JudgeGuard engine if available in environment
-                try:
-                    from judge_guard import JudgeGuard
-                    jg = JudgeGuard()
-                    if jg._is_dangerous_command(action_desc):
-                        is_safe = False
-                        reason = "Security Violation: Action contains forbidden dangerous commands."
-                    else:
-                        is_safe = not any(b in action_desc.lower() for b in ["rm -rf", "delete database", "drop table", "override system", "bypass", "drop database"])
-                        reason = "Action adheres to governance rules and safety standards." if is_safe else "Action contains prohibited or destructive patterns."
-                except Exception:
-                    is_safe = not any(b in action_desc.lower() for b in ["rm -rf", "delete database", "drop table", "override system", "bypass", "drop database"])
-                    reason = "Action adheres to governance rules and safety standards." if is_safe else "Action contains prohibited or destructive patterns."
-                verdict = "PASSED" if is_safe else "BLOCKED"
-            except Exception as e:
-                verdict = "BLOCKED"
-                reason = f"Verification engine exception: {e}"
-
+            # Execute 4-Step Fail-Closed Governance Pipeline
+            pipeline_verdict = governance_pipeline.verify(action_desc, context=context, model_id=model_id)
+            
             result_data = {
-                "verdict": verdict,
-                "approved": verdict == "PASSED",
-                "reason": reason,
-                "action": action_desc,
+                "verdict": pipeline_verdict.verdict,
+                "approved": pipeline_verdict.approved,
+                "stage_resolved": pipeline_verdict.stage_resolved,
+                "risk_score": pipeline_verdict.risk_score,
+                "confidence": pipeline_verdict.confidence,
+                "reason": pipeline_verdict.reason,
+                "action": pipeline_verdict.action,
+                "policy_citations": pipeline_verdict.policy_citations,
+                "fail_closed_triggered": pipeline_verdict.fail_closed_triggered,
+                "timing": {
+                    "fast_gate_ms": round(pipeline_verdict.timing.fast_gate_ms, 3),
+                    "grounded_retrieve_ms": round(pipeline_verdict.timing.grounded_retrieve_ms, 3),
+                    "evaluate_ms": round(pipeline_verdict.timing.evaluate_ms, 3),
+                    "fail_safe_audit_ms": round(pipeline_verdict.timing.fail_safe_audit_ms, 3),
+                    "total_ms": round(pipeline_verdict.timing.total_ms, 3)
+                },
                 "timestamp": time.time()
             }
             await broadcast_event("judgeguard_verdict", result_data)
@@ -306,7 +305,7 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
                     "content": [
                         {"type": "text", "text": json.dumps(result_data, indent=2)}
                     ],
-                    "isError": verdict != "PASSED"
+                    "isError": not pipeline_verdict.approved
                 }
             }
 
