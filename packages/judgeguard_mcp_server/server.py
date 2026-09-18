@@ -1,7 +1,8 @@
 """
 JudgeGuard Autonomous AI Governance & Alexa+ MCP Bridge Server
 Streamable HTTP Transport (MCP Specification 2025-11-25+)
-Features Mandatory NotebookLM RAG Grounding and Pre-Action Verification.
+Features Mandatory Policy Corpus Grounding and Pre-Action Verification.
+(NotebookLM used during development; runtime operates deterministically).
 """
 
 import sys
@@ -40,14 +41,14 @@ logger = logging.getLogger("JudgeGuard.MCPServer")
 
 app = FastAPI(
     title="JudgeGuard Alexa+ MCP Server",
-    description="Authoritative AI Governance & Alexa+ MCP Bridge with Streamable HTTP and NotebookLM RAG",
+    description="Authoritative AI Governance & Alexa+ MCP Bridge with Streamable HTTP and Deterministic Policy Corpus Grounding",
     version="1.0.0"
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["http://127.0.0.1:8765", "http://localhost:8765"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -88,22 +89,23 @@ MCP_TOOLS = [
     },
     {
         "name": "judgeguard_notebooklm_rag",
-        "description": "MANDATORY RAG TOOL: Queries NotebookLM knowledge base to retrieve authoritative facts, rules, and sources.",
+        "description": "Queries the deterministic policy corpus derived from official hackathon rules. (NotebookLM was used during development as a research environment; runtime access is not required).",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "query": {"type": "string", "description": "Topic or question to resolve against NotebookLM"}
+                "query": {"type": "string", "description": "Topic or question to resolve against policy rules"}
             },
             "required": ["query"]
         }
     },
     {
         "name": "judgeguard_audit_context",
-        "description": "Audits agent responses against NotebookLM ground truth to eliminate hallucinations and verify consistency.",
+        "description": "Audits agent responses against policy ground truth to eliminate hallucinations and verify consistency.",
         "inputSchema": {
             "type": "object",
             "properties": {
-                "content": {"type": "string", "description": "Generated content to audit"}
+                "content": {"type": "string", "description": "Generated content to audit"},
+                "policy_topic": {"type": "string", "description": "Optional policy topic to audit against (e.g. general, financial, privacy, actuator)"}
             },
             "required": ["content"]
         }
@@ -127,7 +129,7 @@ MCP_TOOLS = [
     },
     {
         "name": "judgeguard_get_status",
-        "description": "Returns current JudgeGuard governance status, active notebook RAG source, and telemetry.",
+        "description": "Returns current JudgeGuard governance status, active policy grounding source, and telemetry.",
         "inputSchema": {
             "type": "object",
             "properties": {}
@@ -140,7 +142,8 @@ MCP_TOOLS = [
             "type": "object",
             "properties": {
                 "action": {"type": "string", "description": "Action to evaluate with AWS Bedrock"},
-                "context": {"type": "string", "description": "Operational context"}
+                "context": {"type": "string", "description": "Operational context"},
+                "model_id": {"type": "string", "description": "Optional AWS Bedrock model ID (e.g. anthropic.claude-3-5-sonnet-20241022-v2:0 or amazon.titan-text-express-v1)"}
             },
             "required": ["action"]
         }
@@ -174,8 +177,9 @@ def health_check():
         "status": "healthy",
         "service": "JudgeGuard Alexa+ MCP Server",
         "transport": "Streamable HTTP (MCP Spec 2025-11-25+)",
-        "rag_engine": "NotebookLM (Mandatory)",
-        "notebook_id": DEFAULT_NOTEBOOK_ID
+        "rag_engine": "Deterministic local policy corpus",
+        "lineage": "NotebookLM used during development; no runtime notebook access required",
+        "aws_bedrock_dispatch": "Dual-Model (Claude & Titan)"
     }
 
 @app.get("/mcp")
@@ -326,7 +330,8 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
         # Tool 3: Factual Audit Context
         if tool_name == "judgeguard_audit_context":
             content = args.get("content", "")
-            audit_res = rag_client.audit_context_against_rag(content)
+            policy_topic = args.get("policy_topic", "general")
+            audit_res = rag_client.audit_context_against_rag(content, policy_topic)
 
             return {
                 "jsonrpc": "2.0",
@@ -368,7 +373,7 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
             status_data = {
                 "status": "OPERATIONAL",
                 "governance_mode": "ENFORCED",
-                "rag_source": f"NotebookLM (UUID: {DEFAULT_NOTEBOOK_ID})",
+                "rag_source": "Deterministic local policy corpus (NotebookLM development lineage)",
                 "active_subscribers": len(subscribers),
                 "timestamp": time.time()
             }
@@ -386,7 +391,10 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
         if tool_name == "judgeguard_bedrock_evaluate":
             action_desc = args.get("action", "")
             context = args.get("context", "")
-            bedrock_res = bedrock_client.evaluate_action_safety(action_desc, context)
+            model_id = args.get("model_id")
+            bedrock_res = bedrock_client.evaluate_action_safety(
+                action_desc, context, override_model=model_id
+            )
             await broadcast_event("bedrock_evaluated", bedrock_res)
 
             return {

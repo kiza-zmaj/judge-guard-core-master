@@ -155,7 +155,7 @@ class PolicyGroundingClient:
             ]
         }
 
-    def audit_context_against_rag(self, response_text: str, expected_policy_topic: str) -> Dict[str, Any]:
+    def audit_context_against_rag(self, response_text: str, expected_policy_topic: str = "general") -> Dict[str, Any]:
         """
         Audits generated text for factual alignment against the policy corpus.
         Flags hallucinations and discrepancy risks.

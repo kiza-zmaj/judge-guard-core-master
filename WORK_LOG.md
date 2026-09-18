@@ -234,3 +234,6 @@
 🟡 Starting Fix 4: Add Streamable HTTP Protocol-Level Test Suite and Refine Protocol Description
 🟡 Starting Fix 5: Create Standalone Open-Source Companion Repo judgeguard-policy-schema for Open Source Challenge
 ✅ Completed Fix 5: Create Standalone Open-Source Companion Repo judgeguard-policy-schema for Open Source Challenge
+🟡 Starting Fix Bedrock model_id pass-through, audit_context signature, CORS, and runtime metadata
+🟡 Starting Final Polish: Dual Bedrock Model Dispatch, Audit Context Signature Fix, Policy Corpus Metadata, and Schema Export
+✅ Completed Final Polish: Dual Bedrock Model Dispatch, Audit Context Signature Fix, Policy Corpus Metadata, and Schema Export
