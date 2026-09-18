@@ -17,6 +17,16 @@ class TestJudgeGuardMCPServer(unittest.TestCase):
         self.assertEqual(data["status"], "healthy")
         self.assertIn("NotebookLM", data["rag_engine"])
 
+    def test_simulator_page(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("Alexa+ Experience Simulator", response.text)
+        self.assertIn("JudgeGuard Edition", response.text)
+
+        response_sim = self.client.get("/simulator")
+        self.assertEqual(response_sim.status_code, 200)
+        self.assertIn("Alexa+ Experience Simulator", response_sim.text)
+
     def test_mcp_initialize(self):
         payload = {
             "jsonrpc": "2.0",

@@ -12,7 +12,7 @@ import asyncio
 import logging
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -131,6 +131,17 @@ async def broadcast_event(event_type: str, data: Dict[str, Any]):
         except Exception:
             if queue in subscribers:
                 subscribers.remove(queue)
+
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+
+@app.get("/")
+@app.get("/simulator")
+def serve_simulator():
+    """Serves the interactive Alexa+ Experience Web Simulator."""
+    index_file = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file, media_type="text/html")
+    return {"message": "Alexa+ Simulator index.html not found"}
 
 @app.get("/health")
 def health_check():
