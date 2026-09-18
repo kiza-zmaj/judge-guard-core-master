@@ -123,11 +123,11 @@ MCP_TOOLS = [
 ]
 
 async def broadcast_event(event_type: str, data: Dict[str, Any]):
-    """Broadcasts events to all connected Streamable HTTP SSE clients."""
+    """Broadcasts events to all connected Streamable HTTP SSE clients (non-blocking)."""
     payload = f"event: {event_type}\ndata: {json.dumps(data)}\n\n"
     for queue in list(subscribers):
         try:
-            await queue.put(payload)
+            queue.put_nowait(payload)
         except Exception:
             if queue in subscribers:
                 subscribers.remove(queue)
@@ -232,10 +232,20 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
             
             # Execute verification logic
             try:
-                # Direct check via JudgeGuard engine
-                is_safe = not any(b in action_desc.lower() for b in ["rm -rf", "delete database", "drop table", "override system", "bypass"])
+                # Direct check via JudgeGuard engine if available in environment
+                try:
+                    from judge_guard import JudgeGuard
+                    jg = JudgeGuard()
+                    if jg._is_dangerous_command(action_desc):
+                        is_safe = False
+                        reason = "Security Violation: Action contains forbidden dangerous commands."
+                    else:
+                        is_safe = not any(b in action_desc.lower() for b in ["rm -rf", "delete database", "drop table", "override system", "bypass", "drop database"])
+                        reason = "Action adheres to governance rules and safety standards." if is_safe else "Action contains prohibited or destructive patterns."
+                except Exception:
+                    is_safe = not any(b in action_desc.lower() for b in ["rm -rf", "delete database", "drop table", "override system", "bypass", "drop database"])
+                    reason = "Action adheres to governance rules and safety standards." if is_safe else "Action contains prohibited or destructive patterns."
                 verdict = "PASSED" if is_safe else "BLOCKED"
-                reason = "Action adheres to governance rules and safety standards." if is_safe else "Action contains prohibited or destructive patterns."
             except Exception as e:
                 verdict = "BLOCKED"
                 reason = f"Verification engine exception: {e}"
