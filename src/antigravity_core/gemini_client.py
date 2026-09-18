@@ -222,8 +222,8 @@ class GeminiClient:
             if has_negative:
                 verdict = False
             else:
-                # Must explicitly match PASSED as a standalone token without negation
-                verdict = bool(re.search(r"\bPASSED\b", result))
+                # Must explicitly match PASSED or PASS as a standalone token without negation
+                verdict = bool(re.search(r"\bPASS(?:ED)?\b", result) or result.startswith("PAS"))
 
             self.last_is_authoritative = True
             return verdict

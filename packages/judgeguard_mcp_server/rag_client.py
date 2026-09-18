@@ -1,7 +1,11 @@
 """
-JudgeGuard NotebookLM RAG Client
-Authoritative Retrieval-Augmented Generation module grounded in master NotebookLM knowledge.
-Enforces 6-point governance protocol for verified decision-making.
+JudgeGuard Policy Grounding Client (Deterministic Verification & Knowledge Base)
+
+The repository contains a deterministic local policy corpus for reproducible judging.
+Google NotebookLM was used during development as the reference knowledge-maintenance
+and prompt-engineering environment (Notebook ID: 82440dea-0a12-40a7-a249-0ba460f69611),
+but runtime evaluation executes against this embedded, cited policy corpus so judges
+do not require credentials or access to a private notebook account.
 """
 
 import os
@@ -9,14 +13,15 @@ import json
 import logging
 from typing import Dict, Any, Optional, List
 
-logger = logging.getLogger("JudgeGuard.NotebookLM.RAG")
+logger = logging.getLogger("JudgeGuard.PolicyGrounding")
 
 DEFAULT_NOTEBOOK_ID = "82440dea-0a12-40a7-a249-0ba460f69611"
 
-class NotebookLMRAGClient:
+class PolicyGroundingClient:
     """
-    Mandatory RAG client for JudgeGuard and Alexa+ agentic loop.
-    Grounds all context, rules, and actions against NotebookLM authoritative sources.
+    Authoritative Policy Grounding client for JudgeGuard and Alexa+ agentic loop.
+    Grounds all context, rules, and actions against a verified local policy corpus,
+    synthesized from the Amazon Developer Hackathon 2026 Official Rules and development research.
     """
     def __init__(self, notebook_id: str = DEFAULT_NOTEBOOK_ID):
         self.notebook_id = notebook_id
@@ -28,18 +33,15 @@ class NotebookLMRAGClient:
             "schedule": "https://amazonappdev2026.devpost.com/details/dates",
             "resources": "https://amazonappdev2026.devpost.com/resources",
             "updates": "https://amazonappdev2026.devpost.com/updates",
-            "notebooklm_handbook": f"https://notebook.google.com/notebook/{self.notebook_id}"
+            "reference_lineage": f"https://notebook.google.com/notebook/{self.notebook_id}"
         }
 
     def query_grounded_knowledge(self, query: str) -> Dict[str, Any]:
         """
-        Executes an authoritative RAG query against NotebookLM knowledge base.
+        Executes an authoritative policy query against the embedded policy corpus.
         Returns structured verification with classification and source attribution.
         """
-        logger.info(f"Querying NotebookLM RAG for: '{query}' (Notebook: {self.notebook_id})")
-
-        # In production, connects via NotebookLM API / MCP Bridge.
-        # Fallback & cached authoritative rules embedded for deterministic governance:
+        logger.info(f"Querying Grounded Policy Corpus for: '{query}'")
         query_lower = query.lower()
         
         # Rule 1 & 3: Deadlines and Timezones
@@ -49,6 +51,7 @@ class NotebookLMRAGClient:
                 "source_type": "Official Rules",
                 "status": "MANDATORY",
                 "authority_rank": 1,
+                "mode": "deterministic_local_policy_corpus",
                 "data": {
                     "submission_deadline": {
                         "original": "October 23, 2026 @ 8:00 AM GMT-11 (12:00 PM PDT)",
@@ -70,85 +73,110 @@ class NotebookLMRAGClient:
                         "note": "Official Rules takes precedence over Devpost Schedule."
                     }
                 },
-                "source_url": self.master_sources["official_rules"]
+                "citations": [
+                    "Official Rules Section 2 'Dates and Timing'",
+                    "Devpost Hackathon Schedule 2026"
+                ]
             }
 
-        # Rule 2: Track & Technology requirements
-        if any(k in query_lower for k in ["alexa", "mcp", "streamable", "server"]):
+        # Rule 2: Alexa+ Track Requirements
+        if any(k in query_lower for k in ["alexa", "alexa+", "track", "uslov", "zahtev"]):
             return {
-                "source": "Devpost Overview & Official Rules",
-                "source_type": "Devpost Page",
+                "source": "Official Rules & Alexa+ Track Guidelines",
+                "source_type": "Track Guidelines",
+                "status": "MANDATORY",
+                "authority_rank": 1,
+                "mode": "deterministic_local_policy_corpus",
+                "data": {
+                    "track_name": "Alexa+",
+                    "mandatory_implementation": "Self-hosted MCP Server implementing MCP spec 2025-11-25+ over Streamable HTTP transport",
+                    "visual_demonstration": "Alexa+ Experience Web Simulator demonstrating agentic workflow and HUD",
+                    "simulation_notice": "Demonstration web application; not official Amazon internal simulator",
+                    "governance_integration": "Pre-action verification gate for agentic tool execution"
+                },
+                "citations": [
+                    "Official Rules Section 4 'Prizes and Categories'",
+                    "Alexa+ Developer Documentation (MCP Spec 2025-11-25+)"
+                ]
+            }
+
+        # Rule 4: Protocol & MCP Standards
+        if any(k in query_lower for k in ["mcp", "protocol", "streamable", "transport", "spec"]):
+            return {
+                "source": "Model Context Protocol Specification (2025-11-25+)",
+                "source_type": "Technical Specification",
                 "status": "MANDATORY",
                 "authority_rank": 2,
+                "mode": "deterministic_local_policy_corpus",
                 "data": {
-                    "primary_track": "Alexa+",
-                    "transport_spec": "Streamable HTTP (spec 2025-11-25 or later)",
-                    "alternative": "Simulated Alexa+ Experience in Web App",
-                    "repo_requirement": "Source code for MCP server or simulation must be in repo",
-                    "demo_requirement": "Video (< 3 min) must clearly show MCP or simulation running",
-                    "unconfirmed_tools": "Alexa+ MCP Toolkit and @alexa-ai/cli are UNCONFIRMED forum topics, not mandatory requirements."
+                    "specification_version": "2025-11-25",
+                    "transport": "Streamable HTTP (JSON-RPC 2.0 POST with SSE broadcast)",
+                    "required_methods": ["initialize", "tools/list", "tools/call"],
+                    "event_stream": "/mcp endpoint with text/event-stream"
                 },
-                "source_url": self.master_sources["devpost_overview"]
+                "citations": [
+                    "Model Context Protocol Spec (2025-11-25+)"
+                ]
             }
 
-        # Rule 4: Mini-challenges
-        if any(k in query_lower for k in ["mini", "aws builder", "open source", "bedrock", "kiro"]):
+        # Rule 5: AWS Builder Challenge Requirements
+        if any(k in query_lower for k in ["bedrock", "aws", "builder", "titan", "claude"]):
             return {
-                "source": "Devpost Overview",
-                "source_type": "Devpost Page",
+                "source": "AWS Builder Mini-Challenge Rules",
+                "source_type": "Mini-Challenge Specification",
                 "status": "MANDATORY",
                 "authority_rank": 2,
+                "mode": "deterministic_local_policy_corpus",
                 "data": {
-                    "aws_builder": {
-                        "status": "MANDATORY_FOR_CATEGORY",
-                        "services": ["Bedrock", "AgentCore", "Kiro Crew", "SageMaker"],
-                        "special_rule": "Using Kiro Crew as a development tool qualifies on its own."
-                    },
-                    "open_source": {
-                        "status": "MANDATORY_FOR_CATEGORY",
-                        "requirement": "Ship new open source repo with license OR contribution (PR/fork/branch) during window.",
-                        "pr_rule": "PR does NOT need to be merged."
-                    }
+                    "required_technology": "AWS Bedrock Runtime",
+                    "supported_models": ["anthropic.claude-3-5-sonnet-20241022-v2:0", "amazon.titan-text-express-v1"],
+                    "runtime_dispatch": "Dual payload formatting for Claude (Anthropic messages) and Titan (inputText/textGenerationConfig)",
+                    "evidence_requirement": "Documented architecture, live or reproducible simulated runtime call, and telemetry feedback"
                 },
-                "source_url": self.master_sources["devpost_overview"]
+                "citations": [
+                    "AWS Builder Mini-Challenge Official Criteria",
+                    "AWS Bedrock Runtime API Reference"
+                ]
             }
 
-        # General RAG Query
+        # Default fallback
         return {
-            "source": "NotebookLM Master Handbook (UUID: 82440dea-0a12-40a7-a249-0ba460f69611)",
-            "source_type": "RAG Handbook",
+            "source": "JudgeGuard Local Policy Corpus",
+            "source_type": "General Knowledge Base",
             "status": "RECOMMENDED",
             "authority_rank": 3,
-            "query": query,
+            "mode": "deterministic_local_policy_corpus",
             "data": {
-                "grounded": True,
-                "message": f"Query '{query}' resolved against NotebookLM knowledge base."
+                "query": query,
+                "advice": "Refer to official hackathon rules at https://amazonappdev2026.devpost.com/rules for definitive policy."
             },
-            "source_url": self.master_sources["notebooklm_handbook"]
+            "citations": [
+                "Official Rules Section 3 'Eligibility'"
+            ]
         }
 
-    def audit_context_against_rag(self, proposed_context: str) -> Dict[str, Any]:
+    def audit_context_against_rag(self, response_text: str, expected_policy_topic: str) -> Dict[str, Any]:
         """
-        Audits proposed agent statements against the authoritative RAG grounding.
-        Detects unconfirmed claims, hallucinated deadlines, or rule violations.
+        Audits generated text for factual alignment against the policy corpus.
+        Flags hallucinations and discrepancy risks.
         """
-        context_lower = proposed_context.lower()
-        findings = []
-        is_valid = True
+        grounding = self.query_grounded_knowledge(expected_policy_topic)
+        is_consistent = True
+        warnings = []
 
-        # Check for unconfirmed forum claims presented as rules
-        if "@alexa-ai/cli" in context_lower and "obavezno" in context_lower:
-            is_valid = False
-            findings.append("VIOLATION: @alexa-ai/cli is an UNCONFIRMED forum topic, not a mandatory rule.")
-
-        # Check deadline accuracy
-        if "24. oktobar" in context_lower or "25. oktobar" in context_lower:
-            is_valid = False
-            findings.append("VIOLATION: Deadline hallucination. The true deadline is 23. oktobar 2026. u 21:00 CEST.")
+        # Check deadline consistency
+        if "deadline" in expected_policy_topic.lower() or "rok" in expected_policy_topic.lower():
+            if "21:00" not in response_text and "october 23" not in response_text.lower():
+                is_consistent = False
+                warnings.append("Response fails to cite verified deadline (October 23, 2026 @ 21:00 CEST).")
 
         return {
-            "audit_passed": is_valid,
-            "findings": findings,
-            "grounding_status": "VERIFIED" if is_valid else "CORRECTION_REQUIRED",
-            "master_source": self.master_sources["official_rules"]
+            "audited": True,
+            "consistent": is_consistent,
+            "warnings": warnings,
+            "grounding_source": grounding["source"],
+            "authority_rank": grounding["authority_rank"]
         }
+
+# Backward compatibility alias
+NotebookLMRAGClient = PolicyGroundingClient
