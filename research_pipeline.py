@@ -351,13 +351,15 @@ class ResearchPipeline:
         if not self.conn:
             self.connect()
 
-        action_hash = hashlib.md5(action.encode()).hexdigest()
+        # SECURITY FIX (P0-6): Use SHA-256 instead of MD5 to prevent collision vulnerabilities
+        action_hash = hashlib.sha256(action.encode("utf-8")).hexdigest()
         auth_int = 1 if is_authoritative else 0
 
         self.conn.execute("""
             INSERT INTO verdicts (action, action_hash, verdict, is_authoritative)
             VALUES (?, ?, ?, ?)
             ON CONFLICT(action) DO UPDATE SET
+                action_hash = excluded.action_hash,
                 verdict = excluded.verdict,
                 is_authoritative = excluded.is_authoritative,
                 timestamp = CURRENT_TIMESTAMP
@@ -374,10 +376,11 @@ class ResearchPipeline:
         if not self.conn:
             self.connect()
 
-        action_hash = hashlib.md5(action.encode()).hexdigest()
+        # SECURITY FIX (P0-6): SHA-256 hash plus exact action match prevents collision false-approvals
+        action_hash = hashlib.sha256(action.encode("utf-8")).hexdigest()
         result = self.conn.execute(
-            "SELECT verdict, is_authoritative FROM verdicts WHERE action_hash = ?",
-            (action_hash,)
+            "SELECT verdict, is_authoritative FROM verdicts WHERE action_hash = ? AND action = ?",
+            (action_hash, action)
         ).fetchone()
 
         if result:
@@ -405,10 +408,10 @@ class ResearchPipeline:
         if not self.conn:
             self.connect()
 
-        action_hash = hashlib.md5(action.encode()).hexdigest()
+        action_hash = hashlib.sha256(action.encode("utf-8")).hexdigest()
         cursor = self.conn.execute(
-            "DELETE FROM verdicts WHERE action_hash = ?",
-            (action_hash,)
+            "DELETE FROM verdicts WHERE action = ? OR action_hash = ?",
+            (action, action_hash)
         )
         self.conn.commit()
         deleted = cursor.rowcount > 0

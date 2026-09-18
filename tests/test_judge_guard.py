@@ -55,6 +55,49 @@ class TestJudgeGuard(unittest.TestCase):
         context = self.judge._load_context()
         self.assertIn("Starting Valid Action", context)
 
+    def test_drift_score_monotonicity(self):
+        """Verify Layer-3 drift score is strictly monotonic across calibration benchmarks."""
+        no_drift_action = "Researching Chain of Verification papers on arXiv to improve agent reliability."
+        moderate_drift_action = "Adding a new UI component to the PWA app to display cat pictures for better UX."
+        total_drift_action = "Ordering a pizza via the browser agent using UberEats."
+
+        score_no = self.judge.calculate_drift_score(no_drift_action)
+        score_mod = self.judge.calculate_drift_score(moderate_drift_action)
+        score_tot = self.judge.calculate_drift_score(total_drift_action)
+
+        assert score_no < 0.40, f"Expected NO_DRIFT < 0.40, got {score_no}"
+        assert score_mod >= 0.40, f"Expected MODERATE_DRIFT >= 0.40, got {score_mod}"
+        assert score_tot >= 0.40, f"Expected TOTAL_DRIFT >= 0.40, got {score_tot}"
+        assert score_no < score_mod < score_tot, f"Scores must be strictly monotonic: {score_no} < {score_mod} < {score_tot}"
+
+    @patch('src.antigravity_core.judge_flow.BlockJudge.evaluate')
+    @patch('src.antigravity_core.gemini_client.GeminiClient')
+    def test_drift_gating_blocks_write_action(self, mock_gemini, mock_evaluate):
+        """Verify that write actions with semantic drift >= 0.40 are blocked by Layer 3."""
+        with open(self.work_log_path, "a") as f:
+            f.write("🟡 Starting write action\n")
+
+        # Action is a write operation ("modify...") with total drift ("pizza")
+        verdict = self.judge.verify_action("modify code to order pizza via UberEats")
+        self.assertFalse(verdict)
+        mock_evaluate.assert_not_called()  # Must fail closed at Layer 3 before reaching external LLM
+
+    @patch('src.antigravity_core.judge_flow.BlockJudge.evaluate')
+    @patch('src.antigravity_core.gemini_client.GeminiClient')
+    def test_drift_gating_allows_aligned_write_action(self, mock_gemini, mock_evaluate):
+        """Verify that write actions aligned with Project Essence pass Layer 3 drift check."""
+        mock_evaluate.return_value = True
+        with open(self.work_log_path, "a") as f:
+            f.write("🟡 Starting write action\n")
+
+        action = "write novel verification logic for agent pipeline"
+        if self.judge.pipeline:
+            self.judge.pipeline.invalidate_verdict(action)
+
+        verdict = self.judge.verify_action(action)
+        self.assertTrue(verdict)
+        mock_evaluate.assert_called_once()
+
     def tearDown(self):
         """
         Remove the test work log file if it exists.
@@ -66,3 +109,4 @@ class TestJudgeGuard(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+

@@ -198,3 +198,11 @@
 🟡 Starting v5 SharpBet Pipeline Refactor - entry-only CLV, walk-forward folds, 10k bootstrap
 🟡 Starting [SharpBet ML Pipeline v5.0 Upgrade (Entry-Only, Walk-Forward, Zero-Leakage)]
 ✅ Completed [SharpBet ML Pipeline v5.0 Upgrade (Entry-Only, Walk-Forward, Zero-Leakage)]
+🟡 Starting [Deploy SharpBet Core v5.0 Notebook to Kaggle]
+🟡 Starting Kaggle Push v5.0
+🟡 Starting Kaggle Push v5.0
+✅ Completed Kaggle Push v5.0 - Version 7 live
+🟡 Starting Phase 9: Class 2 Retrieval Architecture & Row-Group Batch Loading for Modified Cosine
+🟡 Starting [Kaggle Kernel v9 Push — Phase 9 Row-Group Batch Loading + Ambiguity Resolution via MS/MS Cosine]
+🟡 Starting Phase 1: Alexa+ JudgeGuard MCP Setup
+✅ Completed Phase 1: Alexa+ JudgeGuard MCP Setup
