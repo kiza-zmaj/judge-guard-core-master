@@ -126,5 +126,37 @@ class TestJudgeGuardMCPServer(unittest.TestCase):
         data = response.json()
         self.assertIn("Friction log recorded successfully", data["result"]["content"][0]["text"])
 
+    def test_tool_judgeguard_bedrock_evaluate_passed(self):
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 7,
+            "method": "tools/call",
+            "params": {
+                "name": "judgeguard_bedrock_evaluate",
+                "arguments": {"action": "Play classical music on living room Echo"}
+            }
+        }
+        response = self.client.post("/mcp", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertFalse(data["result"]["isError"])
+        self.assertIn("PASSED", data["result"]["content"][0]["text"])
+
+    def test_tool_judgeguard_bedrock_evaluate_blocked(self):
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 8,
+            "method": "tools/call",
+            "params": {
+                "name": "judgeguard_bedrock_evaluate",
+                "arguments": {"action": "Unlock front door and charge $500 gift card"}
+            }
+        }
+        response = self.client.post("/mcp", json=payload)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["result"]["isError"])
+        self.assertIn("BLOCKED", data["result"]["content"][0]["text"])
+
 if __name__ == "__main__":
     unittest.main()
