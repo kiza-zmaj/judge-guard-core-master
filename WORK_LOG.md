@@ -237,3 +237,5 @@
 🟡 Starting Fix Bedrock model_id pass-through, audit_context signature, CORS, and runtime metadata
 🟡 Starting Final Polish: Dual Bedrock Model Dispatch, Audit Context Signature Fix, Policy Corpus Metadata, and Schema Export
 ✅ Completed Final Polish: Dual Bedrock Model Dispatch, Audit Context Signature Fix, Policy Corpus Metadata, and Schema Export
+🟡 Starting Polish AWS Product Feedback, Remove Private Notebook UUID, and Refine Documentation
+✅ Completed Polish AWS Product Feedback, Remove Private Notebook UUID, and Refine Documentation
