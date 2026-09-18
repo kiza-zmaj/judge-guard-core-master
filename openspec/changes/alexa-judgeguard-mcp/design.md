@@ -6,6 +6,7 @@ Amazon Developer Hackathon 2026 presents a premier opportunity to showcase **Jud
 
 As Alexa+ transitions to multi-agent autonomy and real-world actions (smart home control, commerce, data extraction, cross-device workflows), safety, hallucination prevention, and action verification become critical. JudgeGuard acts as the **Autonomous Gatekeeper (JudgeGuard Gate)**:
 - Every high-stakes action (e.g. door unlock, commerce transaction, schema mutation, code deployment) is routed through a JudgeGuard verification pipeline before execution.
+- **NotebookLM as Mandatory RAG & Data Engine**: All context, rule sets, policy documents, and external domain data are grounded authoritatively via **NotebookLM RAG** (`judgeguard_notebooklm_rag`) to eliminate hallucination, provide traceable source citations, and guarantee strict factual grounding.
 - Implemented as a high-performance **MCP Server** strictly adhering to the **Model Context Protocol (MCP) Streamable HTTP transport (v2025-11-25+)**.
 - Paired with an interactive **Alexa+ Simulated Web Experience** delivering real-time agentic reasoning, step-by-step verification feeds, and user confirmation loops.
 
@@ -27,13 +28,21 @@ flowchart TD
         
         Tools --> Tool_Verify[judgeguard_verify_action]
         Tools --> Tool_Audit[judgeguard_audit_context]
+        Tools --> Tool_RAG[judgeguard_notebooklm_rag - MANDATORY RAG]
         Tools --> Tool_Rules[judgeguard_get_governance_rules]
         Tools --> Tool_Friction[judgeguard_log_friction]
+    end
+
+    subgraph Authoritative_Data_Layer [NotebookLM RAG & Knowledge Base]
+        Tool_RAG --> NLM_Engine[NotebookLM Grounded Query API]
+        NLM_Engine --> Sources[(Curated Source Documents / Policies)]
+        NLM_Engine -->|Grounded Facts & Citations| Tool_RAG
     end
 
     subgraph JudgeGuard_Core_Engine [JudgeGuard Verification Engine]
         Tool_Verify --> Validator[Consolidated Verification & Bias Gate]
         Tool_Audit --> SafetyLLM[AWS Bedrock / Gemini Governance Evaluator]
+        Tool_RAG -.->|Grounded Policy Context| Validator
         Validator --> Cache[Verdict Cache & Audit Trail]
     end
 
@@ -54,9 +63,10 @@ flowchart TD
   - `GET /mcp/events`: SSE stream for live audit logs, verification verdict telemetry, and friction tracking.
 * **Exposed MCP Tools**:
   1. `judgeguard_verify_action`: Evaluates whether a proposed agent action meets safety, authorization, and consistency rules before execution.
-  2. `judgeguard_audit_context`: Performs deep hallucination and factual consistency checks on generated agent responses.
-  3. `judgeguard_check_eligibility`: Verifies user permissions, device states, and environment constraints.
-  4. `judgeguard_record_friction`: Automatically generates friction log entries compliant with the hackathon's 10% judging bonus requirement.
+  2. `judgeguard_notebooklm_rag` (**MANDATORY RAG TOOL**): Queries NotebookLM's grounded corpus to retrieve verified facts, rules, and domain data with exact source attribution.
+  3. `judgeguard_audit_context`: Performs deep hallucination and factual consistency checks on generated agent responses by comparing them against NotebookLM RAG ground truth.
+  4. `judgeguard_check_eligibility`: Verifies user permissions, device states, and environment constraints.
+  5. `judgeguard_record_friction`: Automatically generates friction log entries compliant with the hackathon's 10% judging bonus requirement.
 
 ### B. `Alexa+ Experience Web Simulator`
 * Visual demonstration of the Alexa+ agentic loop interacting with the user.
