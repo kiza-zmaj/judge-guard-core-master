@@ -18,7 +18,8 @@ class TestJudgeGuardMCPServer(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertEqual(data["status"], "healthy")
-        self.assertIn("NotebookLM", data["rag_engine"])
+        self.assertEqual(data["rag_engine"], "Deterministic local policy corpus")
+        self.assertIn("NotebookLM", data["lineage"])
 
     def test_simulator_page(self):
         response = self.client.get("/")

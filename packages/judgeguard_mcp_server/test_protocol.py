@@ -3,6 +3,7 @@ Streamable HTTP Protocol Compliance Tests for JudgeGuard Alexa+ MCP Server.
 Validates MCP Spec 2025-11-25+ transport, JSON-RPC 2.0 router, and SSE event streaming.
 """
 
+import json
 import unittest
 from fastapi.testclient import TestClient
 
@@ -137,6 +138,9 @@ class TestStreamableHTTPProtocol(unittest.TestCase):
         self.assertEqual(res_claude.status_code, 200)
         data_claude = res_claude.json()
         self.assertFalse(data_claude["result"]["isError"])
+        claude_res = json.loads(data_claude["result"]["content"][0]["text"])
+        self.assertIn("claude", claude_res["model_used"].lower())
+        self.assertEqual(claude_res["verdict"], "PASSED")
 
         # Test Amazon Titan dispatch
         titan_payload = {
@@ -155,6 +159,66 @@ class TestStreamableHTTPProtocol(unittest.TestCase):
         self.assertEqual(res_titan.status_code, 200)
         data_titan = res_titan.json()
         self.assertFalse(data_titan["result"]["isError"])
+        titan_res = json.loads(data_titan["result"]["content"][0]["text"])
+        self.assertIn("titan", titan_res["model_used"].lower())
+        self.assertEqual(titan_res["verdict"], "PASSED")
+
+    def test_bedrock_client_payload_formatting(self):
+        """Directly validates model-specific JSON request formatting for Claude vs Titan."""
+        from bedrock_client import AWSBedrockSafetyClient
+        client = AWSBedrockSafetyClient()
+
+        # Claude payload formatting
+        claude_body = json.loads(client._format_request_body("test prompt", "anthropic.claude-3-5-sonnet-20241022-v2:0"))
+        self.assertEqual(claude_body["anthropic_version"], "bedrock-2023-05-31")
+        self.assertIn("messages", claude_body)
+        self.assertEqual(claude_body["messages"][0]["content"], "test prompt")
+
+        # Titan payload formatting
+        titan_body = json.loads(client._format_request_body("test prompt", "amazon.titan-text-express-v1"))
+        self.assertEqual(titan_body["inputText"], "test prompt")
+        self.assertIn("textGenerationConfig", titan_body)
+        self.assertEqual(titan_body["textGenerationConfig"]["maxTokenCount"], 512)
+
+    def test_tools_call_audit_context(self):
+        """Validates tools/call execution for judgeguard_audit_context tool."""
+        # 1. Calling with only content (default policy_topic='general')
+        payload_default = {
+            "jsonrpc": "2.0",
+            "id": 110,
+            "method": "tools/call",
+            "params": {
+                "name": "judgeguard_audit_context",
+                "arguments": {
+                    "content": "The application follows all hackathon security rules and standards."
+                }
+            }
+        }
+        res_default = self.client.post("/mcp", json=payload_default, headers=self.headers)
+        self.assertEqual(res_default.status_code, 200)
+        data_default = res_default.json()
+        audit_res1 = json.loads(data_default["result"]["content"][0]["text"])
+        self.assertTrue(audit_res1["audited"])
+
+        # 2. Calling with explicit policy_topic
+        payload_topic = {
+            "jsonrpc": "2.0",
+            "id": 111,
+            "method": "tools/call",
+            "params": {
+                "name": "judgeguard_audit_context",
+                "arguments": {
+                    "content": "Submission deadline is October 23, 2026 at 21:00 CEST.",
+                    "policy_topic": "deadline"
+                }
+            }
+        }
+        res_topic = self.client.post("/mcp", json=payload_topic, headers=self.headers)
+        self.assertEqual(res_topic.status_code, 200)
+        data_topic = res_topic.json()
+        audit_res2 = json.loads(data_topic["result"]["content"][0]["text"])
+        self.assertTrue(audit_res2["audited"])
+        self.assertTrue(audit_res2["consistent"])
 
     def test_tools_call_policy_grounding(self):
         """Validates tools/call query against deterministic grounded policy corpus."""
@@ -204,12 +268,15 @@ class TestStreamableHTTPProtocol(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
     def test_transport_metadata(self):
-        """Validates /health reports Streamable HTTP transport compliance."""
+        """Validates /health reports Streamable HTTP transport compliance and deterministic corpus."""
         res = self.client.get("/health")
         self.assertEqual(res.status_code, 200)
         data = res.json()
         self.assertEqual(data["transport"], "Streamable HTTP (MCP Spec 2025-11-25+)")
         self.assertEqual(data["status"], "healthy")
+        self.assertEqual(data["rag_engine"], "Deterministic local policy corpus")
+        self.assertIn("lineage", data)
+        self.assertNotIn("notebook_id", data)
 
 if __name__ == "__main__":
     unittest.main()
