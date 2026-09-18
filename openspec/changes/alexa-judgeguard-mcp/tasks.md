@@ -20,9 +20,9 @@
 - [x] 3.4 Implement visual JudgeGuard Verdict HUD (🟢 PASSED, 🛑 BLOCKED, 🟡 AUDITING)
 
 ## Phase 4: AWS Builder Mini-Challenge Integration
-- [ ] 4.1 Integrate AWS Bedrock client SDK for secondary safety and reasoning layer
-- [ ] 4.2 Document architecture, service integration, and configuration guidelines in README
-- [ ] 4.3 Prepare AWS Product Feedback document according to Devpost mandatory format
+- [x] 4.1 Integrate AWS Bedrock client SDK for secondary safety and reasoning layer
+- [x] 4.2 Document architecture, service integration, and configuration guidelines in README
+- [x] 4.3 Prepare AWS Product Feedback document according to Devpost mandatory format
 
 ## Phase 5: Submission Preparation, Friction Log & Video Pipeline
 - [ ] 5.1 Compile comprehensive Friction Log entries for the 10% judging bonus

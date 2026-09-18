@@ -22,6 +22,7 @@ if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
 from packages.judgeguard_mcp_server.rag_client import NotebookLMRAGClient, DEFAULT_NOTEBOOK_ID
+from packages.judgeguard_mcp_server.bedrock_client import AWSBedrockSafetyClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("JudgeGuard.MCPServer")
@@ -41,6 +42,7 @@ app.add_middleware(
 )
 
 rag_client = NotebookLMRAGClient(DEFAULT_NOTEBOOK_ID)
+bedrock_client = AWSBedrockSafetyClient()
 
 # Event subscribers for Streamable HTTP SSE
 subscribers: List[asyncio.Queue] = []
@@ -118,6 +120,18 @@ MCP_TOOLS = [
         "inputSchema": {
             "type": "object",
             "properties": {}
+        }
+    },
+    {
+        "name": "judgeguard_bedrock_evaluate",
+        "description": "AWS Builder Mini-Challenge: Evaluates action safety using AWS Bedrock Claude 3.5 / Titan reasoning models.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "action": {"type": "string", "description": "Action to evaluate with AWS Bedrock"},
+                "context": {"type": "string", "description": "Operational context"}
+            },
+            "required": ["action"]
         }
     }
 ]
@@ -353,6 +367,24 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
                     "content": [
                         {"type": "text", "text": json.dumps(status_data, indent=2)}
                     ]
+                }
+            }
+
+        # Tool 6: AWS Bedrock Evaluator (AWS Builder Challenge)
+        if tool_name == "judgeguard_bedrock_evaluate":
+            action_desc = args.get("action", "")
+            context = args.get("context", "")
+            bedrock_res = bedrock_client.evaluate_action_safety(action_desc, context)
+            await broadcast_event("bedrock_evaluated", bedrock_res)
+
+            return {
+                "jsonrpc": "2.0",
+                "id": req_id,
+                "result": {
+                    "content": [
+                        {"type": "text", "text": json.dumps(bedrock_res, indent=2)}
+                    ],
+                    "isError": not bedrock_res.get("approved", True)
                 }
             }
 

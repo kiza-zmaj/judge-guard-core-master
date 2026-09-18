@@ -70,3 +70,35 @@ curl -X POST http://localhost:8765/mcp \
 ```bash
 curl -N http://localhost:8765/mcp
 ```
+
+### 4. Interactive Alexa+ Web Simulator
+Open your browser and navigate to:
+```
+http://localhost:8765/
+```
+Or:
+```
+http://localhost:8765/simulator
+```
+Features:
+- Live multi-turn Alexa+ conversational assistant.
+- Real-time **JudgeGuard Verdict HUD** (🟢 PASSED, 🛑 BLOCKED, 🟡 AUDITING).
+- Instant **NotebookLM RAG Grounding** with exact source citations.
+- Built-in **Friction Log Recorder** saving directly to `research/friction_logs/hackathon_friction_logs.jsonl`.
+
+### 5. AWS Builder Mini-Challenge: AWS Bedrock Integration
+JudgeGuard integrates **AWS Bedrock Runtime** (`packages/judgeguard_mcp_server/bedrock_client.py`) using Claude 3.5 Sonnet and Amazon Titan Text Express for secondary semantic reasoning and prompt injection auditing:
+```bash
+curl -X POST http://localhost:8765/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 4,
+    "method": "tools/call",
+    "params": {
+      "name": "judgeguard_bedrock_evaluate",
+      "arguments": {"action": "Play classical music on living room Echo"}
+    }
+  }'
+```
+See [`AWS_PRODUCT_FEEDBACK.md`](./AWS_PRODUCT_FEEDBACK.md) for detailed feedback and evaluation notes.
