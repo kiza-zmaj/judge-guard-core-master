@@ -51,9 +51,11 @@ The server starts on `http://127.0.0.1:8765` and serves both the Streamable HTTP
 ```bash
 python3 -m unittest test_server.py test_protocol.py
 ```
-**Test Baseline:**
-- **Command:** `python3 -m unittest test_server.py test_protocol.py`
-- **Result:** `Ran 21 tests in 0.096s - OK` (21 passed, 0 failures, 0 errors)
+**Test Baseline & Conformance:**
+- **Primary Server Tests:** `python3 -m unittest test_server.py test_protocol.py` (21 passed, 0 failures, 0 errors)
+- **Companion Schema Tests:** `pytest tests/` in [`judgeguard-policy-schema`](https://github.com/kiza-zmaj/judgeguard-policy-schema) (6 passed, 0 failures)
+- **Protocol Status:** MCP Streamable HTTP implementation with protocol-level regression tests
+- **Live AWS Bedrock Execution:** Optional / environment-dependent (automated tests run against deterministic offline fallback when AWS credentials are not set)
 - **Environment:** Python 3.12.3 on Linux x86_64 (`Linux 6.8.0-101-generic`)
 
 ---

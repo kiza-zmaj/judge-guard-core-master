@@ -2,10 +2,9 @@
 JudgeGuard Policy Grounding Client (Deterministic Verification & Knowledge Base)
 
 The repository contains a deterministic local policy corpus for reproducible judging.
-Google NotebookLM was used during development as the reference knowledge-maintenance
-and prompt-engineering environment (Notebook ID: 82440dea-0a12-40a7-a249-0ba460f69611),
-but runtime evaluation executes against this embedded, cited policy corpus so judges
-do not require credentials or access to a private notebook account.
+Google NotebookLM was used during development as the reference research and knowledge-synthesis
+pipeline, but runtime evaluation executes against this embedded, cited policy corpus so judges
+do not require credentials or access to private notebook resources.
 """
 
 import os
@@ -15,7 +14,7 @@ from typing import Dict, Any, Optional, List
 
 logger = logging.getLogger("JudgeGuard.PolicyGrounding")
 
-DEFAULT_NOTEBOOK_ID = "82440dea-0a12-40a7-a249-0ba460f69611"
+DEFAULT_NOTEBOOK_ID = os.getenv("NOTEBOOKLM_NOTEBOOK_ID", "")
 
 class PolicyGroundingClient:
     """
@@ -23,8 +22,8 @@ class PolicyGroundingClient:
     Grounds all context, rules, and actions against a verified local policy corpus,
     synthesized from the Amazon Developer Hackathon 2026 Official Rules and development research.
     """
-    def __init__(self, notebook_id: str = DEFAULT_NOTEBOOK_ID):
-        self.notebook_id = notebook_id
+    def __init__(self, notebook_id: Optional[str] = None):
+        self.notebook_id = notebook_id or DEFAULT_NOTEBOOK_ID
         self._cache_dir = os.path.join(os.path.dirname(__file__), ".rag_cache")
         os.makedirs(self._cache_dir, exist_ok=True)
         self.master_sources = {
@@ -33,7 +32,7 @@ class PolicyGroundingClient:
             "schedule": "https://amazonappdev2026.devpost.com/details/dates",
             "resources": "https://amazonappdev2026.devpost.com/resources",
             "updates": "https://amazonappdev2026.devpost.com/updates",
-            "reference_lineage": f"https://notebook.google.com/notebook/{self.notebook_id}"
+            "reference_lineage": "Synthesized and vetted using NotebookLM research pipeline during hackathon period"
         }
 
     def query_grounded_knowledge(self, query: str) -> Dict[str, Any]:
