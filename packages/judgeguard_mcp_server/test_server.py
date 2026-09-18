@@ -4,7 +4,10 @@ Unit tests for JudgeGuard Alexa+ MCP Server and NotebookLM RAG integration.
 
 import unittest
 from fastapi.testclient import TestClient
-from packages.judgeguard_mcp_server.server import app
+try:
+    from packages.judgeguard_mcp_server.server import app
+except (ImportError, ModuleNotFoundError):
+    from server import app
 
 class TestJudgeGuardMCPServer(unittest.TestCase):
     def setUp(self):

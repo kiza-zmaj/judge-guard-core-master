@@ -21,8 +21,12 @@ REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
-from packages.judgeguard_mcp_server.rag_client import NotebookLMRAGClient, DEFAULT_NOTEBOOK_ID
-from packages.judgeguard_mcp_server.bedrock_client import AWSBedrockSafetyClient
+try:
+    from packages.judgeguard_mcp_server.rag_client import NotebookLMRAGClient, DEFAULT_NOTEBOOK_ID
+    from packages.judgeguard_mcp_server.bedrock_client import AWSBedrockSafetyClient
+except (ImportError, ModuleNotFoundError):
+    from rag_client import NotebookLMRAGClient, DEFAULT_NOTEBOOK_ID
+    from bedrock_client import AWSBedrockSafetyClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("JudgeGuard.MCPServer")
