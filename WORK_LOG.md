@@ -227,3 +227,10 @@
 ✅ Completed Add Root MIT License and Update Root README with Hackathon Navigation
 🟡 Starting Create Standalone Repository judgeguard-alexa-mcp for Alexa+ Hackathon Submission
 ✅ Completed Create Standalone Repository judgeguard-alexa-mcp for Alexa+ Hackathon Submission
+🟡 Starting Fix 1 & 2: Fix standalone server.py imports, pyproject.toml, and implement dual Bedrock Titan/Claude payload handling
+✅ Completed Fix 1 & 2: Fix standalone server.py imports, pyproject.toml, and implement dual Bedrock Titan/Claude payload handling
+🟡 Starting Fix 3: Refactor rag_client.py to transparent PolicyGroundingClient with reproducible policy corpus
+✅ Completed Fix 3: Refactor rag_client.py to transparent PolicyGroundingClient with reproducible policy corpus
+🟡 Starting Fix 4: Add Streamable HTTP Protocol-Level Test Suite and Refine Protocol Description
+🟡 Starting Fix 5: Create Standalone Open-Source Companion Repo judgeguard-policy-schema for Open Source Challenge
+✅ Completed Fix 5: Create Standalone Open-Source Companion Repo judgeguard-policy-schema for Open Source Challenge

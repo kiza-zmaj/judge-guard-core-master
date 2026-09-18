@@ -16,10 +16,17 @@ from fastapi.responses import StreamingResponse, JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-# Ensure repo root is on sys.path to access judge_guard core
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if REPO_ROOT not in sys.path:
-    sys.path.insert(0, REPO_ROOT)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+if CURRENT_DIR not in sys.path:
+    sys.path.insert(0, CURRENT_DIR)
+
+PARENT_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, "..", ".."))
+if os.path.exists(os.path.join(PARENT_ROOT, "judge_guard.py")):
+    REPO_ROOT = PARENT_ROOT
+    if PARENT_ROOT not in sys.path:
+        sys.path.insert(0, PARENT_ROOT)
+else:
+    REPO_ROOT = CURRENT_DIR
 
 try:
     from packages.judgeguard_mcp_server.rag_client import NotebookLMRAGClient, DEFAULT_NOTEBOOK_ID
@@ -311,7 +318,8 @@ async def mcp_jsonrpc_handler(req: JSONRPCRequest):
                 "result": {
                     "content": [
                         {"type": "text", "text": json.dumps(rag_res, indent=2)}
-                    ]
+                    ],
+                    "isError": False
                 }
             }
 
@@ -408,7 +416,7 @@ def main():
     import uvicorn
     port = int(os.getenv("PORT", "8765"))
     logger.info(f"Starting JudgeGuard Alexa+ MCP Server on port {port}...")
-    uvicorn.run("packages.judgeguard_mcp_server.server:app", host="0.0.0.0", port=port, reload=False)
+    uvicorn.run(app, host="0.0.0.0", port=port, reload=False)
 
 if __name__ == "__main__":
     main()

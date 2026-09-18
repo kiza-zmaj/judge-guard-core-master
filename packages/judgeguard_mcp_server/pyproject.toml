@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "judgeguard-mcp-server"
 version = "1.0.0"
-description = "Authoritative Autonomous AI Governance & Alexa+ MCP Bridge with Mandatory NotebookLM RAG"
+description = "Authoritative Autonomous AI Governance & Alexa+ MCP Bridge"
 readme = "README.md"
 authors = [{ name = "JudgeGuard Core Team" }]
 license = { text = "MIT" }
@@ -15,7 +15,9 @@ dependencies = [
     "uvicorn>=0.28.0",
     "pydantic>=2.0.0",
     "requests>=2.31.0",
-    "aiohttp>=3.9.0"
+    "aiohttp>=3.9.0",
+    "boto3>=1.34.0",
+    "httpx>=0.27.0"
 ]
 
 [project.scripts]
