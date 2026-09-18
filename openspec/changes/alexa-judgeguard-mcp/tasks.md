@@ -25,7 +25,7 @@
 - [x] 4.3 Prepare AWS Product Feedback document according to Devpost mandatory format
 
 ## Phase 5: Submission Preparation, Friction Log & Video Pipeline
-- [ ] 5.1 Compile comprehensive Friction Log entries for the 10% judging bonus
-- [ ] 5.2 Write complete Product Feedback for all tools (MCP, Alexa+, Bedrock)
-- [ ] 5.3 Verify GitHub repo public visibility, open-source license, and testing instructions
-- [ ] 5.4 Draft and rehearse 2:45 demo video script following the recommended structure
+- [x] 5.1 Compile comprehensive Friction Log entries for the 10% judging bonus
+- [x] 5.2 Write complete Product Feedback for all tools (MCP, Alexa+, Bedrock)
+- [x] 5.3 Verify GitHub repo public visibility, open-source license, and testing instructions
+- [x] 5.4 Draft and rehearse 2:45 demo video script following the recommended structure
