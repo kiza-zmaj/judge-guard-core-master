@@ -8,9 +8,10 @@
 ## Phase 2: JudgeGuard MCP Server Implementation (Streamable HTTP, Spec 2025-11-25+)
 - [ ] 2.1 Implement Streamable HTTP transport and JSON-RPC 2.0 router
 - [ ] 2.2 Implement `judgeguard_verify_action` tool calling JudgeGuard core engine
-- [ ] 2.3 Implement `judgeguard_audit_context` tool for hallucination & consistency check
-- [ ] 2.4 Implement `judgeguard_record_friction` tool with automated submission formatting
-- [ ] 2.5 Add unit tests for all MCP tools and transport streaming
+- [ ] 2.3 Implement mandatory NotebookLM RAG integration & `judgeguard_notebooklm_rag` tool for grounded factual retrieval
+- [ ] 2.4 Implement `judgeguard_audit_context` tool for hallucination & consistency check against NotebookLM ground truth
+- [ ] 2.5 Implement `judgeguard_record_friction` tool with automated submission formatting
+- [ ] 2.6 Add unit tests for all MCP tools, NotebookLM RAG integration, and transport streaming
 
 ## Phase 3: Alexa+ Experience Web Simulator
 - [ ] 3.1 Build lightweight, high-aesthetic Web Simulator interface (Vanilla CSS + HTML5 + JS)
