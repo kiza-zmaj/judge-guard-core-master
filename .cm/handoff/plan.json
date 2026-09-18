@@ -1,0 +1,16 @@
+{
+  "schema": "plan@1",
+  "goal": "Build JudgeGuard Autonomous AI Governance & Alexa+ MCP Bridge for Amazon Developer Hackathon 2026",
+  "decisions": [
+    "Primary Track: Alexa+ (Self-hosted MCP Server with Streamable HTTP spec 2025-11-25+ & Simulated Web App)",
+    "Mini-Challenges: AWS Builder (Bedrock safety/reasoning layer) + Open Source (MIT licensed standalone package)",
+    "Governance: Mandatory Pre-Action Verification via JudgeGuard on all phases, actions, and commits",
+    "Source Authority: Official Rules primary authority; NotebookLM 82440dea-0a12-40a7-a249-0ba460f69611 operational master source"
+  ],
+  "first_tasks": [
+    "1.3 Initialize MCP Server package structure with open-source MIT license",
+    "2.1 Implement Streamable HTTP transport and JSON-RPC 2.0 router",
+    "2.2 Implement judgeguard_verify_action tool calling JudgeGuard core engine"
+  ],
+  "openspec_path": "openspec/changes/alexa-judgeguard-mcp/"
+}

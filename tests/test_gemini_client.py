@@ -95,3 +95,43 @@ def test_judge_content_failed(mock_genai, monkeypatch):
     result = client.judge_content("content", "criteria")
 
     assert result is False
+
+@pytest.mark.parametrize("adversarial_output", [
+    "NOT PASSED",
+    "CRITICAL FAILURE: NOT PASSED",
+    "FAILED: Action was not approved",
+    "REJECTED: Unsafe operation",
+    "BLOCKED by safety criteria",
+    "VIOLATION: Harmful command detected",
+    "UNSAFE",
+    "I cannot approve this: DID NOT PASS",
+    "Random explanation without any verdict token",
+])
+def test_judge_content_fail_closed_adversarial(mock_genai, monkeypatch, adversarial_output):
+    mock_config, mock_model_class = mock_genai
+    mock_model_instance = mock_model_class.return_value
+    mock_model_instance.generate_content.return_value.text = adversarial_output
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test_key")
+    client = GeminiClient()
+    result = client.judge_content("malicious action", "criteria")
+
+    assert result is False
+
+@pytest.mark.parametrize("valid_passed_output", [
+    "PASSED",
+    "PASSED.",
+    "Verdict: PASSED",
+    "Action verified: PASSED",
+])
+def test_judge_content_valid_passed(mock_genai, monkeypatch, valid_passed_output):
+    mock_config, mock_model_class = mock_genai
+    mock_model_instance = mock_model_class.return_value
+    mock_model_instance.generate_content.return_value.text = valid_passed_output
+
+    monkeypatch.setenv("GEMINI_API_KEY", "test_key")
+    client = GeminiClient()
+    result = client.judge_content("safe action", "criteria")
+
+    assert result is True
+

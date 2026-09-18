@@ -1,4 +1,5 @@
 import os
+import re
 import time
 from typing import Optional, Dict, Tuple
 import logging
@@ -204,7 +205,26 @@ class GeminiClient:
 
             result = raw_result.strip().upper()
             logger.info(f"Gemini Verdict: {result}")
-            verdict = "PASSED" in result or result.startswith("PAS")
+
+            # SECURITY FIX (P0-1): Fail-closed verdict parsing.
+            # Rejection, failure, or negation tokens take absolute precedence.
+            negative_patterns = [
+                r"\bNOT\s+PASSED\b",
+                r"\bFAIL(?:ED|URE|S)?\b",
+                r"\bREJECT(?:ED)?\b",
+                r"\bBLOCK(?:ED)?\b",
+                r"\bDENI(?:ED|ES)\b",
+                r"\bUNSAFE\b",
+                r"\bVIOLAT(?:ION|ES|ED)?\b",
+            ]
+            has_negative = any(re.search(pat, result) for pat in negative_patterns)
+
+            if has_negative:
+                verdict = False
+            else:
+                # Must explicitly match PASSED as a standalone token without negation
+                verdict = bool(re.search(r"\bPASSED\b", result))
+
             self.last_is_authoritative = True
             return verdict
 

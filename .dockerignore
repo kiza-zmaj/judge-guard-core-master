@@ -1,0 +1,127 @@
+# .dockerignore — root build context za sharpbet_core Docker build
+# Ovo se odnosi na context: ../.. u docker-compose.yml
+
+# Git & version control
+.git
+.git/**
+.github
+.github/**
+
+# Node.js
+node_modules
+node_modules/**
+package-lock.json
+package.json
+yarn.lock
+
+# TypeScript / JS build artifacts
+dist
+dist/**
+build
+build/**
+*.tsbuildinfo
+
+# Python cache & artifacts
+__pycache__
+__pycache__/**
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.pytest_cache/**
+.mypy_cache
+.mypy_cache/**
+.eggs
+eggs
+*.egg-info
+*.egg
+
+# IDE & editor
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs & temp
+*.log
+*.tmp
+*.bak
+*.pid
+*.lock
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Docker (don't nest Docker inside Docker)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Large data directories
+exports
+exports/**
+research
+research/**
+*.db
+*.sqlite
+*.sqlite3
+
+# Docs (except README)
+*.md
+!README.md
+
+# Test files
+tests
+tests/**
+
+# OS files
+.bak
+*.tmp
+Desktop.ini
+Thumbs.db
+ehthumbs.db
+
+# Specific large dirs from this project
+actions-runner
+agent-browser
+agy-lead
+Antigravity\ IDE
+Apps
+cira
+docs
+FK\ SAVA\ 45\ SAJT
+fksava-agent
+Hacktoon
+home
+incidentiq
+linkedin_automation
+local_crdb
+memory
+metrics
+openclaw
+openclaw-brain
+sobriety-os-app
+ToolUniverse
+unified_betting_production
+verified_notebooks_knowledge
+webui-auth
+wiki
+wiki-server.log
+wiki-webui
+
+# Cloudflare Workers
+my-worker
+my-worker/**
+
+# Jupyter
+*.ipynb
+*.ipynb_checkpoints
+
+# Conda
+.conda
+.conda/**
