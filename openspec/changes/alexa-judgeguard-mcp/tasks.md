@@ -14,10 +14,10 @@
 - [x] 2.6 Add unit tests for all MCP tools, NotebookLM RAG integration, and transport streaming
 
 ## Phase 3: Alexa+ Experience Web Simulator
-- [ ] 3.1 Build lightweight, high-aesthetic Web Simulator interface (Vanilla CSS + HTML5 + JS)
-- [ ] 3.2 Implement simulated Alexa+ voice/text prompt assistant with multi-turn context
-- [ ] 3.3 Connect simulator to JudgeGuard MCP Server via live JSON-RPC & SSE stream
-- [ ] 3.4 Implement visual JudgeGuard Verdict HUD (🟢 PASSED, 🛑 BLOCKED, 🟡 AUDITING)
+- [x] 3.1 Build lightweight, high-aesthetic Web Simulator interface (Vanilla CSS + HTML5 + JS)
+- [x] 3.2 Implement simulated Alexa+ voice/text prompt assistant with multi-turn context
+- [x] 3.3 Connect simulator to JudgeGuard MCP Server via live JSON-RPC & SSE stream
+- [x] 3.4 Implement visual JudgeGuard Verdict HUD (🟢 PASSED, 🛑 BLOCKED, 🟡 AUDITING)
 
 ## Phase 4: AWS Builder Mini-Challenge Integration
 - [ ] 4.1 Integrate AWS Bedrock client SDK for secondary safety and reasoning layer

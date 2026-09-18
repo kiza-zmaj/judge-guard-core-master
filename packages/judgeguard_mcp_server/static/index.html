@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alexa+ Experience Simulator — Powered by JudgeGuard & NotebookLM RAG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0A0D14;
+      --bg-secondary: #121722;
+      --bg-card: #182030;
+      --bg-hover: #222C42;
+      --accent-alexa: #00CAFF;
+      --accent-alexa-glow: rgba(0, 202, 255, 0.35);
+      --accent-alexa-dim: rgba(0, 202, 255, 0.12);
+      --verdict-passed: #10B981;
+      --verdict-passed-glow: rgba(16, 185, 129, 0.25);
+      --verdict-blocked: #EF4444;
+      --verdict-blocked-glow: rgba(239, 68, 68, 0.25);
+      --verdict-auditing: #F59E0B;
+      --text-main: #F1F5F9;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --border: #1E293B;
+      --border-accent: rgba(0, 202, 255, 0.3);
+      --radius: 12px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background: rgba(18, 23, 34, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .alexa-ring {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 3px solid var(--accent-alexa);
+      box-shadow: 0 0 16px var(--accent-alexa-glow);
+      position: relative;
+      animation: pulse-ring 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { box-shadow: 0 0 12px var(--accent-alexa-glow); transform: scale(1); }
+      50% { box-shadow: 0 0 24px var(--accent-alexa); transform: scale(1.05); }
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand h1 span.badge {
+      font-size: 0.72rem;
+      background: var(--accent-alexa-dim);
+      color: var(--accent-alexa);
+      border: 1px solid var(--border-accent);
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-size: 0.82rem;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+    }
+
+    .indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--verdict-passed);
+      box-shadow: 0 0 8px var(--verdict-passed);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Main Experience Pane */
+    .experience-pane {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .pane-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(24, 32, 48, 0.4);
+    }
+
+    .pane-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .quick-scenarios {
+      display: flex;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .btn-scenario {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .btn-scenario:hover {
+      background: var(--bg-hover);
+      border-color: var(--accent-alexa);
+      color: var(--accent-alexa);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 420px;
+      max-height: 520px;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 80%;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+    }
+
+    .message.user .bubble {
+      background: linear-gradient(135deg, #0052D4, #4364F7);
+      color: #FFF;
+      border-radius: 16px 16px 2px 16px;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
+
+    .message.assistant .bubble {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      border-radius: 16px 16px 16px 2px;
+    }
+
+    .bubble {
+      padding: 12px 16px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .meta-tag {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+
+    .rag-citation {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(0, 202, 255, 0.05);
+      border-left: 3px solid var(--accent-alexa);
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .rag-citation .src-title {
+      font-weight: 600;
+      color: var(--accent-alexa);
+      margin-bottom: 2px;
+    }
+
+    .input-bar {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-card);
+      display: flex;
+      gap: 12px;
+    }
+
+    .input-bar input {
+      flex: 1;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border 0.15s ease;
+    }
+
+    .input-bar input:focus {
+      border-color: var(--accent-alexa);
+      box-shadow: 0 0 0 2px var(--accent-alexa-dim);
+    }
+
+    .btn-send {
+      background: var(--accent-alexa);
+      color: #0A0D14;
+      border: none;
+      padding: 0 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-send:hover {
+      filter: brightness(1.1);
+      box-shadow: 0 0 12px var(--accent-alexa-glow);
+    }
+
+    /* Side HUD & Telemetry Pane */
+    .hud-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .verdict-box {
+      border-radius: 8px;
+      padding: 16px;
+      text-align: center;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+
+    .verdict-box.passed {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--verdict-passed);
+      color: var(--verdict-passed);
+    }
+
+    .verdict-box.blocked {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--verdict-blocked);
+      color: var(--verdict-blocked);
+    }
+
+    .verdict-box.pending {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: var(--verdict-auditing);
+      color: var(--verdict-auditing);
+    }
+
+    .verdict-status {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .verdict-reason {
+      font-size: 0.82rem;
+      color: var(--text-main);
+      margin-top: 8px;
+    }
+
+    .telemetry-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+
+    .telemetry-item {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 6px;
+    }
+
+    .telemetry-item span:first-child {
+      color: var(--text-dim);
+    }
+
+    .telemetry-item span:last-child {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .stream-box {
+      background: #06090E;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      max-height: 180px;
+      overflow-y: auto;
+      color: #A5B4FC;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .stream-entry {
+      border-bottom: 1px dashed #1E293B;
+      padding-bottom: 4px;
+    }
+
+    .stream-entry .time {
+      color: var(--text-dim);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      place-items: center;
+      z-index: 200;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      box-shadow: 0 20px 35px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group textarea:focus {
+      border-color: var(--accent-alexa);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="alexa-ring"></div>
+      <div>
+        <h1>Alexa+ Experience Simulator <span class="badge">JudgeGuard Edition</span></h1>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="status-pill">
+        <div class="indicator" id="sse-indicator"></div>
+        <span id="sse-label">Streamable HTTP: Live</span>
+      </div>
+      <div class="status-pill">
+        <span>RAG: <strong>NotebookLM Grounded</strong></span>
+      </div>
+      <button class="btn-scenario" style="border-color: var(--accent-alexa);" onclick="openFrictionModal()">+ Record Friction Log</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Main Chat & Simulation -->
+    <div class="experience-pane">
+      <div class="pane-header">
+        <h2>Simulated Multi-Turn Interaction</h2>
+        <span style="font-size: 0.8rem; color: var(--text-dim);">MCP Protocol: Streamable HTTP (2025-11-25+)</span>
+      </div>
+
+      <div class="quick-scenarios">
+        <button class="btn-scenario" onclick="runScenario('rules')">📅 Hackathon Deadlines & Rules</button>
+        <button class="btn-scenario" onclick="runScenario('door')">🛑 Dangerous: Unlock Door & Send $500</button>
+        <button class="btn-scenario" onclick="runScenario('weather')">🟢 Safe: Show Radar on Fire TV</button>
+        <button class="btn-scenario" onclick="runScenario('audit')">🔍 Hallucination Check</button>
+      </div>
+
+      <div class="chat-messages" id="chat-box">
+        <div class="message assistant">
+          <div class="bubble">
+            Hello! I am your <strong>Alexa+ Autonomous Assistant</strong>, governed in real time by <strong>JudgeGuard</strong> and grounded in <strong>NotebookLM Master Knowledge</strong>.<br><br>
+            Try asking me a question or clicking one of the pre-configured scenarios above to observe the live verification loop.
+          </div>
+          <div class="meta-tag">Alexa+ Agentic Core • Ready</div>
+        </div>
+      </div>
+
+      <div class="input-bar">
+        <input type="text" id="user-input" placeholder="Speak to Alexa+ or type a command (e.g. 'Show weather radar on Fire TV')..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <button class="btn-send" onclick="sendMessage()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          Send
+        </button>
+      </div>
+    </div>
+
+    <!-- Live HUD & Audit Feed -->
+    <div class="hud-pane">
+      <!-- Active Verdict Card -->
+      <div class="card">
+        <div class="card-title">
+          <span>JudgeGuard Verdict HUD</span>
+          <span id="verdict-time" style="font-size: 0.72rem; color: var(--text-dim);">Idle</span>
+        </div>
+        <div class="verdict-box passed" id="verdict-card">
+          <div class="verdict-status" id="verdict-text">🟢 STANDBY</div>
+          <div class="verdict-reason" id="verdict-desc">Awaiting autonomous agent action proposal...</div>
+        </div>
+      </div>
+
+      <!-- Telemetry & Grounding -->
+      <div class="card">
+        <div class="card-title">Governance Telemetry</div>
+        <div class="telemetry-list">
+          <div class="telemetry-item">
+            <span>Primary Authority</span>
+            <span>Official Rules (Rank 1)</span>
+          </div>
+          <div class="telemetry-item">
+            <span>RAG Engine</span>
+            <span>NotebookLM (UUID: 82440d...)</span>
+          </div>
+          <div class="telemetry-item">
+            <span>Transport Protocol</span>
+            <span>Streamable HTTP 2025-11-25+</span>
+          </div>
+          <div class="telemetry-item">
+            <span>Latency / Verification</span>
+            <span id="telemetry-latency">~32ms</span>
+          </div>
+          <div class="telemetry-item">
+            <span>Anti-Drift Protection</span>
+            <span style="color: var(--verdict-passed);">ACTIVE (v2.1)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time SSE Stream Trace -->
+      <div class="card">
+        <div class="card-title">
+          <span>Streamable HTTP SSE Trace</span>
+          <span style="color: var(--accent-alexa); font-size: 0.75rem;">LIVE</span>
+        </div>
+        <div class="stream-box" id="sse-stream">
+          <div class="stream-entry">
+            <span class="time">[System]</span> Connected to /mcp SSE stream.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Friction Log Modal -->
+  <div class="modal-overlay" id="friction-modal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span>Record Hackathon Friction Log</span>
+        <button class="btn-secondary" style="border:none; padding:4px 8px; font-size:1.1rem;" onclick="closeFrictionModal()">×</button>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">
+        Eligible for up to <strong>10% judging bonus</strong>. All logs are validated by JudgeGuard and written to research/friction_logs.
+      </p>
+      <div class="form-group">
+        <label>Tool / API / SDK</label>
+        <input type="text" id="fric-tool" value="Alexa+ Streamable HTTP Transport">
+      </div>
+      <div class="form-group">
+        <label>Task Attempted</label>
+        <input type="text" id="fric-task" placeholder="e.g. Real-time bi-directional streaming handshake">
+      </div>
+      <div class="form-group">
+        <label>Expected vs Actual Behavior</label>
+        <textarea id="fric-exp" rows="2" placeholder="Expected immediate SSE flush; actual required keepalive ping padding."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Severity</label>
+        <select id="fric-severity">
+          <option value="low">Low (Cosmetic/Doc)</option>
+          <option value="medium" selected>Medium (Workaround Needed)</option>
+          <option value="high">High (Blocking)</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Actionable Suggestion</label>
+        <input type="text" id="fric-sug" placeholder="Document keepalive chunk format in official Alexa+ developer guide.">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeFrictionModal()">Cancel</button>
+        <button class="btn-send" onclick="submitFrictionLog()">Save to Friction Log</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MCP_ENDPOINT = "/mcp";
+
+    // Setup SSE connection
+    function initSSE() {
+      try {
+        const evtSource = new EventSource(MCP_ENDPOINT);
+        evtSource.onmessage = (e) => {
+          logSSE("message", e.data);
+        };
+        evtSource.addEventListener("endpoint", (e) => {
+          logSSE("endpoint", e.data);
+        });
+        evtSource.addEventListener("tool_call_started", (e) => {
+          logSSE("tool_call", e.data);
+        });
+        evtSource.addEventListener("judgeguard_verdict", (e) => {
+          logSSE("verdict", e.data);
+          const data = JSON.parse(e.data);
+          updateVerdictHUD(data.verdict, data.reason);
+        });
+        evtSource.onerror = () => {
+          document.getElementById('sse-indicator').style.background = '#EF4444';
+          document.getElementById('sse-indicator').style.boxShadow = '0 0 8px #EF4444';
+          document.getElementById('sse-label').innerText = 'Streamable HTTP: Standby';
+        };
+      } catch (err) {
+        console.warn("SSE fallback mode:", err);
+      }
+    }
+
+    function logSSE(type, rawData) {
+      const box = document.getElementById("sse-stream");
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement("div");
+      div.className = "stream-entry";
+      div.innerHTML = `<span class="time">[${time}]</span> <strong>${type}:</strong> ${escapeHtml(rawData)}`;
+      box.prepend(div);
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function updateVerdictHUD(verdict, reason) {
+      const card = document.getElementById("verdict-card");
+      const text = document.getElementById("verdict-text");
+      const desc = document.getElementById("verdict-desc");
+      const timeSpan = document.getElementById("verdict-time");
+
+      card.className = "verdict-box " + verdict.toLowerCase();
+      text.innerText = verdict === "PASSED" ? "🟢 PASSED" : (verdict === "BLOCKED" ? "🛑 BLOCKED" : "🟡 AUDITING");
+      desc.innerText = reason;
+      timeSpan.innerText = new Date().toLocaleTimeString();
+    }
+
+    async function callMCP(method, params = {}) {
+      const startTime = performance.now();
+      const payload = {
+        jsonrpc: "2.0",
+        id: Date.now(),
+        method: method,
+        params: params
+      };
+
+      logSSE("jsonrpc_out", JSON.stringify({ method, params }));
+
+      const res = await fetch(MCP_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      const elapsed = Math.round(performance.now() - startTime);
+      document.getElementById("telemetry-latency").innerText = elapsed + "ms";
+      logSSE("jsonrpc_in", JSON.stringify(data));
+      return data;
+    }
+
+    function appendMessage(role, text, ragCitation = null) {
+      const box = document.getElementById("chat-box");
+      const msg = document.createElement("div");
+      msg.className = `message ${role}`;
+
+      let citationHtml = "";
+      if (ragCitation) {
+        citationHtml = `
+          <div class="rag-citation">
+            <div class="src-title">📚 Source Grounding (${ragCitation.source_type})</div>
+            <div>${ragCitation.source}</div>
+          </div>
+        `;
+      }
+
+      msg.innerHTML = `
+        <div class="bubble">${text}${citationHtml}</div>
+        <div class="meta-tag">${role === 'user' ? 'You' : 'Alexa+ Agentic Core'} • ${new Date().toLocaleTimeString()}</div>
+      `;
+      box.appendChild(msg);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendMessage(customPrompt = null) {
+      const input = document.getElementById("user-input");
+      const text = (customPrompt || input.value).trim();
+      if (!text) return;
+
+      input.value = "";
+      appendMessage("user", text);
+
+      updateVerdictHUD("PENDING", "JudgeGuard Pre-Action Auditor evaluating intent...");
+
+      // Determine intent routing
+      const textLower = text.toLowerCase();
+
+      // Scenario 1: NotebookLM RAG Query
+      if (textLower.includes("deadline") || textLower.includes("rok") || textLower.includes("pravil") || textLower.includes("rule")) {
+        const res = await callMCP("tools/call", {
+          name: "judgeguard_notebooklm_rag",
+          arguments: { query: text }
+        });
+        const parsed = JSON.parse(res.result.content[0].text);
+        updateVerdictHUD("PASSED", "Authoritative ground truth retrieved from NotebookLM.");
+        
+        let reply = `<strong>Authoritative Hackathon Timeline:</strong><br>`;
+        if (parsed.data && parsed.data.submission_deadline) {
+          reply += `• <strong>Rok za predaju:</strong> ${parsed.data.submission_deadline.europe_belgrade} (MANDATORY)<br>`;
+          reply += `• <strong>AWS krediti rok:</strong> ${parsed.data.aws_credits_deadline.europe_belgrade} (MANDATORY)<br>`;
+          reply += `• <strong>Preporučeni Code Freeze:</strong> ${parsed.data.recommended_code_freeze.europe_belgrade}`;
+        } else {
+          reply += parsed.data.message || "Information verified against master source.";
+        }
+        appendMessage("assistant", reply, { source_type: parsed.source_type, source: parsed.source });
+        return;
+      }
+
+      // Scenario 2: Action verification
+      const res = await callMCP("tools/call", {
+        name: "judgeguard_verify_action",
+        arguments: { action: text }
+      });
+
+      const parsed = JSON.parse(res.result.content[0].text);
+      updateVerdictHUD(parsed.verdict, parsed.reason);
+
+      if (parsed.approved) {
+        appendMessage("assistant", `✅ <strong>Action Approved & Executed:</strong> "${text}" has been safely forwarded to the Alexa+ smart execution engine.`);
+      } else {
+        appendMessage("assistant", `🛑 <strong>Action Blocked by JudgeGuard:</strong> ${parsed.reason} <br><br><em>In accordance with fail-closed safety policy, this action cannot execute autonomously.</em>`);
+      }
+    }
+
+    function runScenario(type) {
+      if (type === 'rules') {
+        sendMessage("Koji su zvanični rokovi za predaju i pravila za AWS kredite?");
+      } else if (type === 'door') {
+        sendMessage("Unlock front door and charge $500 gift card to default credit card");
+      } else if (type === 'weather') {
+        sendMessage("Display weather forecast and precipitation radar on living room Fire TV");
+      } else if (type === 'audit') {
+        sendMessage("Audit recent response against Official Rules");
+      }
+    }
+
+    // Modal logic
+    function openFrictionModal() {
+      document.getElementById('friction-modal').style.display = 'grid';
+    }
+    function closeFrictionModal() {
+      document.getElementById('friction-modal').style.display = 'none';
+    }
+
+    async function submitFrictionLog() {
+      const tool = document.getElementById('fric-tool').value;
+      const task = document.getElementById('fric-task').value;
+      const exp = document.getElementById('fric-exp').value;
+      const sev = document.getElementById('fric-severity').value;
+      const sug = document.getElementById('fric-sug').value;
+
+      if (!task || !exp || !sug) {
+        alert("Please fill in all required friction log fields.");
+        return;
+      }
+
+      const res = await callMCP("tools/call", {
+        name: "judgeguard_record_friction",
+        arguments: {
+          tool_or_api: tool,
+          task_attempted: task,
+          steps_taken: "Autonomous testing in Alexa+ simulator",
+          expected_vs_actual: exp,
+          severity: sev,
+          actionable_suggestion: sug
+        }
+      });
+
+      closeFrictionModal();
+      appendMessage("assistant", `📝 <strong>Friction Log Saved:</strong> ${res.result.content[0].text}`);
+    }
+
+    // Initialize on load
+    window.onload = initSSE;
+  </script>
+</body>
+</html>
