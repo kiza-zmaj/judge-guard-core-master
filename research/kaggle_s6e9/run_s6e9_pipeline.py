@@ -74,8 +74,9 @@ def main():
     
     print(f"  Train: {train_raw.shape}, Test: {test_raw.shape}")
     
-    y = train_raw[TARGET_COL].values
-    test_ids = test_raw[ID_COL].values
+    target_map = {"Yes": 1, "No": 0, 1: 1, 0: 0, 1.0: 1, 0.0: 0}
+    y = train_raw[TARGET_COL].map(target_map).fillna(0).to_numpy(dtype=np.int32)
+    test_ids = test_raw[ID_COL].to_numpy()
     
     # Feature Engineering
     X, X_test, train_margin, test_margin = build_features(train_raw, test_raw)

@@ -1,0 +1,108 @@
+[{"stream_name":"stdout","time":10.19335128,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":10.193423162,"data":"🚗⚡ KAGGLE S6E9: GENERATOR-FORENSICS \u0026 5-SUBMISSION PIPELINE (CLOUD GPU)\n"}
+,{"stream_name":"stdout","time":10.193428717,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":10.193431847,"data":"📂 [Directory Scan] Files currently present in /kaggle/input:\n"}
+,{"stream_name":"stdout","time":10.197228589,"data":"   /kaggle/input/competitions/playground-series-s6e9/sample_submission.csv\n"}
+,{"stream_name":"stdout","time":10.197252854,"data":"   /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
+,{"stream_name":"stdout","time":10.197257933,"data":"   /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
+,{"stream_name":"stdout","time":10.209970454,"data":"   /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
+,{"stream_name":"stdout","time":10.20999484,"data":"\n"}
+,{"stream_name":"stdout","time":10.210000458,"data":"📥 Loading raw datasets...\n"}
+,{"stream_name":"stdout","time":10.210004726,"data":"🔍 Searching for 'train.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":10.216256524,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
+,{"stream_name":"stdout","time":10.21634897,"data":"🔍 Searching for 'test.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":10.220125264,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
+,{"stream_name":"stdout","time":10.220158664,"data":"🔍 Searching for 'sample_submission.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":10.223857501,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/sample_submission.csv\n"}
+,{"stream_name":"stdout","time":14.451221113999999,"data":"  Train: (668665, 15), Test: (286571, 14)\n"}
+,{"stream_name":"stdout","time":14.491043517,"data":"🛠️ [Feature Engineering] Building generator forensics feature set...\n"}
+,{"stream_name":"stdout","time":15.532797987,"data":"  -\u003e Extracting string-safe digit features...\n"}
+,{"stream_name":"stdout","time":26.255634227,"data":"  -\u003e Creating Simpson's paradox interaction terms...\n"}
+,{"stream_name":"stdout","time":26.37187362,"data":"  -\u003e Encoding deterministic bounds and generator cluster spikes...\n"}
+,{"stream_name":"stdout","time":26.472026052,"data":"  -\u003e Encoding categoricals and interactions...\n"}
+,{"stream_name":"stdout","time":28.525159182,"data":"✅ Total features: 49\n"}
+,{"stream_name":"stdout","time":28.681091143,"data":"\n"}
+,{"stream_name":"stdout","time":28.681137196999998,"data":"🚀 [Sub 1] Training Baseline 10-Fold LightGBM...\n"}
+,{"stream_name":"stdout","time":75.423743157,"data":"  Fold 1/10 AUC: 0.942046\n"}
+,{"stream_name":"stdout","time":97.376450402,"data":"  Fold 2/10 AUC: 0.941770\n"}
+,{"stream_name":"stdout","time":120.800337404,"data":"  Fold 3/10 AUC: 0.942330\n"}
+,{"stream_name":"stdout","time":166.901683554,"data":"  Fold 4/10 AUC: 0.943346\n"}
+,{"stream_name":"stdout","time":192.693905171,"data":"  Fold 5/10 AUC: 0.943674\n"}
+,{"stream_name":"stdout","time":213.970843725,"data":"  Fold 6/10 AUC: 0.943697\n"}
+,{"stream_name":"stdout","time":258.339720743,"data":"  Fold 7/10 AUC: 0.943163\n"}
+,{"stream_name":"stdout","time":278.942175753,"data":"  Fold 8/10 AUC: 0.943640\n"}
+,{"stream_name":"stdout","time":299.670993518,"data":"  Fold 9/10 AUC: 0.943896\n"}
+,{"stream_name":"stdout","time":360.203380447,"data":"  Fold 10/10 AUC: 0.942322\n"}
+,{"stream_name":"stdout","time":360.34350237,"data":"✅ Sub 1 Overall 10-Fold CV AUC: 0.942963\n"}
+,{"stream_name":"stdout","time":360.96322973,"data":"\n"}
+,{"stream_name":"stdout","time":360.963267492,"data":"🚀 [Sub 2] Training CatBoost Symmetric Trees (10-Fold)...\n"}
+,{"stream_name":"stderr","time":362.364181506,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":375.197371929,"data":"  Fold 1/10 AUC: 0.941677\n"}
+,{"stream_name":"stderr","time":375.964041857,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":388.8888935,"data":"  Fold 2/10 AUC: 0.941975\n"}
+,{"stream_name":"stderr","time":389.576841976,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":402.602088965,"data":"  Fold 3/10 AUC: 0.942550\n"}
+,{"stream_name":"stderr","time":403.288225343,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":413.125688463,"data":"  Fold 4/10 AUC: 0.942933\n"}
+,{"stream_name":"stderr","time":413.914774704,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":426.388825451,"data":"  Fold 5/10 AUC: 0.943819\n"}
+,{"stream_name":"stderr","time":427.103430907,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":439.427179981,"data":"  Fold 6/10 AUC: 0.944166\n"}
+,{"stream_name":"stderr","time":440.219325152,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":451.108707743,"data":"  Fold 7/10 AUC: 0.942963\n"}
+,{"stream_name":"stderr","time":451.899048257,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":462.989049688,"data":"  Fold 8/10 AUC: 0.944046\n"}
+,{"stream_name":"stderr","time":463.800042204,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":475.830119884,"data":"  Fold 9/10 AUC: 0.944010\n"}
+,{"stream_name":"stderr","time":476.619870111,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":489.600983469,"data":"  Fold 10/10 AUC: 0.941909\n"}
+,{"stream_name":"stdout","time":489.739720691,"data":"✅ Sub 2 Overall 10-Fold CV AUC: 0.942997\n"}
+,{"stream_name":"stdout","time":490.297854685,"data":"\n"}
+,{"stream_name":"stdout","time":490.297911812,"data":"🚀 [Sub 3] Training XGBoost with Generator base_margin Prior (GPU)...\n"}
+,{"stream_name":"stdout","time":497.900785311,"data":"  Fold 1/10 AUC: 0.942309\n"}
+,{"stream_name":"stdout","time":505.000950731,"data":"  Fold 2/10 AUC: 0.942580\n"}
+,{"stream_name":"stdout","time":511.244693361,"data":"  Fold 3/10 AUC: 0.943044\n"}
+,{"stream_name":"stdout","time":519.326217346,"data":"  Fold 4/10 AUC: 0.943551\n"}
+,{"stream_name":"stdout","time":527.158855936,"data":"  Fold 5/10 AUC: 0.944420\n"}
+,{"stream_name":"stdout","time":534.939006202,"data":"  Fold 6/10 AUC: 0.944677\n"}
+,{"stream_name":"stdout","time":541.176576764,"data":"  Fold 7/10 AUC: 0.943385\n"}
+,{"stream_name":"stdout","time":548.309797928,"data":"  Fold 8/10 AUC: 0.944532\n"}
+,{"stream_name":"stdout","time":556.175265183,"data":"  Fold 9/10 AUC: 0.944771\n"}
+,{"stream_name":"stdout","time":564.556637446,"data":"  Fold 10/10 AUC: 0.942501\n"}
+,{"stream_name":"stdout","time":564.693115005,"data":"✅ Sub 3 Overall 10-Fold CV AUC: 0.943573\n"}
+,{"stream_name":"stdout","time":565.248035204,"data":"\n"}
+,{"stream_name":"stdout","time":565.248095842,"data":"🚀 [Sub 4] Training LightGBM with Generator init_score Prior...\n"}
+,{"stream_name":"stdout","time":638.929056213,"data":"  Fold 1/10 AUC: 0.942367\n"}
+,{"stream_name":"stdout","time":718.542600046,"data":"  Fold 2/10 AUC: 0.942533\n"}
+,{"stream_name":"stdout","time":770.748927592,"data":"  Fold 3/10 AUC: 0.942781\n"}
+,{"stream_name":"stdout","time":834.030946522,"data":"  Fold 4/10 AUC: 0.943375\n"}
+,{"stream_name":"stdout","time":927.453859729,"data":"  Fold 5/10 AUC: 0.944492\n"}
+,{"stream_name":"stdout","time":1016.625577835,"data":"  Fold 6/10 AUC: 0.944706\n"}
+,{"stream_name":"stdout","time":1094.686465716,"data":"  Fold 7/10 AUC: 0.943380\n"}
+,{"stream_name":"stdout","time":1155.142581817,"data":"  Fold 8/10 AUC: 0.944446\n"}
+,{"stream_name":"stdout","time":1243.201097605,"data":"  Fold 9/10 AUC: 0.944835\n"}
+,{"stream_name":"stdout","time":1309.598752923,"data":"  Fold 10/10 AUC: 0.942535\n"}
+,{"stream_name":"stdout","time":1309.735197969,"data":"✅ Sub 4 Overall 10-Fold CV AUC: 0.943537\n"}
+,{"stream_name":"stdout","time":1310.295004375,"data":"\n"}
+,{"stream_name":"stdout","time":1310.295060111,"data":"🚀 [Sub 5] Optimizing Master Rank Blend with Nelder-Mead...\n"}
+,{"stream_name":"stdout","time":1333.527486839,"data":"  Optimal Weights: [0.0534 0.     0.494  0.4526]\n"}
+,{"stream_name":"stdout","time":1334.145998696,"data":"🏆 Sub 5 Master Blend 10-Fold CV AUC: 0.943706\n"}
+,{"stream_name":"stdout","time":1334.932141457,"data":"\n"}
+,{"stream_name":"stdout","time":1334.932173298,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":1334.932181274,"data":"🏆 KAGGLE S6E9: ALL 5 SUBMISSION FILES CREATED IN /kaggle/working/\n"}
+,{"stream_name":"stdout","time":1334.932189587,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":1334.932196579,"data":"Sub 1: LightGBM Baseline       | 0.942963             | submission_1_lgb_baseline.csv\n"}
+,{"stream_name":"stdout","time":1334.932203615,"data":"Sub 2: CatBoost Symmetric      | 0.942997             | submission_2_catboost_symmetric.csv\n"}
+,{"stream_name":"stdout","time":1334.932210363,"data":"Sub 3: XGBoost Margin          | 0.943573             | submission_3_xgboost_formula_margin.csv\n"}
+,{"stream_name":"stdout","time":1334.932217217,"data":"Sub 4: LightGBM init_score     | 0.943537             | submission_4_lgbm_init_score.csv\n"}
+,{"stream_name":"stdout","time":1334.932223922,"data":"Sub 5: Master Rank Blend       | 0.943706             | submission_5_master_blend.csv\n"}
+,{"stream_name":"stdout","time":1334.932242021,"data":"--------------------------------------------------------------------------------\n"}
+,{"stream_name":"stdout","time":1334.932248754,"data":"⏱️ Total Cloud GPU Execution Time: 22.08 minutes\n"}
+,{"stream_name":"stdout","time":1334.932255719,"data":"================================================================================\n"}
+,{"stream_name":"stderr","time":1338.273535534,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":1338.273602057,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":1338.480414734,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":1338.480449418,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":1339.117408132,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":1339.940428906,"data":"[NbConvertApp] Writing 368594 bytes to __results__.html\n"}
+]

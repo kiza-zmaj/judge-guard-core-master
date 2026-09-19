@@ -24,14 +24,27 @@ print("=" * 80)
 print("🚗⚡ KAGGLE S6E9: GENERATOR-FORENSICS & 5-SUBMISSION PIPELINE (CLOUD GPU)")
 print("=" * 80)
 
-# Paths in Kaggle Environment
-INPUT_DIR = Path("/kaggle/input/playground-series-s6e9")
-ORIG_DIR = Path("/kaggle/input/ev-adoption-behavior-and-range-anxiety")
 OUTPUT_DIR = Path("/kaggle/working")
 
-TRAIN_PATH = INPUT_DIR / "train.csv"
-TEST_PATH = INPUT_DIR / "test.csv"
-SAMPLE_SUB_PATH = INPUT_DIR / "sample_submission.csv"
+def find_input_file(name: str) -> Path:
+    print(f"🔍 Searching for '{name}' in /kaggle/input...")
+    for root, dirs, files in os.walk("/kaggle/input"):
+        if name in files:
+            p = Path(root) / name
+            print(f"  -> Found: {p}")
+            return p
+    for root, dirs, files in os.walk("/kaggle"):
+        if name in files:
+            p = Path(root) / name
+            print(f"  -> Found in /kaggle: {p}")
+            return p
+    raise FileNotFoundError(f"Could not locate '{name}' in /kaggle environment!")
+
+print("📂 [Directory Scan] Files currently present in /kaggle/input:")
+for root, dirs, files in os.walk("/kaggle/input"):
+    for f in files:
+        print("  ", os.path.join(root, f))
+
 
 # Hyperparameters
 RANDOM_SEED = 42
@@ -174,9 +187,13 @@ def main():
     start_time = time.time()
     
     print(f"\n📥 Loading raw datasets...")
-    train_raw = pd.read_csv(TRAIN_PATH)
-    test_raw = pd.read_csv(TEST_PATH)
-    sample_sub = pd.read_csv(SAMPLE_SUB_PATH)
+    train_path = find_input_file("train.csv")
+    test_path = find_input_file("test.csv")
+    sample_sub_path = find_input_file("sample_submission.csv")
+    
+    train_raw = pd.read_csv(train_path)
+    test_raw = pd.read_csv(test_path)
+    sample_sub = pd.read_csv(sample_sub_path)
     
     print(f"  Train: {train_raw.shape}, Test: {test_raw.shape}")
     
