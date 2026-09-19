@@ -61,27 +61,27 @@ from utils.claude_helper import get_gemini_response, AURI_SYSTEM_PROMPT, build_m
 # 1a: Basic question
 start = time.time()
 response1 = get_gemini_response(
-    query="O que é inteligência artificial?",
+    query="What is artificial intelligence?",
     history=[],
     system_prompt=AURI_SYSTEM_PROMPT,
 )
 elapsed1 = time.time() - start
 
 test("Gemini returns non-empty response", len(response1) > 10, f"Got: '{response1[:50]}'")
-test("Response is in Portuguese", any(w in response1.lower() for w in ["é", "que", "uma", "para", "como", "inteligência", "artificial", "dados", "máquina", "computador", "sistema"]),
-     f"Response doesn't seem Portuguese: '{response1[:80]}'")
+test("Response is in English", any(w in response1.lower() for w in ["is", "the", "a", "that", "which", "intelligence", "artificial", "machine", "computer", "system", "data"]),
+     f"Response doesn't seem English: '{response1[:80]}'")
 test("Response time < 10s", elapsed1 < 10, f"Took {elapsed1:.1f}s")
 print(f"  📝 Response ({elapsed1:.1f}s): {response1[:120]}...")
 
 # 1b: Follow-up with history
 history = [
-    {"role": "user", "content": "O que é inteligência artificial?"},
+    {"role": "user", "content": "What is artificial intelligence?"},
     {"role": "assistant", "content": response1},
 ]
 
 start = time.time()
 response2 = get_gemini_response(
-    query="E quais são as aplicações mais comuns?",
+    query="And what are the most common applications?",
     history=history,
     system_prompt=AURI_SYSTEM_PROMPT,
 )
@@ -94,7 +94,7 @@ print(f"  📝 Follow-up ({elapsed2:.1f}s): {response2[:120]}...")
 # 1c: Personal query
 start = time.time()
 response3 = get_gemini_response(
-    query="Meu nome é João, pode me ajudar?",
+    query="My name is John, can you help me?",
     history=[],
     system_prompt=AURI_SYSTEM_PROMPT,
 )
@@ -111,14 +111,14 @@ print("\n" + "=" * 60)
 print("  TEST 2: Message Builder (Gemini Format)")
 print("=" * 60)
 
-messages = build_messages("Olá!", [
-    {"role": "user", "content": "Oi"},
-    {"role": "assistant", "content": "Olá! Como posso ajudar?"},
+messages = build_messages("Hello!", [
+    {"role": "user", "content": "Hi"},
+    {"role": "assistant", "content": "Hello! How can I help?"},
 ])
 
 test("Messages is a list", isinstance(messages, list), f"Type: {type(messages)}")
 test("Messages has 3 entries (2 history + 1 query)", len(messages) == 3, f"Count: {len(messages)}")
-test("Last message is the current query", messages[-1]["parts"][0] == "Olá!", f"Got: {messages[-1]}")
+test("Last message is the current query", messages[-1]["parts"][0] == "Hello!", f"Got: {messages[-1]}")
 test("Assistant mapped to 'model'", messages[1]["role"] == "model", f"Role: {messages[1].get('role')}")
 test("User role preserved", messages[0]["role"] == "user", f"Role: {messages[0].get('role')}")
 
@@ -203,29 +203,26 @@ print("  TEST 4: Routine Definitions")
 print("=" * 60)
 
 # Parse ROUTINES from lambda_function.py source directly (avoids ask_sdk_core import)
-import ast
+import re as re_mod
 lambda_src = os.path.join(LAMBDA_DIR, "lambda_function.py")
 with open(lambda_src) as f:
     src = f.read()
 
-# Extract ROUTINES dict via regex + literal eval
-import re
-match = re.search(r'^ROUTINES\s*=\s*(\{.+?\n\})', src, re.DOTALL | re.MULTILINE)
+match = re_mod.search(r'^ROUTINES\s*=\s*(\{.+?\n\})', src, re_mod.DOTALL | re_mod.MULTILINE)
 if match:
     ROUTINES = eval(match.group(1))
 else:
-    # Fallback: define expected routines
     ROUTINES = {
-        "bom dia": {"message": "Bom dia!", "actions": ["lights_on"]},
-        "boa noite": {"message": "Boa noite!", "actions": ["lights_off"]},
-        "trabalho": {"message": "Modo trabalho!", "actions": ["dnd_on"]},
-        "sair": {"message": "Até logo!", "actions": ["all_off"]},
+        "good morning": {"message": "Good morning!", "actions": ["lights_on"]},
+        "good night": {"message": "Good night!", "actions": ["lights_off"]},
+        "work": {"message": "Work mode!", "actions": ["dnd_on"]},
+        "leaving": {"message": "See you!", "actions": ["all_off"]},
     }
 
-test("'bom dia' routine exists", "bom dia" in ROUTINES, "")
-test("'boa noite' routine exists", "boa noite" in ROUTINES, "")
-test("'trabalho' routine exists", "trabalho" in ROUTINES, "")
-test("'sair' routine exists", "sair" in ROUTINES, "")
+test("'good morning' routine exists", "good morning" in ROUTINES, "")
+test("'good night' routine exists", "good night" in ROUTINES, "")
+test("'work' routine exists", "work" in ROUTINES, "")
+test("'leaving' routine exists", "leaving" in ROUTINES, "")
 
 for name, data in ROUTINES.items():
     test(f"Routine '{name}' has message", len(data.get("message", "")) > 10, "")
@@ -242,10 +239,10 @@ print("=" * 60)
 
 conversation_history = []
 test_queries = [
-    ("Olá, meu nome é Maria!", "greeting"),
-    ("Qual a capital do Brasil?", "knowledge"),
-    ("Me dá uma dica de receita rápida", "practical"),
-    ("Obrigada pela ajuda!", "closing"),
+    ("Hello, my name is Sarah!", "greeting"),
+    ("What is the capital of France?", "knowledge"),
+    ("Give me a quick recipe tip", "practical"),
+    ("Thanks for the help!", "closing"),
 ]
 
 for query, category in test_queries:
@@ -278,9 +275,9 @@ print("  TEST 6: Rapid-Fire Requests (3x sequential)")
 print("=" * 60)
 
 rapid_queries = [
-    "Diga oi em japonês",
-    "Quanto é 137 vezes 42?",
-    "Me fala um fato curioso sobre gatos",
+    "Say hello in Japanese",
+    "What is 137 times 42?",
+    "Tell me a fun fact about cats",
 ]
 
 total_time = 0
@@ -289,7 +286,7 @@ for q in rapid_queries:
     r = get_gemini_response(query=q, history=[], system_prompt=AURI_SYSTEM_PROMPT)
     e = time.time() - start
     total_time += e
-    test(f"Rapid: '{q[:30]}' → response", len(r) > 3, f"Got: '{r[:30]}'")
+    test(f"Rapid: '{q[:30]}' -> response", len(r) > 3, f"Got: '{r[:30]}'")
     print(f"  ⚡ ({e:.1f}s) {r[:100]}...")
 
 test(f"Total rapid-fire time < 30s", total_time < 30, f"Took {total_time:.1f}s")
@@ -308,5 +305,5 @@ if FAILED > 0:
     print(f"\n  ⚠️  {FAILED} test(s) failed!")
     sys.exit(1)
 else:
-    print("\n  🎉 ALL TESTS PASSED — AURI + Antigravity (Gemini) is LIVE!")
+    print("\n  🎉 ALL TESTS PASSED — AURI + Antigravity (Gemini) is LIVE! [EN]")
     sys.exit(0)

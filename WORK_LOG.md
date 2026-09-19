@@ -253,3 +253,10 @@
 ✅ Completed Implementation Plan: Enveda CASMI 2026 DreaMS & MSAlign Neural Reranking Sprint
 🟡 Starting Enveda CASMI 2026 Sprint Iteration 1: Baseline Restoration & Multi-Spectrum Merge (Kernel v10)
 ✅ Completed Enveda CASMI 2026 Sprint Iteration 1: Baseline Restoration & Multi-Spectrum Merge (Kernel v10) (Public Score: 0.174)
+🟡 Starting Enveda CASMI 2026 Sprint Iteration 2: Mass-Shifted Analog Search & Spectral Binning (Target 0.220+)
+🟡 Starting Full AURI Alexa Skill Setup (End-to-End)
+✅ Completed Full AURI Alexa Skill Setup (End-to-End) — 21 files created
+🟡 Starting AURI Claude→Antigravity Migration + E2E Real Tests
+✅ Completed AURI Claude→Antigravity Migration + E2E 46/46 PASSED
+🟡 Starting AURI Language Change PT-BR → English
+✅ Completed AURI Language Change PT-BR → English — E2E 46/46 PASSED

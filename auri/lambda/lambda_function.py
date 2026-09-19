@@ -78,7 +78,7 @@ CHAT_APL_DOCUMENT = {
                     },
                     {
                         "type": "Text",
-                        "text": "Diga algo para continuar...",
+                        "text": "Say something to continue...",
                         "fontSize": "18dp",
                         "color": "#888888",
                         "textAlign": "center",
@@ -119,20 +119,20 @@ def _add_apl_chat(handler_input: HandlerInput, text: str) -> None:
 # Routine definitions
 # ---------------------------------------------------------------------------
 ROUTINES = {
-    "bom dia": {
-        "message": "Bom dia! Acendendo as luzes, ligando a cafeteira e preparando sua playlist matinal. Vamos começar o dia com energia!",
+    "good morning": {
+        "message": "Good morning! Turning on the lights, starting the coffee maker, and queuing up your morning playlist. Let's start the day with energy!",
         "actions": ["lights_on", "coffee_start", "playlist_morning"],
     },
-    "boa noite": {
-        "message": "Boa noite! Apagando as luzes, ativando o modo não perturbe e ajustando o ar para 22 graus. Durma bem!",
-        "actions": ["lights_off", "dnd_on", "thermostat_22"],
+    "good night": {
+        "message": "Good night! Turning off the lights, enabling do not disturb mode, and setting the thermostat to 72 degrees. Sleep well!",
+        "actions": ["lights_off", "dnd_on", "thermostat_72"],
     },
-    "trabalho": {
-        "message": "Modo trabalho ativado! Silenciando notificações, ajustando a iluminação para foco e iniciando sua playlist de concentração.",
+    "work": {
+        "message": "Work mode activated! Silencing notifications, adjusting the lighting for focus, and starting your concentration playlist.",
         "actions": ["dnd_on", "lights_focus", "playlist_focus"],
     },
-    "sair": {
-        "message": "Até logo! Desligando tudo, ativando o alarme e trancando as portas. Tenha um ótimo dia!",
+    "leaving": {
+        "message": "See you later! Shutting everything down, arming the alarm, and locking the doors. Have a great day!",
         "actions": ["all_off", "alarm_on", "locks_on"],
     },
 }
@@ -151,15 +151,15 @@ class LaunchRequestHandler(AbstractRequestHandler):
         attrs = handler_input.attributes_manager.persistent_attributes
         name = attrs.get("name", "")
         if name:
-            greeting = f"Oi, {name}! Eu sou a Auri. Como posso ajudar?"
+            greeting = f"Hi, {name}! I'm Auri. How can I help?"
         else:
-            greeting = "Oi! Eu sou a Auri, sua assistente inteligente. Como posso ajudar?"
+            greeting = "Hi! I'm Auri, your intelligent assistant. How can I help?"
 
         _add_apl_chat(handler_input, greeting)
 
         return (
             handler_input.response_builder.speak(greeting)
-            .ask("Em que posso ajudar?")
+            .ask("How can I help you?")
             .response
         )
 
@@ -177,8 +177,8 @@ class ChatIntentHandler(AbstractRequestHandler):
 
         if not query_value:
             return (
-                handler_input.response_builder.speak("Pode repetir? Não entendi bem.")
-                .ask("Pode repetir?")
+                handler_input.response_builder.speak("Could you repeat that? I didn't quite catch it.")
+                .ask("Could you repeat that?")
                 .response
             )
 
@@ -195,7 +195,7 @@ class ChatIntentHandler(AbstractRequestHandler):
 
         # Truncate if too long for Alexa
         if len(reply) > MAX_RESPONSE_CHARS:
-            reply = reply[:MAX_RESPONSE_CHARS] + "... Quer que eu continue?"
+            reply = reply[:MAX_RESPONSE_CHARS] + "... Would you like me to continue?"
 
         # Save history
         history.append({"role": "user", "content": query_value})
@@ -209,7 +209,7 @@ class ChatIntentHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder.speak(reply)
-            .ask("Mais alguma coisa?")
+            .ask("Anything else?")
             .response
         )
 
@@ -228,9 +228,9 @@ class SetNameIntentHandler(AbstractRequestHandler):
         if not name_value:
             return (
                 handler_input.response_builder.speak(
-                    "Desculpa, não consegui pegar seu nome. Pode repetir?"
+                    "Sorry, I didn't catch your name. Could you repeat it?"
                 )
-                .ask("Qual é seu nome?")
+                .ask("What's your name?")
                 .response
             )
 
@@ -239,10 +239,10 @@ class SetNameIntentHandler(AbstractRequestHandler):
         handler_input.attributes_manager.persistent_attributes = attrs
         handler_input.attributes_manager.save_persistent_attributes()
 
-        reply = f"Prazer, {name_value}! Vou lembrar do seu nome. Como posso ajudar?"
+        reply = f"Nice to meet you, {name_value}! I'll remember your name. How can I help?"
         return (
             handler_input.response_builder.speak(reply)
-            .ask("Em que posso ajudar?")
+            .ask("How can I help you?")
             .response
         )
 
@@ -258,21 +258,21 @@ class SmartHomeIntentHandler(AbstractRequestHandler):
         device = slots.get("device")
         action = slots.get("action")
 
-        device_value = device.value if device else "dispositivo"
-        action_value = action.value if action else "controlar"
+        device_value = device.value if device else "device"
+        action_value = action.value if action else "control"
 
-        if action_value in ("liga", "acende", "ativa"):
-            reply = f"Pronto! Liguei {device_value}."
-        elif action_value in ("desliga", "apaga", "desativa"):
-            reply = f"Pronto! Desliguei {device_value}."
+        if action_value in ("turn on", "switch on", "activate"):
+            reply = f"Done! I turned on the {device_value}."
+        elif action_value in ("turn off", "switch off", "deactivate"):
+            reply = f"Done! I turned off the {device_value}."
         else:
-            reply = f"Pronto! Executei {action_value} em {device_value}."
+            reply = f"Done! Executed {action_value} on {device_value}."
 
         logger.info("Smart Home action: %s on %s", action_value, device_value)
 
         return (
             handler_input.response_builder.speak(reply)
-            .ask("Mais algum comando?")
+            .ask("Any other commands?")
             .response
         )
 
@@ -298,15 +298,15 @@ class RoutineIntentHandler(AbstractRequestHandler):
             )
         else:
             reply = (
-                "Não conheço essa rotina. As rotinas disponíveis são: "
-                "bom dia, boa noite, trabalho e sair."
+                "I don't know that routine. The available routines are: "
+                "good morning, good night, work, and leaving."
             )
 
         _add_apl_chat(handler_input, reply)
 
         return (
             handler_input.response_builder.speak(reply)
-            .ask("Quer ativar outra rotina?")
+            .ask("Want to activate another routine?")
             .response
         )
 
@@ -319,13 +319,13 @@ class HelpIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input: HandlerInput) -> Response:
         help_text = (
-            "Eu sou a Auri, sua assistente inteligente! "
-            "Você pode me fazer qualquer pergunta, pedir para controlar dispositivos, "
-            "ou ativar rotinas como bom dia e boa noite. O que gostaria de fazer?"
+            "I'm Auri, your intelligent assistant! "
+            "You can ask me any question, ask me to control devices, "
+            "or activate routines like good morning and good night. What would you like to do?"
         )
         return (
             handler_input.response_builder.speak(help_text)
-            .ask("O que gostaria de saber?")
+            .ask("What would you like to know?")
             .response
         )
 
@@ -339,7 +339,7 @@ class CancelStopIntentHandler(AbstractRequestHandler):
         ) or is_intent_name("AMAZON.StopIntent")(handler_input)
 
     def handle(self, handler_input: HandlerInput) -> Response:
-        return handler_input.response_builder.speak("Até mais! Tchau!").response
+        return handler_input.response_builder.speak("Goodbye! See you later!").response
 
 
 class FallbackIntentHandler(AbstractRequestHandler):
@@ -351,9 +351,9 @@ class FallbackIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input: HandlerInput) -> Response:
         return (
             handler_input.response_builder.speak(
-                "Hmm, não entendi. Pode tentar de outra forma?"
+                "Hmm, I didn't understand. Could you try saying it differently?"
             )
-            .ask("Pode reformular?")
+            .ask("Could you rephrase that?")
             .response
         )
 
@@ -383,9 +383,9 @@ class GlobalExceptionHandler(AbstractExceptionHandler):
         logger.error("Unhandled exception: %s", exception, exc_info=True)
         return (
             handler_input.response_builder.speak(
-                "Desculpa, tive um problema. Pode tentar de novo?"
+                "Sorry, I ran into a problem. Could you try again?"
             )
-            .ask("Pode repetir?")
+            .ask("Could you repeat that?")
             .response
         )
 

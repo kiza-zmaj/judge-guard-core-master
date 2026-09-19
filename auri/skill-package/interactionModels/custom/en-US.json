@@ -33,17 +33,17 @@
           ],
           "samples": [
             "{query}",
-            "me ajuda com {query}",
-            "quero saber sobre {query}",
-            "o que você sabe sobre {query}",
-            "explique {query}",
-            "pesquise {query}",
-            "fale sobre {query}",
-            "me conta sobre {query}",
-            "qual é {query}",
-            "como funciona {query}",
-            "o que é {query}",
-            "me diga {query}"
+            "help me with {query}",
+            "I want to know about {query}",
+            "what do you know about {query}",
+            "explain {query}",
+            "search for {query}",
+            "tell me about {query}",
+            "what is {query}",
+            "how does {query} work",
+            "can you help with {query}",
+            "I need help with {query}",
+            "tell me {query}"
           ]
         },
         {
@@ -59,14 +59,14 @@
             }
           ],
           "samples": [
-            "{action} a {device}",
-            "{action} o {device}",
-            "controla {device}",
-            "acende {device}",
-            "apaga {device}",
-            "{action} luz da {device}",
-            "{action} luz do {device}",
-            "pode {action} a {device}"
+            "{action} the {device}",
+            "{action} {device}",
+            "control {device}",
+            "turn on {device}",
+            "turn off {device}",
+            "{action} the lights in the {device}",
+            "{action} the {device} lights",
+            "please {action} the {device}"
           ]
         },
         {
@@ -78,13 +78,13 @@
             }
           ],
           "samples": [
-            "ativa rotina {routine}",
-            "executa {routine}",
-            "modo {routine}",
-            "rotina {routine}",
-            "ativar {routine}",
-            "iniciar rotina {routine}",
-            "começa {routine}"
+            "activate {routine} routine",
+            "run {routine}",
+            "{routine} mode",
+            "start {routine} routine",
+            "routine {routine}",
+            "activate {routine}",
+            "begin {routine}"
           ]
         },
         {
@@ -96,12 +96,12 @@
             }
           ],
           "samples": [
-            "meu nome é {userName}",
-            "me chamo {userName}",
-            "pode me chamar de {userName}",
-            "sou {userName}",
-            "sou o {userName}",
-            "sou a {userName}"
+            "my name is {userName}",
+            "I'm {userName}",
+            "call me {userName}",
+            "you can call me {userName}",
+            "I am {userName}",
+            "the name is {userName}"
           ]
         }
       ],
@@ -111,23 +111,23 @@
           "values": [
             {
               "name": {
-                "value": "liga",
+                "value": "turn on",
                 "synonyms": [
-                  "acende",
-                  "ativa",
-                  "ligar",
-                  "acender"
+                  "switch on",
+                  "activate",
+                  "enable",
+                  "power on"
                 ]
               }
             },
             {
               "name": {
-                "value": "desliga",
+                "value": "turn off",
                 "synonyms": [
-                  "apaga",
-                  "desativa",
-                  "desligar",
-                  "apagar"
+                  "switch off",
+                  "deactivate",
+                  "disable",
+                  "power off"
                 ]
               }
             }
@@ -138,42 +138,41 @@
           "values": [
             {
               "name": {
-                "value": "bom dia",
+                "value": "good morning",
                 "synonyms": [
-                  "acordar",
-                  "manhã",
-                  "amanhecer"
+                  "wake up",
+                  "morning",
+                  "sunrise"
                 ]
               }
             },
             {
               "name": {
-                "value": "boa noite",
+                "value": "good night",
                 "synonyms": [
-                  "dormir",
-                  "descansar",
-                  "hora de dormir"
+                  "sleep",
+                  "bedtime",
+                  "rest"
                 ]
               }
             },
             {
               "name": {
-                "value": "trabalho",
+                "value": "work",
                 "synonyms": [
-                  "trabalhar",
-                  "foco",
-                  "produtividade"
+                  "working",
+                  "focus",
+                  "productivity"
                 ]
               }
             },
             {
               "name": {
-                "value": "sair",
+                "value": "leaving",
                 "synonyms": [
-                  "saindo",
                   "goodbye",
-                  "tchau",
-                  "indo embora"
+                  "heading out",
+                  "going out"
                 ]
               }
             }
