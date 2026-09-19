@@ -1,0 +1,76 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "pt-BR": {
+          "summary": "Auri é uma assistente virtual inteligente alimentada por IA avançada.",
+          "examplePhrases": [
+            "Alexa, abrir auri",
+            "Alexa, pedir para auri me ajudar",
+            "Alexa, perguntar para auri sobre o clima"
+          ],
+          "keywords": [
+            "assistente",
+            "IA",
+            "inteligente",
+            "claude",
+            "chat"
+          ],
+          "name": "Auri",
+          "description": "Auri é sua assistente pessoal inteligente. Ela pode responder perguntas, ajudar com tarefas, controlar dispositivos da casa e muito mais. Alimentada por IA de última geração."
+        }
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "Diga 'Alexa, abrir auri' para começar. Depois faça perguntas naturais.",
+      "category": "KNOWLEDGE_AND_TRIVIA",
+      "distributionCountries": [
+        "BR"
+      ]
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:ACCOUNT_ID:function:auri-skill"
+        },
+        "interfaces": [
+          {
+            "type": "ALEXA_PRESENTATION_APL",
+            "supportedViewports": [
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minWidth": 1024,
+                "maxWidth": 1280,
+                "minHeight": 600,
+                "maxHeight": 800
+              },
+              {
+                "mode": "HUB",
+                "shape": "RECTANGLE",
+                "minWidth": 960,
+                "maxWidth": 960,
+                "minHeight": 480,
+                "maxHeight": 480
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "locales": {
+        "pt-BR": {
+          "privacyPolicyUrl": "",
+          "termsOfUseUrl": ""
+        }
+      },
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
+    },
+    "permissions": []
+  }
+}

@@ -1,0 +1,148 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AURI Alexa Skill - CloudFormation Stack (Lambda, DynamoDB, IAM)"
+
+Parameters:
+  SkillId:
+    Type: String
+    Description: "Alexa Skill ID (amzn1.ask.skill.xxx)"
+  LambdaRuntime:
+    Type: String
+    Default: "python3.11"
+  LambdaHandler:
+    Type: String
+    Default: "lambda_function.handler"
+  CodeBucket:
+    Type: String
+    Description: "S3 bucket containing the Lambda deployment package"
+  CodeKey:
+    Type: String
+    Description: "S3 key for the Lambda deployment package"
+  CodeVersion:
+    Type: String
+    Description: "S3 object version for the Lambda deployment package"
+
+Resources:
+  # IAM Role for Lambda
+  AuriLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "auri-lambda-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: "AuriLambdaPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:GetItem"
+                  - "dynamodb:PutItem"
+                  - "dynamodb:UpdateItem"
+                  - "dynamodb:DeleteItem"
+                  - "dynamodb:Query"
+                Resource: !GetAtt AuriUsersTable.Arn
+              - Effect: Allow
+                Action:
+                  - "polly:SynthesizeSpeech"
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - "secretsmanager:GetSecretValue"
+                Resource: !Sub "arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:auri/*"
+              - Effect: Allow
+                Action:
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                Resource: !Sub "arn:aws:s3:::auri-audio-${AWS::AccountId}/*"
+              - Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
+
+  # Lambda Function
+  AuriLambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: "auri-skill"
+      Runtime: !Ref LambdaRuntime
+      Handler: !Ref LambdaHandler
+      Role: !GetAtt AuriLambdaRole.Arn
+      Timeout: 8
+      MemorySize: 512
+      Code:
+        S3Bucket: !Ref CodeBucket
+        S3Key: !Ref CodeKey
+        S3ObjectVersion: !Ref CodeVersion
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref AuriUsersTable
+          AWS_REGION_NAME: !Ref "AWS::Region"
+          AURI_AUDIO_BUCKET: !Sub "auri-audio-${AWS::AccountId}"
+
+  # Alexa Skills Kit trigger permission
+  AlexaSkillPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !Ref AuriLambdaFunction
+      Action: "lambda:InvokeFunction"
+      Principal: "alexa-appkit.amazon.com"
+      EventSourceToken: !Ref SkillId
+
+  # DynamoDB Table
+  AuriUsersTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: "auri-users"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: "userId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "userId"
+          KeyType: "HASH"
+      TimeToLiveSpecification:
+        AttributeName: "ttl"
+        Enabled: true
+      Tags:
+        - Key: Project
+          Value: AURI
+        - Key: Environment
+          Value: production
+
+  # S3 Bucket for Polly audio
+  AuriAudioBucket:
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "auri-audio-${AWS::AccountId}"
+      LifecycleConfiguration:
+        Rules:
+          - Id: "DeleteOldAudio"
+            Status: Enabled
+            ExpirationInDays: 1
+
+Outputs:
+  LambdaFunctionArn:
+    Description: "ARN of the AURI Lambda function"
+    Value: !GetAtt AuriLambdaFunction.Arn
+
+  DynamoDBTableName:
+    Description: "Name of the AURI DynamoDB table"
+    Value: !Ref AuriUsersTable
+
+  LambdaRoleArn:
+    Description: "ARN of the Lambda execution role"
+    Value: !GetAtt AuriLambdaRole.Arn
+
+  AudioBucketName:
+    Description: "S3 bucket for Polly audio files"
+    Value: !Ref AuriAudioBucket

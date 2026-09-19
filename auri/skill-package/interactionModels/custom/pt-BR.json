@@ -1,0 +1,185 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "auri",
+      "intents": [
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "ChatIntent",
+          "slots": [
+            {
+              "name": "query",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "{query}",
+            "me ajuda com {query}",
+            "quero saber sobre {query}",
+            "o que você sabe sobre {query}",
+            "explique {query}",
+            "pesquise {query}",
+            "fale sobre {query}",
+            "me conta sobre {query}",
+            "qual é {query}",
+            "como funciona {query}",
+            "o que é {query}",
+            "me diga {query}"
+          ]
+        },
+        {
+          "name": "SmartHomeIntent",
+          "slots": [
+            {
+              "name": "device",
+              "type": "AMAZON.Room"
+            },
+            {
+              "name": "action",
+              "type": "ActionType"
+            }
+          ],
+          "samples": [
+            "{action} a {device}",
+            "{action} o {device}",
+            "controla {device}",
+            "acende {device}",
+            "apaga {device}",
+            "{action} luz da {device}",
+            "{action} luz do {device}",
+            "pode {action} a {device}"
+          ]
+        },
+        {
+          "name": "RoutineIntent",
+          "slots": [
+            {
+              "name": "routine",
+              "type": "RoutineType"
+            }
+          ],
+          "samples": [
+            "ativa rotina {routine}",
+            "executa {routine}",
+            "modo {routine}",
+            "rotina {routine}",
+            "ativar {routine}",
+            "iniciar rotina {routine}",
+            "começa {routine}"
+          ]
+        },
+        {
+          "name": "SetNameIntent",
+          "slots": [
+            {
+              "name": "userName",
+              "type": "AMAZON.FirstName"
+            }
+          ],
+          "samples": [
+            "meu nome é {userName}",
+            "me chamo {userName}",
+            "pode me chamar de {userName}",
+            "sou {userName}",
+            "sou o {userName}",
+            "sou a {userName}"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "ActionType",
+          "values": [
+            {
+              "name": {
+                "value": "liga",
+                "synonyms": [
+                  "acende",
+                  "ativa",
+                  "ligar",
+                  "acender"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "desliga",
+                "synonyms": [
+                  "apaga",
+                  "desativa",
+                  "desligar",
+                  "apagar"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "RoutineType",
+          "values": [
+            {
+              "name": {
+                "value": "bom dia",
+                "synonyms": [
+                  "acordar",
+                  "manhã",
+                  "amanhecer"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "boa noite",
+                "synonyms": [
+                  "dormir",
+                  "descansar",
+                  "hora de dormir"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "trabalho",
+                "synonyms": [
+                  "trabalhar",
+                  "foco",
+                  "produtividade"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "sair",
+                "synonyms": [
+                  "saindo",
+                  "goodbye",
+                  "tchau",
+                  "indo embora"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
