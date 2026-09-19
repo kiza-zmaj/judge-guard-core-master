@@ -1,0 +1,18 @@
+{
+  "id": "kiza123123/s6e9-generator-forensics-5sub",
+  "title": "S6E9 Generator Forensics 5-Submission Pipeline",
+  "code_file": "s6e9_kernel.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [
+    "itzzomkar/ev-adoption-behavior-and-range-anxiety"
+  ],
+  "competition_sources": [
+    "playground-series-s6e9"
+  ],
+  "kernel_sources": []
+}
