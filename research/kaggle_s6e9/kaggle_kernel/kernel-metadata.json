@@ -1,6 +1,6 @@
 {
-  "id": "kiza123123/s6e9-generator-forensics-5sub",
-  "title": "S6E9 Generator Forensics 5-Submission Pipeline",
+  "id": "kiza123123/s6e9-generator-forensics-5-submission-pipeline",
+  "title": "s6e9-generator-forensics-5-submission-pipeline",
   "code_file": "s6e9_kernel.py",
   "language": "python",
   "kernel_type": "script",
@@ -14,5 +14,6 @@
   "competition_sources": [
     "playground-series-s6e9"
   ],
-  "kernel_sources": []
+  "kernel_sources": [],
+  "model_sources": []
 }
