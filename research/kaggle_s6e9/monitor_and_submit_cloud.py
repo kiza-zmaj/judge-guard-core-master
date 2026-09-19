@@ -93,13 +93,13 @@ def main():
         print("Failed to download kernel outputs.")
         sys.exit(1)
         
-    # Verify and submit all 5 submission files
+    # Verify and submit all 5 submission files for Round 2 (Top 10 Assault)
     submission_files = [
-        ("submission_1_lgb_baseline.csv", "Sub 1: Baseline 10-Fold LightGBM (Generator Forensics)"),
-        ("submission_2_catboost_symmetric.csv", "Sub 2: CatBoost Oblivious Trees (Symmetric Architecture)"),
-        ("submission_3_xgboost_formula_margin.csv", "Sub 3: XGBoost Formula Margin + Safe Digits (Chris Deotte Forensics)"),
-        ("submission_4_lgbm_init_score.csv", "Sub 4: LightGBM Generator init_score Prior"),
-        ("submission_5_master_blend.csv", "Sub 5: Master Rank Nelder-Mead Blend (>0.9464 CV)")
+        ("submission_6_xgb_triple_te.csv", "Sub 6: Lossguide XGBoost with Triple Target Encoding (Najiama ~0.94639)"),
+        ("submission_7_xgb_recipe_base_margin.csv", "Sub 7: Lossguide XGBoost + Chris Deotte Recipe base_margin (Top 10 Target)"),
+        ("submission_8_lgbm_triple_te_init_score.csv", "Sub 8: LightGBM Triple TE with Recipe init_score"),
+        ("submission_9_catboost_triple_te.csv", "Sub 9: CatBoost Oblivious Trees on Triple TE Features"),
+        ("submission_10_top10_master_blend.csv", "Sub 10: Master Rank Nelder-Mead Blend (Top 10 Target >=0.94670)")
     ]
     
     for filename, message in submission_files:

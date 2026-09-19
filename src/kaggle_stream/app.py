@@ -1,10 +1,18 @@
-import gradio as gr
 import os
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from src.kaggle_stream.kaggle_agent import KaggleAgent
 from src.kaggle_stream.multimedia import MultimediaManager
 from src.kaggle_stream.log_streamer import LogStreamer
+
+# Lazy-import gradio only when the UI is actually being launched.
+# This keeps the module importable in test environments without gradio installed.
+try:
+    import gradio as gr
+    _HAS_GRADIO = True
+except ImportError:
+    gr = None  # type: ignore
+    _HAS_GRADIO = False
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -59,35 +67,40 @@ def collaborative_step(mode, task):
 
     return [msg_a, img_a, aud_a, msg_b, img_b, aud_b]
 
-# Gradio Interface
-with gr.Blocks(title="🦅 Antigravity AI Live Stream") as demo:
-    gr.Markdown("# 🦅 Antigravity AI Live Stream")
-    gr.Markdown("Watch AI Agents collaborate on Kaggle challenges or audit the **Antigravity Project Logs**.")
 
-    mode_selector = gr.Radio(["Kaggle Challenge", "Project Log Stream"], label="Stream Mode", value="Kaggle Challenge")
+# Gradio Interface — only built when gradio is available.
+demo = None
+if _HAS_GRADIO:
+    with gr.Blocks(title="🦅 Antigravity AI Live Stream") as demo:
+        gr.Markdown("# 🦅 Antigravity AI Live Stream")
+        gr.Markdown("Watch AI Agents collaborate on Kaggle challenges or audit the **Antigravity Project Logs**.")
 
-    with gr.Row():
-        with gr.Column():
-            gr.Markdown("### 🔵 Eagle-Alpha")
-            alpha_img = gr.Image(label="Mood")
-            alpha_status = gr.Textbox(label="Message")
-            alpha_audio = gr.Audio(label="Voice", autoplay=True)
+        mode_selector = gr.Radio(["Kaggle Challenge", "Project Log Stream"], label="Stream Mode", value="Kaggle Challenge")
 
-        with gr.Column():
-            gr.Markdown("### 🔴 Falcon-Beta")
-            beta_img = gr.Image(label="Mood")
-            beta_status = gr.Textbox(label="Message")
-            beta_audio = gr.Audio(label="Voice", autoplay=False)
+        with gr.Row():
+            with gr.Column():
+                gr.Markdown("### 🔵 Eagle-Alpha")
+                alpha_img = gr.Image(label="Mood")
+                alpha_status = gr.Textbox(label="Message")
+                alpha_audio = gr.Audio(label="Voice", autoplay=True)
 
-    with gr.Row():
-        input_task = gr.Textbox(label="Challenge/Context", value="House Prices - Advanced Regression Techniques")
-        start_btn = gr.Button("🚀 Next Collaborative Step", variant="primary")
+            with gr.Column():
+                gr.Markdown("### 🔴 Falcon-Beta")
+                beta_img = gr.Image(label="Mood")
+                beta_status = gr.Textbox(label="Message")
+                beta_audio = gr.Audio(label="Voice", autoplay=False)
 
-    start_btn.click(
-        fn=collaborative_step,
-        inputs=[mode_selector, input_task],
-        outputs=[alpha_status, alpha_img, alpha_audio, beta_status, beta_img, beta_audio]
-    )
+        with gr.Row():
+            input_task = gr.Textbox(label="Challenge/Context", value="House Prices - Advanced Regression Techniques")
+            start_btn = gr.Button("🚀 Next Collaborative Step", variant="primary")
+
+        start_btn.click(
+            fn=collaborative_step,
+            inputs=[mode_selector, input_task],
+            outputs=[alpha_status, alpha_img, alpha_audio, beta_status, beta_img, beta_audio]
+        )
 
 if __name__ == "__main__":
+    if not _HAS_GRADIO:
+        raise ImportError("gradio is required to run the live UI. Install it with: pip install gradio")
     demo.launch()
