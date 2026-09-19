@@ -2,30 +2,28 @@
   "manifest": {
     "publishingInformation": {
       "locales": {
-        "pt-BR": {
-          "summary": "Auri é uma assistente virtual inteligente alimentada por IA avançada.",
+        "en-US": {
+          "summary": "Auri is an intelligent virtual assistant powered by advanced AI.",
           "examplePhrases": [
-            "Alexa, abrir auri",
-            "Alexa, pedir para auri me ajudar",
-            "Alexa, perguntar para auri sobre o clima"
+            "Alexa, open auri",
+            "Alexa, ask auri to help me",
+            "Alexa, ask auri about the weather"
           ],
           "keywords": [
-            "assistente",
-            "IA",
-            "inteligente",
-            "claude",
+            "assistant",
+            "AI",
+            "intelligent",
+            "gemini",
             "chat"
           ],
           "name": "Auri",
-          "description": "Auri é sua assistente pessoal inteligente. Ela pode responder perguntas, ajudar com tarefas, controlar dispositivos da casa e muito mais. Alimentada por IA de última geração."
+          "description": "Auri is your intelligent personal assistant. She can answer questions, help with tasks, control smart home devices, and much more. Powered by cutting-edge AI."
         }
       },
-      "isAvailableWorldwide": false,
-      "testingInstructions": "Diga 'Alexa, abrir auri' para começar. Depois faça perguntas naturais.",
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Say 'Alexa, open auri' to start. Then ask any question naturally.",
       "category": "KNOWLEDGE_AND_TRIVIA",
-      "distributionCountries": [
-        "BR"
-      ]
+      "distributionCountries": []
     },
     "apis": {
       "custom": {
@@ -61,7 +59,7 @@
     "privacyAndCompliance": {
       "allowsPurchases": false,
       "locales": {
-        "pt-BR": {
+        "en-US": {
           "privacyPolicyUrl": "",
           "termsOfUseUrl": ""
         }

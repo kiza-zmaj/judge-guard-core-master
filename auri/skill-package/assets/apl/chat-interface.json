@@ -57,7 +57,7 @@
             "items": [
               {
                 "type": "Text",
-                "text": "🎤 Diga algo para continuar...",
+                "text": "🎤 Say something to continue...",
                 "fontSize": "18dp",
                 "color": "#888888",
                 "textAlign": "center"

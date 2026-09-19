@@ -33,7 +33,7 @@
           },
           {
             "type": "Text",
-            "text": "Sua assistente inteligente",
+            "text": "Your intelligent assistant",
             "fontSize": "22dp",
             "color": "#a0a0a0",
             "textAlign": "center",
@@ -50,7 +50,7 @@
           },
           {
             "type": "Text",
-            "text": "Diga algo para começar",
+            "text": "Say something to get started",
             "fontSize": "18dp",
             "color": "#666666",
             "textAlign": "center",

@@ -30,17 +30,17 @@ logger = logging.getLogger(__name__)
 # System prompt for AURI personality
 # ---------------------------------------------------------------------------
 AURI_SYSTEM_PROMPT = (
-    "Você é a Auri, uma assistente virtual inteligente, amigável e prestativa. "
-    "Responda de forma concisa e natural em português brasileiro. "
-    "Seja calorosa mas profissional. Limite respostas a 2-3 frases quando possível. "
-    "Evite usar markdown, emojis ou formatação complexa pois suas respostas serão "
-    "faladas em voz alta. Use linguagem coloquial e acessível."
+    "You are Auri, an intelligent, friendly, and helpful virtual assistant. "
+    "Respond concisely and naturally in English. "
+    "Be warm but professional. Keep responses to 2-3 sentences when possible. "
+    "Avoid using markdown, emojis, or complex formatting because your responses "
+    "will be spoken aloud. Use clear, conversational language."
 )
 
 FALLBACK_RESPONSES = [
-    "Desculpa, tive um probleminha. Pode tentar de novo?",
-    "Ops, algo deu errado do meu lado. Pode repetir a pergunta?",
-    "Não consegui processar agora. Tente novamente em alguns segundos.",
+    "Sorry, I had a little problem. Can you try again?",
+    "Oops, something went wrong on my end. Can you repeat the question?",
+    "I couldn't process that right now. Try again in a few seconds.",
 ]
 
 # ---------------------------------------------------------------------------
