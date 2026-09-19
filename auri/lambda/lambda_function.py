@@ -16,14 +16,14 @@ from ask_sdk_core.dispatch_components import (
 from ask_sdk_model import Response
 from ask_sdk_dynamodb_persistence_adapter import DynamoDbPersistenceAdapter
 
-from utils.claude_helper import get_claude_response, AURI_SYSTEM_PROMPT
+from utils.claude_helper import get_gemini_response, AURI_SYSTEM_PROMPT
 from utils.polly_helper import synthesize_speech, build_ssml
 from utils.dynamodb_helper import add_to_history, get_history
 
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-CLAUDE_MODEL = "claude-sonnet-4-20250514"
+GEMINI_MODEL = "gemini-2.5-flash"
 MAX_HISTORY = 20
 MAX_RESPONSE_CHARS = 600
 DYNAMODB_TABLE = os.environ.get("DYNAMODB_TABLE", "auri-users")
@@ -186,11 +186,10 @@ class ChatIntentHandler(AbstractRequestHandler):
         attrs = handler_input.attributes_manager.persistent_attributes
         history = attrs.get("history", [])
 
-        # Get Claude response
-        reply = get_claude_response(
+        # Get Gemini (Antigravity) response
+        reply = get_gemini_response(
             query=query_value,
             history=history[-MAX_HISTORY:],
-            model=CLAUDE_MODEL,
             system_prompt=AURI_SYSTEM_PROMPT,
         )
 
