@@ -251,3 +251,5 @@
 ✅ Completed spec-test: Implement NotebookLM + Kaggle CLI Closed-Loop Pipeline
 🟡 Starting Implementation Plan: Enveda CASMI 2026 DreaMS & MSAlign Neural Reranking Sprint
 ✅ Completed Implementation Plan: Enveda CASMI 2026 DreaMS & MSAlign Neural Reranking Sprint
+🟡 Starting Enveda CASMI 2026 Sprint Iteration 1: Baseline Restoration & Multi-Spectrum Merge (Kernel v10)
+✅ Completed Enveda CASMI 2026 Sprint Iteration 1: Baseline Restoration & Multi-Spectrum Merge (Kernel v10) (Public Score: 0.174)
