@@ -1,0 +1,63 @@
+{
+  "type": "APL",
+  "version": "2023.3",
+  "theme": "dark",
+  "mainTemplate": {
+    "parameters": ["payload"],
+    "items": [
+      {
+        "type": "Container",
+        "width": "100%",
+        "height": "100%",
+        "backgroundColor": "#1a1a2e",
+        "direction": "column",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "items": [
+          {
+            "type": "Text",
+            "text": "✦",
+            "fontSize": "64dp",
+            "color": "#e94560",
+            "textAlign": "center"
+          },
+          {
+            "type": "Text",
+            "text": "AURI",
+            "fontSize": "48dp",
+            "color": "#e94560",
+            "fontWeight": "bold",
+            "textAlign": "center",
+            "letterSpacing": "8dp",
+            "paddingTop": "16dp"
+          },
+          {
+            "type": "Text",
+            "text": "Sua assistente inteligente",
+            "fontSize": "22dp",
+            "color": "#a0a0a0",
+            "textAlign": "center",
+            "paddingTop": "12dp"
+          },
+          {
+            "type": "Text",
+            "text": "${payload.greeting}",
+            "fontSize": "26dp",
+            "color": "#ffffff",
+            "textAlign": "center",
+            "paddingTop": "32dp",
+            "maxLines": 3
+          },
+          {
+            "type": "Text",
+            "text": "Diga algo para começar",
+            "fontSize": "18dp",
+            "color": "#666666",
+            "textAlign": "center",
+            "paddingTop": "40dp"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "type": "APL",
+  "version": "2023.3",
+  "theme": "dark",
+  "mainTemplate": {
+    "parameters": ["payload"],
+    "items": [
+      {
+        "type": "Container",
+        "width": "100%",
+        "height": "100%",
+        "backgroundColor": "#1a1a2e",
+        "direction": "column",
+        "items": [
+          {
+            "type": "Container",
+            "height": "60dp",
+            "width": "100%",
+            "alignItems": "center",
+            "justifyContent": "center",
+            "backgroundColor": "#16213e",
+            "items": [
+              {
+                "type": "Text",
+                "text": "AURI",
+                "fontSize": "32dp",
+                "color": "#e94560",
+                "fontWeight": "bold",
+                "letterSpacing": "4dp"
+              }
+            ]
+          },
+          {
+            "type": "ScrollView",
+            "grow": 1,
+            "paddingLeft": "24dp",
+            "paddingRight": "24dp",
+            "paddingTop": "16dp",
+            "items": [
+              {
+                "type": "Text",
+                "text": "${payload.lastResponse}",
+                "fontSize": "24dp",
+                "color": "#ffffff",
+                "lineHeight": "1.4",
+                "maxLines": 12
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "height": "50dp",
+            "width": "100%",
+            "alignItems": "center",
+            "justifyContent": "center",
+            "backgroundColor": "#0f3460",
+            "items": [
+              {
+                "type": "Text",
+                "text": "🎤 Diga algo para continuar...",
+                "fontSize": "18dp",
+                "color": "#888888",
+                "textAlign": "center"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
