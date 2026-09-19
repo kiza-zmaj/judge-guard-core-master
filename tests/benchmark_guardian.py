@@ -10,12 +10,15 @@ sys.path.append(os.getcwd())
 from src.antigravity_core.guardian_agent import GuardianAgent
 
 class BenchmarkGuardian(unittest.TestCase):
-    @patch('src.antigravity_core.guardian_agent.NotionClient')
-    @patch('src.antigravity_core.guardian_agent.GeminiClient')
+    # GuardianAgent uses lazy imports inside @property methods, so we must
+    # patch the actual module paths where the classes live, not the guardian
+    # module's namespace (which never has these names at module level).
+    @patch('src.antigravity_core.notion_client.NotionClient')
+    @patch('src.antigravity_core.gemini_client.GeminiClient')
     def test_process_logs_latency(self, mock_gemini_class, mock_notion_class):
         # Setup mocks
-        mock_notion = mock_notion_class.return_value
-        mock_gemini = mock_gemini_class.return_value
+        mock_notion = MagicMock()
+        mock_gemini = MagicMock()
 
         # Mock 5 logs
         logs = [{"id": f"log{i}", "properties": {"Entry": {"title": [{"text": {"content": f"log {i}"}}]}}} for i in range(5)]
@@ -45,6 +48,9 @@ class BenchmarkGuardian(unittest.TestCase):
         # Environment variables for init
         with patch.dict('os.environ', {'GOALS_DB_ID': 'g', 'LOGS_DB_ID': 'l'}):
             agent = GuardianAgent()
+            # Directly inject mock instances to bypass lazy-init properties
+            agent._notion = mock_notion
+            agent._gemini = mock_gemini
 
             print("\n--- Starting Guardian Benchmark (Sequential) ---")
             start_time = time.time()

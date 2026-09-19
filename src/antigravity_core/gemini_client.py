@@ -210,6 +210,9 @@ class GeminiClient:
             # Rejection, failure, or negation tokens take absolute precedence.
             negative_patterns = [
                 r"\bNOT\s+PASSED\b",
+                r"\bDID\s+NOT\s+PASS\b",
+                r"\bDO\s+NOT\s+PASS\b",
+                r"\bCAN(?:NOT|'T)\b.*\bPASS\b",
                 r"\bFAIL(?:ED|URE|S)?\b",
                 r"\bREJECT(?:ED)?\b",
                 r"\bBLOCK(?:ED)?\b",
@@ -218,6 +221,15 @@ class GeminiClient:
                 r"\bVIOLAT(?:ION|ES|ED)?\b",
             ]
             has_negative = any(re.search(pat, result) for pat in negative_patterns)
+
+            # Additional: if PASS appears but any NOT precedes it anywhere in the string,
+            # treat as negative to prevent "I cannot approve this: DID NOT PASS"-style bypass.
+            has_pass_token = bool(re.search(r"\bPASS(?:ED)?\b", result))
+            if has_pass_token and not has_negative:
+                # Check for negating NOT anywhere before PASS
+                not_before_pass = bool(re.search(r"\bNOT\b.*\bPASS(?:ED)?\b", result))
+                if not_before_pass:
+                    has_negative = True
 
             if has_negative:
                 verdict = False

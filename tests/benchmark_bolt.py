@@ -11,12 +11,12 @@ from src.kaggle_stream.kaggle_agent import KaggleAgent
 from src.kaggle_stream.app import run_agent_turn
 
 class TestPerformance(unittest.TestCase):
-    @patch('src.kaggle_stream.kaggle_agent.NotionClient')
+    # KaggleAgent uses lazy imports inside @property, so we inject mock directly
+    # rather than patching the module namespace (which never has NotionClient).
     @patch('src.kaggle_stream.app.multimedia')
-    def test_run_agent_turn_latency(self, mock_multimedia, mock_notion_class):
+    def test_run_agent_turn_latency(self, mock_multimedia):
         # Setup Notion mock
         mock_notion_instance = MagicMock()
-        mock_notion_class.return_value = mock_notion_instance
 
         def slow_notion(*args, **kwargs):
             time.sleep(0.5)
@@ -35,9 +35,9 @@ class TestPerformance(unittest.TestCase):
         mock_multimedia.generate_mood_image.side_effect = slow_image
 
         agent = KaggleAgent(name="TestAgent")
-        # In KaggleAgent.__init__, it might fail to init Notion if no key.
-        # We manually set it for the test.
-        agent.notion = mock_notion_instance
+        # Inject mock notion directly to bypass lazy-init property
+        agent._notion = mock_notion_instance
+        agent.notion_db_id = "test_db"
         agent.demo_mode = True # Use demo data to avoid Gemini API calls
 
         print("\n--- Starting Benchmark (Baseline) ---")
