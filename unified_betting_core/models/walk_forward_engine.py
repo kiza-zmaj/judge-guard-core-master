@@ -36,9 +36,12 @@ from unified_betting_core.decision_engine.empirical_gate import (
     evaluate_three_gate_verdict,
 )
 from unified_betting_core.decision_engine.pnl_tracker import PnLTracker
+from unified_betting_core.models.base_margin_model import BaseMarginModel
 from unified_betting_core.models.calibration import ModelCalibration, TemperatureScaler
 from unified_betting_core.models.poisson_model import PoissonEngine
+from unified_betting_core.validation.block_bootstrap import BlockBootstrap
 from unified_betting_core.validation.evidence_package import EvidencePackageGenerator
+from unified_betting_core.validation.segment_clv_audit import SegmentCLVAuditor
 
 logger = logging.getLogger("SharpBet.WalkForward")
 
@@ -54,10 +57,12 @@ class WalkForwardEngine:
         bankroll: float = DEFAULT_BANKROLL,
         burn_in_matches: int = 380,  # Season 1 for burn-in
         calib_window: int = 150,  # Rolling past window for temperature scaling
+        n_bootstrap: int = 2000,  # Number of block-bootstrap samples
     ):
         self.initial_bankroll = bankroll
         self.burn_in_matches = burn_in_matches
         self.calib_window = calib_window
+        self.n_bootstrap = n_bootstrap
         self.data_provider = RealDataProvider()
 
     def run_walk_forward(
@@ -99,6 +104,8 @@ class WalkForwardEngine:
         # Rolling past history for zero-leakage calibration fitting
         past_raw_dists: list[dict[str, float]] = []
         past_actuals: list[str] = []
+        past_base_records: list[dict[str, Any]] = []
+        base_margin_model = BaseMarginModel(min_train_samples=50)
 
         # Rejection tracking
         rejections_counts = {
@@ -142,6 +149,20 @@ class WalkForwardEngine:
             if idx < self.burn_in_matches:
                 past_raw_dists.append(raw_model_probs)
                 past_actuals.append(actual_result)
+                b_odds_burn = {
+                    "home": float(row["home_odds"]),
+                    "draw": float(row["draw_odds"]),
+                    "away": float(row["away_odds"]),
+                }
+                b_devig_burn = DevigEngine.devig_power(b_odds_burn)
+                form_delta_burn = max(min((h_xg - a_xg) / 3.0, 1.0), -1.0)
+                past_base_records.append({
+                    "p_market_home": b_devig_burn["home"],
+                    "p_market_draw": b_devig_burn["draw"],
+                    "p_market_away": b_devig_burn["away"],
+                    "form_delta_home": form_delta_burn,
+                    "actual_result": actual_result,
+                })
                 continue
 
             # 2. Out-of-Sample Calibration (Temperature Scaling fit on strictly past window)
@@ -162,6 +183,19 @@ class WalkForwardEngine:
                 "away": float(row["away_odds"]),
             }
             devig_probs = DevigEngine.devig_power(odds_dict)
+
+            # Base-margin model: predict residual over market logit odds
+            form_delta = max(min((h_xg - a_xg) / 3.0, 1.0), -1.0)
+            if len(past_base_records) >= 50:
+                base_margin_model.fit(past_base_records[-self.calib_window:])
+            bm_result = base_margin_model.predict_match(devig_probs, form_delta_home=form_delta)
+            past_base_records.append({
+                "p_market_home": devig_probs["home"],
+                "p_market_draw": devig_probs["draw"],
+                "p_market_away": devig_probs["away"],
+                "form_delta_home": form_delta,
+                "actual_result": actual_result,
+            })
 
             # 4. Real Pinnacle Closing Odds for retrospective CLV
             closing_odds_dict = {
@@ -234,6 +268,8 @@ class WalkForwardEngine:
                         )
                         and (b_odds <= 4.0)
                     ),
+                    "base_margin_best_edge": bm_result.best_edge_value,
+                    "base_margin_outcome": bm_result.best_edge_outcome,
                 }
                 candidate_warehouse.append(candidate_record)
 
@@ -394,8 +430,15 @@ class WalkForwardEngine:
         GATE_C_MIN_BETS = 100  # Statistical sample size requirement
         GATE_C_MAX_DRAWDOWN = 35.0
 
-        # Confidence interval for ROI
-        if total_bets >= 10:
+        # Block-Bootstrap confidence intervals for Gate C and Gate B
+        bb = BlockBootstrap(n_bootstrap=self.n_bootstrap, block_unit="date")
+        bootstrap_roi = bb.compute_ci(placed_bets, metric="roi_pct") if placed_bets else None
+        bootstrap_clv = bb.compute_ci(settled_candidates_clv, metric="fair_clv_pct") if settled_candidates_clv else None
+
+        if bootstrap_roi and bootstrap_roi.n_blocks >= 5:
+            roi_ci_lower = bootstrap_roi.ci_lower
+            roi_ci_upper = bootstrap_roi.ci_upper
+        elif total_bets >= 10:
             returns = [(b["pnl"] / max(b["stake"], 0.01)) for b in pnl_tracker.bets]
             ret_std_err = float(np.std(returns, ddof=1) / math.sqrt(total_bets))
             roi_ci_lower = roi_pct - (1.96 * ret_std_err * 100.0)
@@ -455,6 +498,11 @@ class WalkForwardEngine:
             pnl_by_outcome=pnl_by_outcome,
         )
 
+        # Segment-Level CLV & ROI Audit (Breakdown by League, Odds, Outcome, Season)
+        segment_auditor = SegmentCLVAuditor()
+        segment_report = segment_auditor.run_audit(placed_bets)
+        segment_audit_dict = segment_auditor.to_dict(segment_report)
+
         # ─────────────────────────────────────────────────────────────────────
         # FINAL THREE-GATE VERDICT
         # ─────────────────────────────────────────────────────────────────────
@@ -507,6 +555,24 @@ class WalkForwardEngine:
             ],
             "reliability_table": gate_a.reliability_table,
             "placed_bets": placed_bets,
+            "base_margin_model": base_margin_model.to_dict(),
+            "block_bootstrap_roi": {
+                "mean_estimate": bootstrap_roi.mean_estimate,
+                "ci_lower": bootstrap_roi.ci_lower,
+                "ci_upper": bootstrap_roi.ci_upper,
+                "is_significant": bootstrap_roi.is_significant,
+                "n_blocks": bootstrap_roi.n_blocks,
+                "p_value_approx": bootstrap_roi.p_value_approx,
+            } if bootstrap_roi else None,
+            "block_bootstrap_clv": {
+                "mean_estimate": bootstrap_clv.mean_estimate,
+                "ci_lower": bootstrap_clv.ci_lower,
+                "ci_upper": bootstrap_clv.ci_upper,
+                "is_significant": bootstrap_clv.is_significant,
+                "n_blocks": bootstrap_clv.n_blocks,
+                "p_value_approx": bootstrap_clv.p_value_approx,
+            } if bootstrap_clv else None,
+            "segment_clv_audit": segment_audit_dict,
         }
 
         # Automatically generate Phase 7 evidence package

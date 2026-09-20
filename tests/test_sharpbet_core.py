@@ -264,3 +264,125 @@ def test_bias_stress_auditor_detects_tail_sensitivity():
     assert audit["roi_flip_k"] == 1  # Removing just the 1 top bet flips ROI negative
     assert "FAILED_STRESS_TEST" in audit["verdict"]
 
+
+# =====================================================================
+# 6. SHARPBET V10 CORE MODULE TESTS
+# =====================================================================
+
+def test_base_margin_model_residual_learning():
+    """Verify BaseMarginModel fits residual over devigged market logit without lookahead."""
+    from unified_betting_core.models.base_margin_model import BaseMarginModel
+
+    model = BaseMarginModel(min_train_samples=10, edge_threshold=0.01)
+    # Generate past records where home team wins frequently when form_delta is positive
+    past_records = [
+        {
+            "p_market_home": 0.45,
+            "p_market_draw": 0.28,
+            "p_market_away": 0.27,
+            "form_delta_home": 0.3,
+            "actual_result": "home",
+        }
+        for _ in range(30)
+    ]
+
+    model.fit(past_records)
+    assert model.is_fitted is True
+
+    # Prediction
+    pred = model.predict_match(
+        p_market_devigged={"home": 0.45, "draw": 0.28, "away": 0.27},
+        form_delta_home=0.3,
+    )
+    assert len(pred.predictions) == 3
+    home_p = next(p for p in pred.predictions if p.outcome == "home")
+    assert home_p.p_final > 0.45  # Model should recognize positive residual for home
+    assert home_p.edge_vs_market > 0.0
+
+
+def test_block_bootstrap_preserves_clusters():
+    """Verify BlockBootstrap groups bets by date blocks and computes 95% CI."""
+    from unified_betting_core.validation.block_bootstrap import BlockBootstrap
+
+    # 30 bets across 10 distinct dates
+    mock_bets = []
+    for day in range(1, 11):
+        d_str = f"2025-02-{day:02d}"
+        for b_idx in range(3):
+            mock_bets.append({
+                "date": d_str,
+                "stake": 10.0,
+                "pnl": 5.0 if (day + b_idx) % 2 == 0 else -10.0,
+                "fair_clv_pct": 2.5 if day % 2 == 0 else -1.0,
+            })
+
+    bb = BlockBootstrap(n_bootstrap=500, confidence=0.95, block_unit="date", seed=42)
+    res_roi = bb.compute_ci(mock_bets, metric="roi_pct")
+    assert res_roi.n_blocks == 10
+    assert res_roi.ci_lower <= res_roi.mean_estimate <= res_roi.ci_upper
+
+    res_clv = bb.compute_ci(mock_bets, metric="fair_clv_pct")
+    assert res_clv.n_blocks == 10
+    assert res_clv.ci_lower <= res_clv.mean_estimate <= res_clv.ci_upper
+
+
+def test_segment_clv_auditor_breakdown():
+    """Verify SegmentCLVAuditor segments bets by odds bucket, outcome, and league."""
+    from unified_betting_core.validation.segment_clv_audit import SegmentCLVAuditor
+
+    mock_bets = [
+        {"date": "2025-01-01", "league": "EPL", "outcome": "home", "odds": 1.45, "stake": 10.0, "pnl": 4.5, "fair_clv_pct": 3.0, "is_win": True},
+        {"date": "2025-01-02", "league": "EPL", "outcome": "draw", "odds": 3.40, "stake": 10.0, "pnl": -10.0, "fair_clv_pct": -2.0, "is_win": False},
+        {"date": "2025-01-03", "league": "LaLiga", "outcome": "away", "odds": 2.20, "stake": 10.0, "pnl": 12.0, "fair_clv_pct": 4.0, "is_win": True},
+    ]
+
+    auditor = SegmentCLVAuditor()
+    report = auditor.run_audit(mock_bets)
+    assert report.total_bets_audited == 3
+    assert len(report.segments_by_odds_bucket) >= 2
+    assert len(report.segments_by_outcome) >= 2
+    assert len(report.segments_by_league) >= 2
+
+    r_dict = auditor.to_dict(report)
+    assert "overall_fair_clv_pct" in r_dict
+    assert "segments_by_odds_bucket" in r_dict
+
+
+def test_paper_trading_ledger_integrity(tmp_path):
+    """Verify PaperTradingLedger registers, settles, and verifies SHA-256 integrity."""
+    from unified_betting_core.validation.paper_ledger import PaperTradingLedger
+
+    ledger_file = tmp_path / "paper_ledger_test.jsonl"
+    ledger = PaperTradingLedger(ledger_path=str(ledger_file))
+
+    # Register bet
+    entry_id = ledger.register_bet(
+        match="Arsenal vs Chelsea",
+        league="EPL",
+        outcome="home",
+        entry_odds=2.10,
+        stake_units=0.01,
+        kickoff_at="2026-09-25T15:00:00Z",
+        model_edge_pct=4.5,
+        p_model=0.50,
+        p_market_devigged=0.45,
+    )
+    assert entry_id.startswith("PL-")
+
+    # Settle bet
+    settled = ledger.settle_bet(
+        entry_id=entry_id,
+        actual_result="home",
+        closing_odds=2.00,
+        fair_closing_odds=2.06,
+    )
+    assert settled.status == "SETTLED_WIN"
+    assert settled.pnl_units > 0
+
+    # Verify integrity
+    integrity = ledger.verify_ledger_integrity()
+    assert integrity["integrity_ok"] is True
+    assert integrity["issues_found"] == 0
+    assert integrity["total_entries"] == 1
+
+
