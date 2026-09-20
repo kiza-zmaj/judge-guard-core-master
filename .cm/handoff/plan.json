@@ -1,17 +1,14 @@
 {
   "schema": "plan@1",
-  "goal": "Build JudgeGuard Autonomous AI Governance & Alexa+ MCP Bridge for Amazon Developer Hackathon 2026",
+  "goal": "Aim for a Top-10 Finish in Kaggle S6E9 Using Five Kaggle Submissions and Kaggle Resources Only",
   "decisions": [
-    "Primary Track: Alexa+ (Self-hosted MCP Server with Streamable HTTP spec 2025-11-25+ & Simulated Web App)",
-    "RAG & Data Engine: NotebookLM is MANDATORY for all authoritative data, grounded facts, and policy verification",
-    "Mini-Challenges: AWS Builder (Bedrock safety/reasoning layer) + Open Source (MIT licensed standalone package)",
-    "Governance: Mandatory Pre-Action Verification via JudgeGuard on all phases, actions, and commits",
-    "Source Authority: Official Rules primary authority; NotebookLM 82440dea-0a12-40a7-a249-0ba460f69611 operational master source"
+    "Execute 100% on Kaggle Cloud GPU via Kaggle CLI kernel push",
+    "Fix IEEE-754 negative digit float bug and isolate income integer digits (0..5)",
+    "Upgrade from 5-fold to 10-fold Stratified CV to reduce test estimation variance",
+    "Integrate Chris Deotte latent recipe base_margin / init_score priors",
+    "Eliminate weak CatBoost leg and focus on multi-seed dual-engine GBDTs + rank ensembling",
+    "Apply deterministic physics boundaries and zero-tie ordinal ranking for Sub 15"
   ],
-  "first_tasks": [
-    "1.3 Initialize MCP Server package structure with open-source MIT license",
-    "2.1 Implement Streamable HTTP transport and JSON-RPC 2.0 router",
-    "2.2 Implement judgeguard_verify_action tool calling JudgeGuard core engine"
-  ],
-  "openspec_path": "openspec/changes/alexa-judgeguard-mcp/"
+  "first_tasks": ["1.1", "1.2", "1.3"],
+  "openspec_path": "openspec/changes/s6e9-top10-assault/"
 }
