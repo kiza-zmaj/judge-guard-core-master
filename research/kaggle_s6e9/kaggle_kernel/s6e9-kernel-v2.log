@@ -1,0 +1,103 @@
+[{"stream_name":"stdout","time":12.668122061,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":12.668164591,"data":"🚀⚡ KAGGLE S6E9: TOP-10 ASSAULT V2 (5-FOLD, 3-SEED, QUAD-TE, ORIGINAL DATA)\n"}
+,{"stream_name":"stdout","time":12.668171701,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":16.906726594,"data":"🔧 Device Configuration: CUDA=True | XGBoost Device='cuda' | CatBoost Task='GPU'\n"}
+,{"stream_name":"stdout","time":16.906767862,"data":"🔍 Searching for 'train.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":16.907582599,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
+,{"stream_name":"stdout","time":16.907605578,"data":"🔍 Searching for 'test.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":16.908360459,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
+,{"stream_name":"stdout","time":16.908380829,"data":"🔍 Searching for 'sample_submission.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":16.909127828,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/sample_submission.csv\n"}
+,{"stream_name":"stdout","time":16.909142805,"data":"🔍 Searching for 'EV_Adoption_and_Range_Anxiety_Dataset.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":16.914456161,"data":"  -\u003e Found: /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
+,{"stream_name":"stdout","time":16.914470157,"data":"📊 Loading Train: /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
+,{"stream_name":"stdout","time":18.102625544,"data":"📊 Loading Test: /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
+,{"stream_name":"stdout","time":18.597806601,"data":"📊 Loading Original Dataset: /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
+,{"stream_name":"stdout","time":18.626352148,"data":"  -\u003e Concatenating Original (10000 rows) to Train (668665 rows)\n"}
+,{"stream_name":"stdout","time":18.703999147,"data":"  -\u003e New Train Shape: (678665, 16)\n"}
+,{"stream_name":"stdout","time":19.106063693,"data":"🔬 Chris Deotte Latent Recipe Standalone ROC-AUC: 0.93720\n"}
+,{"stream_name":"stdout","time":19.106124909,"data":"\n"}
+,{"stream_name":"stdout","time":19.106134459,"data":"🛠️ Constructing Feature Space (Fractional Digits, Charger Digits, Interactions)...\n"}
+,{"stream_name":"stdout","time":25.75627616,"data":"✂️ Dropping 3 constant features: ['Buyer_ID_org_mean', 'Buyer_ID_fe', 'commute_frac4']\n"}
+,{"stream_name":"stdout","time":26.156424945,"data":"✅ Total Base Features: 73\n"}
+,{"stream_name":"stdout","time":26.156491101,"data":"✅ Columns to Target Encode: 24\n"}
+,{"stream_name":"stdout","time":26.156499016,"data":"\n"}
+,{"stream_name":"stdout","time":26.1565045,"data":"🔄 Running 5-Fold Stratified Split and Quad Target Encoding...\n"}
+,{"stream_name":"stdout","time":27.297099897,"data":"  -\u003e Processing Fold 1/5 Quad TE...\n"}
+,{"stream_name":"stdout","time":61.534965342,"data":"  -\u003e Processing Fold 2/5 Quad TE...\n"}
+,{"stream_name":"stdout","time":94.086946717,"data":"  -\u003e Processing Fold 3/5 Quad TE...\n"}
+,{"stream_name":"stdout","time":126.508328723,"data":"  -\u003e Processing Fold 4/5 Quad TE...\n"}
+,{"stream_name":"stdout","time":159.000477932,"data":"  -\u003e Processing Fold 5/5 Quad TE...\n"}
+,{"stream_name":"stdout","time":191.391418508,"data":"✅ Prepared all 5 folds. Feature count per fold: 145\n"}
+,{"stream_name":"stdout","time":191.391489646,"data":"\n"}
+,{"stream_name":"stdout","time":191.391494658,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":191.391497356,"data":"💡 [MODEL 1] Deeper Multi-Seed LightGBM (3 Seeds)\n"}
+,{"stream_name":"stdout","time":191.391499825,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":191.392826683,"data":"\n"}
+,{"stream_name":"stdout","time":191.392845828,"data":"🌱 Training LightGBM Seed 42...\n"}
+,{"stream_name":"stdout","time":1196.918169842,"data":"  -\u003e LGBM Seed 42 OOF ROC-AUC: 0.94583\n"}
+,{"stream_name":"stdout","time":1196.918257953,"data":"\n"}
+,{"stream_name":"stdout","time":1196.918266826,"data":"🌱 Training LightGBM Seed 101...\n"}
+,{"stream_name":"stdout","time":2175.811075734,"data":"  -\u003e LGBM Seed 101 OOF ROC-AUC: 0.94580\n"}
+,{"stream_name":"stdout","time":2175.811151389,"data":"\n"}
+,{"stream_name":"stdout","time":2175.81115989,"data":"🌱 Training LightGBM Seed 2026...\n"}
+,{"stream_name":"stdout","time":3356.867324329,"data":"  -\u003e LGBM Seed 2026 OOF ROC-AUC: 0.94593\n"}
+,{"stream_name":"stdout","time":3357.019520885,"data":"\n"}
+,{"stream_name":"stdout","time":3357.019591362,"data":"🏆 LIGHTGBM MULTI-SEED ENSEMBLE OOF ROC-AUC: 0.94589\n"}
+,{"stream_name":"stdout","time":3357.019599243,"data":"\n"}
+,{"stream_name":"stdout","time":3357.019604682,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":3357.019610068,"data":"🌲 [MODEL 2] Deeper Multi-Seed XGBoost (3 Seeds)\n"}
+,{"stream_name":"stdout","time":3357.019615578,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":3357.020256055,"data":"\n"}
+,{"stream_name":"stdout","time":3357.020290242,"data":"🌱 Training XGBoost Seed 42...\n"}
+,{"stream_name":"stdout","time":3570.100102539,"data":"  -\u003e XGBoost Seed 42 OOF ROC-AUC: 0.94562\n"}
+,{"stream_name":"stdout","time":3570.100159594,"data":"\n"}
+,{"stream_name":"stdout","time":3570.10017076,"data":"🌱 Training XGBoost Seed 101...\n"}
+,{"stream_name":"stdout","time":3772.796215453,"data":"  -\u003e XGBoost Seed 101 OOF ROC-AUC: 0.94561\n"}
+,{"stream_name":"stdout","time":3772.796296086,"data":"\n"}
+,{"stream_name":"stdout","time":3772.796304026,"data":"🌱 Training XGBoost Seed 2026...\n"}
+,{"stream_name":"stdout","time":3994.009631914,"data":"  -\u003e XGBoost Seed 2026 OOF ROC-AUC: 0.94562\n"}
+,{"stream_name":"stdout","time":3994.176697645,"data":"\n"}
+,{"stream_name":"stdout","time":3994.17675939,"data":"🏆 XGBOOST MULTI-SEED ENSEMBLE OOF ROC-AUC: 0.94565\n"}
+,{"stream_name":"stdout","time":3994.176768222,"data":"\n"}
+,{"stream_name":"stdout","time":3994.176773824,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":3994.176779474,"data":"🐈 [MODEL 3] Deeper CatBoost\n"}
+,{"stream_name":"stdout","time":3994.176785167,"data":"================================================================================\n"}
+,{"stream_name":"stderr","time":3995.792097891,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":4004.455433695,"data":"  -\u003e CatBoost Fold 1 ROC-AUC: 0.94435\n"}
+,{"stream_name":"stderr","time":4005.907881308,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":4049.298067701,"data":"  -\u003e CatBoost Fold 2 ROC-AUC: 0.94694\n"}
+,{"stream_name":"stderr","time":4050.600769439,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":4085.205504297,"data":"  -\u003e CatBoost Fold 3 ROC-AUC: 0.94694\n"}
+,{"stream_name":"stderr","time":4086.706146537,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":4095.788760602,"data":"  -\u003e CatBoost Fold 4 ROC-AUC: 0.94363\n"}
+,{"stream_name":"stderr","time":4097.16409138,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":4138.206728322,"data":"  -\u003e CatBoost Fold 5 ROC-AUC: 0.94553\n"}
+,{"stream_name":"stdout","time":4138.392270074,"data":"\n"}
+,{"stream_name":"stdout","time":4138.392326245,"data":"🏆 CATBOOST OOF ROC-AUC: 0.94518\n"}
+,{"stream_name":"stdout","time":4138.392332771,"data":"\n"}
+,{"stream_name":"stdout","time":4138.392336152,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":4138.392339825,"data":"🎯 [BLEND] Nelder-Mead Tri-Engine Rank Blend\n"}
+,{"stream_name":"stdout","time":4138.392343217,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":4156.764554296,"data":"🎯 Tri-Engine Blend Weights: LGBM=0.7437 | XGB=0.0000 | CB=0.2563\n"}
+,{"stream_name":"stdout","time":4156.764624368,"data":"🏆 BLEND OOF ROC-AUC: 0.94598\n"}
+,{"stream_name":"stdout","time":4156.90132629,"data":"\n"}
+,{"stream_name":"stdout","time":4156.90137271,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":4156.901379976,"data":"👑 [FINAL] Master Top-10 Assault: Physics Shifts \u0026 Zero-Tie Lexsort\n"}
+,{"stream_name":"stdout","time":4156.901385726,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":4156.984632372,"data":"🎯 Zero-Tie Ordinal Rank Status:\n"}
+,{"stream_name":"stdout","time":4156.996412788,"data":"  • Unique Predicted Ranks: 286,571 / 286,571 (100% Zero Ties)\n"}
+,{"stream_name":"stdout","time":4156.996507328,"data":"  • Min Rank Score: 0.000002\n"}
+,{"stream_name":"stdout","time":4156.996618892,"data":"  • Max Rank Score: 0.999998\n"}
+,{"stream_name":"stderr","time":4156.998296543,"data":"Traceback (most recent call last):\n"}
+,{"stream_name":"stderr","time":4156.998314887,"data":"  File \"/kaggle/src/script.py\", line 581, in \u003cmodule\u003e\n"}
+,{"stream_name":"stderr","time":4156.998829053,"data":"    assert len(sub) == 286572, f\"Row count mismatch: {len(sub)} != 286572\" # 286572 is the test size\n"}
+,{"stream_name":"stderr","time":4156.998921104,"data":"           ^^^^^^^^^^^^^^^^^^\n"}
+,{"stream_name":"stderr","time":4156.998937418,"data":"AssertionError: Row count mismatch: 286571 != 286572\n"}
+,{"stream_name":"stderr","time":4162.55829439,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":4162.558339793,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":4162.823450387,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":4162.823504213,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":4163.606693941,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":4164.521333433,"data":"[NbConvertApp] Writing 401177 bytes to __results__.html\n"}
+]
