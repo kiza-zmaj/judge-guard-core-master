@@ -1,0 +1,18 @@
+sample_id,ticket_id,ticket_name,match,home_team,away_team,league,start_time,market_type,selection,odds,p_model,implied_prob_devigged,edge,xg_home,xg_away,predicted_score,actual_score,outcome_win,status
+1,1137024777052893,SIGURICA / VALUE BANKERI,Criciuma vs Operario PR,Criciuma,Operario PR,Brazil 2,Uto 00:30,double_chance,1X,1.14,0.8482,0.835,0.0132,1.45,0.85,1-0,,,PENDING
+2,1137024777052893,SIGURICA / VALUE BANKERI,Malacateco vs Deportivo Mixco,Malacateco,Deportivo Mixco,Gvatemala 1 - Apertura,Pon 03:00,double_chance,1X,1.14,0.8455,0.834,0.0115,1.65,0.8,2-0,,,PENDING
+3,1137024777052893,SIGURICA / VALUE BANKERI,Olimpia Tegucigalpa vs Independiente Siguatepeque,Olimpia Tegucigalpa,Independiente Siguatepeque,Honduras 1 - Apertura,Pon 01:15,double_chance,12,1.15,0.8361,0.825,0.0111,1.7,0.7,2-0,,,PENDING
+4,1137024777052893,SIGURICA / VALUE BANKERI,Philippines M23 vs Kuwait M23,Philippines M23,Kuwait M23,Azijske igre,Uto 07:00,double_chance,X2,1.13,0.8387,0.831,0.0077,0.75,1.6,0-2,,,PENDING
+5,1137024777052893,SIGURICA / VALUE BANKERI,Trento vs Pro Vercelli,Trento,Pro Vercelli,Italija 3 A,Pon 20:30,double_chance,1X,1.18,0.8177,0.805,0.0127,1.35,0.85,1-0,,,PENDING
+6,1137024772928642,MEGA KOMBO VALUE (Top Picks),Montana vs Hebar,Montana,Hebar,Bugarska 2,Pon 18:30,1X2,1,1.9,0.536,0.505,0.031,1.5,0.95,1-0,,,PENDING
+7,1137024772928642,MEGA KOMBO VALUE (Top Picks),Malacateco vs Deportivo Mixco,Malacateco,Deportivo Mixco,Gvatemala 1 - Apertura,Pon 03:00,1X2,1,1.7,0.6003,0.565,0.0353,1.65,0.8,2-0,,,PENDING
+8,1137024772928642,MEGA KOMBO VALUE (Top Picks),Guabira vs SA Bulo Bulo,Guabira,SA Bulo Bulo,Bolivija Liga Kup,Uto 00:00,total_goals,2+,1.18,0.8012,0.792,0.0092,1.8,0.9,2-0,,,PENDING
+9,1137024772928642,MEGA KOMBO VALUE (Top Picks),Redditch vs Rc Warwick,Redditch,Rc Warwick,Engleska 7 - Central,Pon 20:45,total_goals,2+,1.2,0.7869,0.778,0.0089,1.7,0.9,2-0,,,PENDING
+10,1137024772928642,MEGA KOMBO VALUE (Top Picks),HB Koge vs Hobro IK,HB Koge,Hobro IK,Danska 2,Pon 19:00,total_goals,2+,1.2,0.7841,0.776,0.0081,1.35,1.25,1-1,,,PENDING
+11,1137024772928642,MEGA KOMBO VALUE (Top Picks),Olimpia Tegucigalpa vs Independiente Siguatepeque,Olimpia Tegucigalpa,Independiente Siguatepeque,Honduras 1 - Apertura,Pon 01:15,1X2,1,1.33,0.7624,0.73,0.0324,1.7,0.7,2-0,,,PENDING
+12,1137024772928642,MEGA KOMBO VALUE (Top Picks),Velez Sarsfield vs Tigre,Velez Sarsfield,Tigre,Argentina 1 - Klausura,Pon 02:30,double_chance,1X,1.3,0.7651,0.742,0.0231,1.25,0.75,1-0,,,PENDING
+13,1137024772928642,MEGA KOMBO VALUE (Top Picks),Lanus vs Estudiantes de La Plata,Lanus,Estudiantes de La Plata,Argentina 1 - Klausura,Uto 02:15,double_chance,1X,1.31,0.7533,0.738,0.0153,1.2,0.8,1-0,,,PENDING
+14,1137024772928642,MEGA KOMBO VALUE (Top Picks),Dolomiti Bellunesi vs Lumezzane,Dolomiti Bellunesi,Lumezzane,Italija 3 A,Pon 20:30,double_chance,1X,1.3,0.7411,0.735,0.0061,1.2,0.8,1-0,,,PENDING
+15,1137024772928642,MEGA KOMBO VALUE (Top Picks),LDU Quito vs Universidad Catolica,LDU Quito,Universidad Catolica,Ekvador 1,Pon 01:30,double_chance,1X,1.3,0.732,0.729,0.003,1.3,1.0,1-1,,,PENDING
+16,1137024772928642,MEGA KOMBO VALUE (Top Picks),Nueva Chicago vs Patronato,Nueva Chicago,Patronato,Argentina 2,Uto 00:00,double_chance,1X,1.32,0.7288,0.721,0.0078,1.2,0.75,1-0,,,PENDING
+17,1137024772928642,MEGA KOMBO VALUE (Top Picks),Sportist Svoge vs Vihren Sandanski,Sportist Svoge,Vihren Sandanski,Bugarska 2,Pon 16:00,1X2,2,1.53,0.6402,0.612,0.0282,0.8,1.45,0-1,,,PENDING
