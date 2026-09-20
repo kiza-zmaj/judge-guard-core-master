@@ -1,5 +1,5 @@
 """
-Base-Margin GBDT Model for SharpBet Core.
+Base-Margin GBDT Residual Model for SharpBet Core v11.
 
 PRINCIPLE (Deotte / S6E9 Lesson):
   Instead of teaching a GBDT to estimate P(home|features) from scratch,
@@ -9,15 +9,20 @@ PRINCIPLE (Deotte / S6E9 Lesson):
   This forces the ensemble to learn ONLY the residual:
       delta = logit(p_true) - logit(p_market)
 
-  i.e., "Where does the market misprice relative to form, injuries, schedule?"
+  i.e., "Where does the market misprice relative to form, Elo, H2H, schedule?"
 
   A model that cannot beat `base_margin = 0` (the market) produces no edge.
   If the residual delta is consistently > 0 in OOS, that is genuine alpha.
 
+v11 UPGRADE:
+  - XGBoost binary classifier with init_score=logit(p_market_array)
+  - 13-feature input: Elo, form, H2H, goals, fatigue, derby, season_week
+  - Fallback: weighted linear residual (if XGBoost not available)
+
 ZERO-LEAKAGE GUARANTEE:
   - `fit()` is called only on strictly past data (before the fold boundary).
-  - `predict_residual()` is called on OOS rows only.
-  - Closing odds are NEVER passed to fit() or predict_residual().
+  - `predict_match()` is called on OOS rows only.
+  - Closing odds are NEVER passed to fit() or predict_match().
 """
 
 import logging

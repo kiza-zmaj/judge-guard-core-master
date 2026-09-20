@@ -4,7 +4,7 @@
   "content": "Welcome to the Agent-Controlled PWA!",
   "components": [],
   "last_verdict": {
-    "action": "Verify [SharpBet v10 End-to-End: Nested Walk-Forward + Base-Margin + CLV Audit + Paper Trading Ledger + Kaggle v10 Generator] Complete",
+    "action": "Verify End-to-End SharpBet v11 Pipeline & Kaggle Push Complete",
     "status": "PASSED",
     "reason": "Approved (Unified Verification)",
     "timestamp": "Now"

@@ -4,11 +4,11 @@
   "total_bets": 205,
   "roi_pct": 3.91,
   "yield_pct": 3.91,
-  "roi_ci_lower_pct": -13.36,
-  "roi_ci_upper_pct": 21.18,
+  "roi_ci_lower_pct": -12.97,
+  "roi_ci_upper_pct": 20.35,
   "max_drawdown_pct": 18.1,
   "failure_reasons": [
-    "ROI 95% CI lower bound (-13.36%) is below safety floor (-2.00%). Statistical edge cannot be distinguished from random noise."
+    "ROI 95% CI lower bound (-12.97%) is below safety floor (-2.00%). Statistical edge cannot be distinguished from random noise."
   ],
   "pnl_by_outcome": {
     "home": {

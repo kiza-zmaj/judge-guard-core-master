@@ -1,0 +1,336 @@
+date,match,outcome,strategy,placed_odds,closing_odds,fair_closing_odds,p_model,p_market,predicted_ev,raw_clv,fair_clv,beat_closing,won,stake,pnl
+2023-03-06,Brentford vs Fulham,home,Model_vs_Pinnacle,2.0,2.08,2.1118,0.585,0.4908,0.17,-0.03846,-0.05294,False,True,75.0,75.0
+2023-03-11,Bournemouth vs Liverpool,away,Model_vs_Pinnacle,1.44,1.45,1.4676,0.7403,0.6844,0.066,-0.0069,-0.01881,False,False,74.96,-74.96
+2023-03-11,Everton vs Brentford,home,Model_vs_Pinnacle,2.75,2.7,2.7556,0.4318,0.3543,0.1873,0.01852,-0.00203,True,True,53.53,93.68
+2023-03-11,Everton vs Brentford,away,Model_vs_Pinnacle,2.82,2.99,3.0579,0.4079,0.3453,0.1503,-0.05686,-0.0778,False,False,41.29,-41.29
+2023-03-11,Leicester vs Chelsea,home,Model_vs_Pinnacle,3.9,4.1,4.2341,0.3242,0.247,0.2643,-0.04878,-0.07891,False,False,45.58,-45.58
+2023-03-11,Leicester vs Chelsea,draw,Model_vs_Pinnacle,3.61,3.75,3.8647,0.3536,0.2674,0.2764,-0.03733,-0.0659,False,False,52.94,-52.94
+2023-03-12,West Ham vs Aston Villa,home,Model_vs_Pinnacle,2.25,2.42,2.4642,0.4613,0.4349,0.0379,-0.07025,-0.08692,False,False,15.16,-15.16
+2023-03-12,West Ham vs Aston Villa,away,Model_vs_Pinnacle,3.45,3.29,3.3712,0.3142,0.2804,0.0839,0.04863,0.02337,True,False,17.13,-17.13
+2023-03-15,Southampton vs Brentford,home,Model_vs_Pinnacle,3.05,3.31,3.3887,0.4681,0.3188,0.4277,-0.07855,-0.09995,False,False,75.0,-75.0
+2023-03-17,Nott'm Forest vs Newcastle,draw,Model_vs_Pinnacle,3.87,3.7,3.8227,0.2691,0.249,0.0413,0.04595,0.01237,True,False,7.19,-7.19
+2023-03-18,Chelsea vs Everton,home,Model_vs_Pinnacle,1.5,1.52,1.5416,0.7034,0.6569,0.0552,-0.01316,-0.02698,False,False,55.16,-55.16
+2023-03-18,Wolves vs Leeds,home,Model_vs_Pinnacle,2.3,2.32,2.3604,0.6252,0.4253,0.4379,-0.00862,-0.02559,False,False,75.0,-75.0
+2023-03-18,Southampton vs Tottenham,draw,Model_vs_Pinnacle,3.78,3.73,3.855,0.3059,0.254,0.1562,0.0134,-0.01946,True,True,28.09,78.09
+2023-03-18,Brentford vs Leicester,home,Model_vs_Pinnacle,1.95,1.9,1.9294,0.5352,0.5027,0.0437,0.02632,0.01068,True,False,23.0,-23.0
+2023-03-18,Aston Villa vs Bournemouth,home,Model_vs_Pinnacle,1.74,1.74,1.7628,0.663,0.5656,0.1536,0.0,-0.01293,False,True,75.0,55.5
+2023-04-01,Crystal Palace vs Leicester,home,Model_vs_Pinnacle,2.56,2.37,2.4137,0.5336,0.3817,0.3661,0.08017,0.06061,True,True,75.0,117.0
+2023-04-01,Brighton vs Brentford,home,Model_vs_Pinnacle,1.67,1.64,1.6572,0.6531,0.5886,0.0906,0.01829,0.00772,True,False,67.63,-67.63
+2023-04-01,Nott'm Forest vs Wolves,home,Model_vs_Pinnacle,3.01,3.44,3.5284,0.4257,0.3231,0.2814,-0.125,-0.14692,False,False,70.0,-70.0
+2023-04-01,Man City vs Liverpool,home,Model_vs_Pinnacle,1.66,1.67,1.6907,0.7434,0.5929,0.234,-0.00599,-0.01816,False,True,75.0,49.5
+2023-04-01,Bournemouth vs Fulham,home,Model_vs_Pinnacle,2.56,2.61,2.6591,0.501,0.3814,0.2825,-0.01916,-0.03727,False,True,75.0,117.0
+2023-04-02,West Ham vs Southampton,home,Model_vs_Pinnacle,1.77,1.77,1.8018,0.7033,0.5553,0.2449,0.0,-0.01765,False,True,75.0,57.75
+2023-04-02,Newcastle vs Man United,home,Model_vs_Pinnacle,2.4,2.32,2.3605,0.5089,0.4071,0.2213,0.03448,0.01673,True,True,75.0,105.0
+2023-04-03,Everton vs Tottenham,away,Model_vs_Pinnacle,2.24,2.06,2.092,0.5223,0.4374,0.17,0.08738,0.07075,True,False,68.55,-68.55
+2023-04-04,Leicester vs Aston Villa,home,Model_vs_Pinnacle,2.68,2.74,2.7942,0.3912,0.3658,0.0484,-0.0219,-0.04087,False,False,14.41,-14.41
+2023-04-04,Leicester vs Aston Villa,away,Model_vs_Pinnacle,2.82,2.7,2.7527,0.4517,0.3473,0.2737,0.04444,0.02445,True,True,75.0,136.5
+2023-04-04,Chelsea vs Liverpool,away,Model_vs_Pinnacle,3.4,3.5,3.5933,0.3589,0.287,0.2202,-0.02857,-0.05379,False,False,45.87,-45.87
+2023-04-05,West Ham vs Newcastle,home,Model_vs_Pinnacle,3.63,3.49,3.5793,0.2981,0.2657,0.082,0.04011,0.01416,True,False,15.59,-15.59
+2023-04-05,West Ham vs Newcastle,draw,Model_vs_Pinnacle,3.46,3.33,3.4119,0.3108,0.2791,0.0752,0.03904,0.0141,True,False,15.29,-15.29
+2023-04-08,Aston Villa vs Nott'm Forest,home,Model_vs_Pinnacle,1.64,1.6,1.6196,0.6947,0.5995,0.1393,0.025,0.0126,True,True,75.0,48.0
+2023-04-08,Brentford vs Newcastle,away,Model_vs_Pinnacle,2.13,1.96,1.99,0.5143,0.4601,0.0954,0.08673,0.07035,True,True,42.2,47.69
+2023-04-08,Fulham vs West Ham,home,Model_vs_Pinnacle,2.81,2.89,2.952,0.4428,0.3465,0.2441,-0.02768,-0.0481,False,False,67.44,-67.44
+2023-04-08,Leicester vs Bournemouth,home,Model_vs_Pinnacle,1.91,2.12,2.1555,0.5756,0.5141,0.0994,-0.09906,-0.11389,False,False,54.63,-54.63
+2023-04-08,Tottenham vs Brighton,home,Model_vs_Pinnacle,2.58,2.83,2.8889,0.4089,0.3785,0.0548,-0.08834,-0.10693,False,True,17.36,27.43
+2023-04-08,Tottenham vs Brighton,away,Model_vs_Pinnacle,2.72,2.61,2.66,0.3814,0.3585,0.0374,0.04215,0.02256,True,False,10.87,-10.87
+2023-04-08,Wolves vs Chelsea,draw,Model_vs_Pinnacle,3.58,3.7,3.8291,0.3065,0.2687,0.0972,-0.03243,-0.06505,False,False,18.83,-18.83
+2023-04-09,Leeds vs Crystal Palace,away,Model_vs_Pinnacle,3.67,3.82,3.9368,0.2898,0.2635,0.0637,-0.03927,-0.06777,False,True,11.92,31.83
+2023-04-09,Liverpool vs Arsenal,away,Model_vs_Pinnacle,2.44,2.51,2.5645,0.5074,0.4007,0.238,-0.02789,-0.04855,False,False,75.0,-75.0
+2023-04-15,Southampton vs Crystal Palace,away,Model_vs_Pinnacle,2.73,2.75,2.8027,0.464,0.3573,0.2667,-0.00727,-0.02594,False,True,75.0,129.75
+2023-04-15,Wolves vs Brentford,home,Model_vs_Pinnacle,2.57,2.9,2.963,0.4181,0.3797,0.0744,-0.11379,-0.13264,False,True,23.7,37.21
+2023-04-15,Chelsea vs Brighton,home,Model_vs_Pinnacle,2.67,3.12,3.1901,0.4781,0.3657,0.2764,-0.14423,-0.16304,False,False,75.0,-75.0
+2023-04-15,Aston Villa vs Newcastle,home,Model_vs_Pinnacle,3.71,3.71,3.8129,0.3184,0.2606,0.1813,0.0,-0.02699,False,True,33.44,90.62
+2023-04-17,Leeds vs Liverpool,away,Model_vs_Pinnacle,1.74,1.73,1.756,0.6137,0.5654,0.0678,0.00578,-0.00911,True,True,45.81,33.9
+2023-04-22,Leicester vs Wolves,away,Model_vs_Pinnacle,3.14,3.13,3.2029,0.3997,0.3094,0.2552,0.00319,-0.01964,True,False,59.63,-59.63
+2023-04-22,Brentford vs Aston Villa,away,Model_vs_Pinnacle,2.85,2.83,2.8884,0.5374,0.3415,0.5315,0.00707,-0.01329,True,False,75.0,-75.0
+2023-04-22,Fulham vs Leeds,away,Model_vs_Pinnacle,3.03,3.11,3.2011,0.3794,0.3206,0.1494,-0.02572,-0.05345,False,False,36.81,-36.81
+2023-04-22,Crystal Palace vs Everton,away,Model_vs_Pinnacle,3.87,4.48,4.6288,0.2678,0.2491,0.0365,-0.13616,-0.16393,False,False,6.36,-6.36
+2023-04-23,Bournemouth vs West Ham,home,Model_vs_Pinnacle,2.85,3.03,3.0978,0.4269,0.3418,0.2167,-0.05941,-0.07999,False,False,58.57,-58.57
+2023-04-25,Leeds vs Leicester,away,Model_vs_Pinnacle,3.02,3.02,3.0895,0.4829,0.3217,0.4585,0.0,-0.0225,False,False,75.0,-75.0
+2023-04-25,Wolves vs Crystal Palace,home,Model_vs_Pinnacle,2.56,2.34,2.3718,0.4105,0.3814,0.0508,0.09402,0.07935,True,True,16.29,25.41
+2023-04-25,Wolves vs Crystal Palace,away,Model_vs_Pinnacle,3.13,3.82,3.9022,0.3744,0.3103,0.1719,-0.18063,-0.19789,False,False,40.36,-40.36
+2023-04-25,Aston Villa vs Fulham,home,Model_vs_Pinnacle,1.8,1.77,1.7968,0.6276,0.5455,0.1297,0.01695,0.00178,True,True,75.0,60.0
+2023-04-26,West Ham vs Liverpool,draw,Model_vs_Pinnacle,3.97,3.89,4.0032,0.2654,0.242,0.0536,0.02057,-0.00829,True,False,9.02,-9.02
+2023-04-26,Chelsea vs Brentford,home,Model_vs_Pinnacle,1.73,1.88,1.9069,0.7119,0.5683,0.2316,-0.07979,-0.09277,False,False,75.0,-75.0
+2023-04-27,Southampton vs Bournemouth,home,Model_vs_Pinnacle,2.34,2.62,2.6711,0.48,0.4182,0.1233,-0.10687,-0.12396,False,False,46.01,-46.01
+2023-04-27,Southampton vs Bournemouth,away,Model_vs_Pinnacle,3.19,3.0,3.0669,0.3362,0.3043,0.0725,0.06333,0.04014,True,True,16.55,36.24
+2023-04-27,Tottenham vs Man United,away,Model_vs_Pinnacle,2.48,2.34,2.3816,0.441,0.3938,0.0938,0.05983,0.04132,True,False,31.68,-31.68
+2023-04-29,Brighton vs Wolves,home,Model_vs_Pinnacle,1.51,1.64,1.6629,0.7689,0.6518,0.1611,-0.07927,-0.09195,False,True,75.0,38.25
+2023-04-30,Bournemouth vs Leeds,home,Model_vs_Pinnacle,2.65,2.51,2.5579,0.3901,0.3675,0.0338,0.05578,0.03601,True,True,10.24,16.9
+2023-04-30,Bournemouth vs Leeds,draw,Model_vs_Pinnacle,3.57,3.43,3.5179,0.292,0.2706,0.0423,0.04082,0.01481,True,False,8.23,-8.23
+2023-04-30,Man United vs Aston Villa,home,Model_vs_Pinnacle,1.81,1.76,1.7876,0.5899,0.5423,0.0677,0.02841,0.01253,True,True,41.78,33.84
+2023-04-30,Liverpool vs Tottenham,home,Model_vs_Pinnacle,1.54,1.54,1.5604,0.719,0.6394,0.1073,0.0,-0.01307,False,True,75.0,40.5
+2023-05-04,Brighton vs Man United,home,Model_vs_Pinnacle,2.05,2.18,2.2183,0.5215,0.4784,0.0691,-0.05963,-0.07587,False,True,32.89,34.53
+2023-05-06,Bournemouth vs Chelsea,draw,Model_vs_Pinnacle,3.55,3.67,3.7743,0.4534,0.2726,0.6096,-0.0327,-0.05943,False,False,75.0,-75.0
+2023-05-06,Wolves vs Aston Villa,home,Model_vs_Pinnacle,3.06,3.19,3.2684,0.3583,0.3177,0.0963,-0.04075,-0.06376,False,True,23.37,48.14
+2023-05-06,Wolves vs Aston Villa,away,Model_vs_Pinnacle,2.51,2.41,2.4548,0.4142,0.3892,0.0396,0.04149,0.02249,True,False,13.11,-13.11
+2023-05-07,Newcastle vs Arsenal,draw,Model_vs_Pinnacle,3.8,3.77,3.8746,0.2749,0.2542,0.0447,0.00796,-0.01925,True,False,7.99,-7.99
+2023-05-07,West Ham vs Man United,home,Model_vs_Pinnacle,3.57,3.64,3.7709,0.3046,0.2708,0.0876,-0.01923,-0.05328,False,True,17.04,43.79
+2023-05-08,Fulham vs Leicester,home,Model_vs_Pinnacle,2.71,2.72,2.7755,0.3828,0.3597,0.0375,-0.00368,-0.0236,False,True,10.95,18.72
+2023-05-08,Fulham vs Leicester,draw,Model_vs_Pinnacle,3.61,3.49,3.5791,0.299,0.268,0.0796,0.03438,0.00863,True,False,15.24,-15.24
+2023-05-08,Brighton vs Everton,home,Model_vs_Pinnacle,1.38,1.37,1.3855,0.7709,0.7153,0.0638,0.0073,-0.00397,True,False,75.0,-75.0
+2023-05-08,Nott'm Forest vs Southampton,home,Model_vs_Pinnacle,2.17,2.03,2.0636,0.5091,0.4513,0.1047,0.06897,0.05156,True,True,44.74,52.35
+2023-05-13,Man United vs Wolves,home,Model_vs_Pinnacle,1.38,1.39,1.4066,0.7656,0.7152,0.0565,-0.00719,-0.01891,False,True,74.39,28.27
+2023-05-13,Crystal Palace vs Bournemouth,home,Model_vs_Pinnacle,1.88,1.81,1.833,0.5678,0.5222,0.0675,0.03867,0.02564,True,True,38.35,33.75
+2023-05-13,Southampton vs Fulham,away,Model_vs_Pinnacle,2.54,2.65,2.7042,0.4433,0.3847,0.1261,-0.04151,-0.06072,False,True,40.94,63.05
+2023-05-13,Aston Villa vs Tottenham,home,Model_vs_Pinnacle,2.34,2.24,2.2791,0.4661,0.4178,0.0907,0.04464,0.02672,True,True,33.85,45.36
+2023-05-13,Aston Villa vs Tottenham,draw,Model_vs_Pinnacle,3.72,3.79,3.8998,0.2802,0.2596,0.0425,-0.01847,-0.0461,False,False,7.81,-7.81
+2023-05-13,Chelsea vs Nott'm Forest,home,Model_vs_Pinnacle,1.51,1.57,1.601,0.7055,0.6525,0.0653,-0.03822,-0.05684,False,False,64.0,-64.0
+2023-05-14,Arsenal vs Brighton,home,Model_vs_Pinnacle,1.78,1.74,1.7656,0.6071,0.5525,0.0807,0.02299,0.00816,True,False,51.73,-51.73
+2023-05-14,Brentford vs West Ham,home,Model_vs_Pinnacle,2.06,1.83,1.8585,0.5325,0.4758,0.0969,0.12568,0.10842,True,True,45.7,48.44
+2023-05-18,Newcastle vs Brighton,home,Model_vs_Pinnacle,2.06,1.8,1.8264,0.5201,0.4757,0.0714,0.14444,0.1279,True,True,33.7,35.72
+2023-05-20,Fulham vs Crystal Palace,home,Model_vs_Pinnacle,2.49,2.44,2.4838,0.454,0.3927,0.1304,0.02049,0.0025,True,False,43.76,-43.76
+2023-05-20,Wolves vs Everton,home,Model_vs_Pinnacle,2.81,3.24,3.2752,0.4348,0.3465,0.2219,-0.13272,-0.14204,False,False,61.3,-61.3
+2023-05-21,West Ham vs Leeds,home,Model_vs_Pinnacle,2.51,2.74,2.8,0.4852,0.3893,0.2179,-0.08394,-0.10357,False,True,72.15,108.95
+2023-05-22,Newcastle vs Leicester,home,Model_vs_Pinnacle,1.4,1.33,1.3443,0.7419,0.7046,0.0386,0.05263,0.04143,True,False,48.31,-48.31
+2023-05-24,Brighton vs Man City,home,Model_vs_Pinnacle,3.93,3.8,3.9142,0.2636,0.2446,0.036,0.03421,0.00404,True,False,6.15,-6.15
+2023-05-28,Man United vs Fulham,home,Model_vs_Pinnacle,1.53,1.49,1.5111,0.7538,0.6412,0.1533,0.02685,0.01251,True,True,75.0,39.75
+2023-05-28,Leicester vs West Ham,home,Model_vs_Pinnacle,1.95,2.11,2.1514,0.5471,0.5008,0.0669,-0.07583,-0.09361,False,True,35.2,33.44
+2023-05-28,Leicester vs West Ham,away,Model_vs_Pinnacle,3.64,3.29,3.3936,0.2848,0.2624,0.0368,0.10638,0.07261,True,False,6.96,-6.96
+2023-05-28,Chelsea vs Newcastle,away,Model_vs_Pinnacle,2.38,2.48,2.5382,0.5073,0.4089,0.2074,-0.04032,-0.06233,False,False,75.0,-75.0
+2023-05-28,Everton vs Bournemouth,home,Model_vs_Pinnacle,1.5,1.65,1.6758,0.6978,0.6557,0.0467,-0.09091,-0.10491,False,True,46.74,23.37
+2023-08-12,Sheffield United vs Crystal Palace,home,Model_vs_Pinnacle,3.28,3.98,4.0998,0.4861,0.2959,0.5945,-0.17588,-0.19996,False,False,75.0,-75.0
+2023-08-12,Bournemouth vs West Ham,home,Model_vs_Pinnacle,2.7,2.75,2.8063,0.4376,0.3611,0.1816,-0.01818,-0.03788,False,False,53.42,-53.42
+2023-08-12,Everton vs Fulham,home,Model_vs_Pinnacle,2.27,2.39,2.4343,0.4907,0.4308,0.1138,-0.05021,-0.06749,False,False,44.81,-44.81
+2023-08-12,Newcastle vs Aston Villa,home,Model_vs_Pinnacle,1.77,1.68,1.7006,0.6209,0.5553,0.099,0.05357,0.04081,True,True,64.27,49.49
+2023-08-13,Chelsea vs Liverpool,away,Model_vs_Pinnacle,2.4,2.2,2.2383,0.512,0.4072,0.2288,0.09091,0.07224,True,False,75.0,-75.0
+2023-08-13,Brentford vs Tottenham,home,Model_vs_Pinnacle,2.76,2.62,2.6702,0.4321,0.3527,0.1926,0.05344,0.03363,True,False,54.73,-54.73
+2023-08-14,Man United vs Wolves,home,Model_vs_Pinnacle,1.32,1.27,1.2828,0.7915,0.7478,0.0447,0.03937,0.029,True,True,69.92,22.37
+2023-08-18,Nott'm Forest vs Sheffield United,draw,Model_vs_Pinnacle,3.48,3.51,3.6133,0.3116,0.2792,0.0844,-0.00855,-0.03689,False,False,17.02,-17.02
+2023-08-19,Fulham vs Brentford,home,Model_vs_Pinnacle,2.76,2.87,2.9337,0.4001,0.3528,0.1043,-0.03833,-0.05921,False,False,29.64,-29.64
+2023-08-19,Wolves vs Brighton,draw,Model_vs_Pinnacle,3.92,4.21,4.3785,0.2662,0.2451,0.0436,-0.06888,-0.10472,False,False,7.46,-7.46
+2023-08-19,Wolves vs Brighton,away,Model_vs_Pinnacle,1.88,1.83,1.8604,0.5943,0.5221,0.1172,0.02732,0.01054,True,True,66.6,58.61
+2023-08-19,Tottenham vs Man United,away,Model_vs_Pinnacle,2.41,2.28,2.3205,0.5138,0.4056,0.2382,0.05702,0.03857,True,False,75.0,-75.0
+2023-08-19,Man City vs Newcastle,home,Model_vs_Pinnacle,1.73,1.87,1.8981,0.642,0.5682,0.1107,-0.07487,-0.08856,False,True,75.0,54.75
+2023-08-20,Aston Villa vs Everton,home,Model_vs_Pinnacle,1.72,1.85,1.8773,0.6127,0.5718,0.0539,-0.07027,-0.08379,False,True,37.45,26.96
+2023-08-20,West Ham vs Chelsea,draw,Model_vs_Pinnacle,3.57,3.65,3.7497,0.3896,0.2707,0.3909,-0.02192,-0.04792,False,False,75.0,-75.0
+2023-08-25,Chelsea vs Luton,home,Model_vs_Pinnacle,1.3,1.27,1.2826,0.8569,0.7614,0.1139,0.02362,0.01357,True,True,75.0,22.5
+2023-08-26,Bournemouth vs Tottenham,away,Model_vs_Pinnacle,1.95,2.09,2.1252,0.5592,0.5032,0.0905,-0.06699,-0.08244,False,True,47.62,45.24
+2023-08-26,Brentford vs Crystal Palace,draw,Model_vs_Pinnacle,3.43,3.37,3.4571,0.3264,0.282,0.1194,0.0178,-0.00784,True,True,24.57,59.71
+2023-08-26,Brighton vs West Ham,home,Model_vs_Pinnacle,1.54,1.5,1.5202,0.7178,0.6392,0.1054,0.02667,0.01302,True,False,75.0,-75.0
+2023-08-27,Newcastle vs Liverpool,home,Model_vs_Pinnacle,2.2,2.24,2.2785,0.4944,0.4454,0.0876,-0.01786,-0.03445,False,False,36.5,-36.5
+2023-08-27,Burnley vs Aston Villa,home,Model_vs_Pinnacle,3.39,3.24,3.3235,0.3403,0.2857,0.1538,0.0463,0.02001,True,False,32.17,-32.17
+2023-08-27,Burnley vs Aston Villa,away,Model_vs_Pinnacle,2.18,2.29,2.3314,0.5335,0.4495,0.1631,-0.04803,-0.06494,False,True,69.1,81.54
+2023-09-01,Luton vs West Ham,away,Model_vs_Pinnacle,1.75,1.76,1.7874,0.637,0.5628,0.1147,-0.00568,-0.02092,False,True,75.0,56.25
+2023-09-02,Sheffield United vs Everton,home,Model_vs_Pinnacle,3.06,3.21,3.2887,0.4564,0.3175,0.3965,-0.04673,-0.06954,False,False,75.0,-75.0
+2023-09-02,Brentford vs Bournemouth,home,Model_vs_Pinnacle,1.75,1.75,1.7769,0.6178,0.5619,0.0812,0.0,-0.01514,False,False,54.16,-54.16
+2023-09-02,Burnley vs Tottenham,away,Model_vs_Pinnacle,1.88,2.04,2.0732,0.6636,0.5216,0.2475,-0.07843,-0.09319,False,True,75.0,66.0
+2023-09-02,Brighton vs Newcastle,home,Model_vs_Pinnacle,2.59,2.64,2.6963,0.416,0.3768,0.0774,-0.01894,-0.03942,False,True,24.33,38.68
+2023-09-03,Crystal Palace vs Wolves,draw,Model_vs_Pinnacle,3.5,3.61,3.7195,0.3218,0.2759,0.1261,-0.03047,-0.05901,False,False,25.23,-25.23
+2023-09-03,Arsenal vs Man United,home,Model_vs_Pinnacle,1.77,1.76,1.7897,0.636,0.5553,0.1256,0.00568,-0.01101,True,True,75.0,57.75
+2023-09-16,Man United vs Brighton,home,Model_vs_Pinnacle,2.25,2.07,2.1031,0.473,0.4351,0.0641,0.08696,0.06985,True,False,25.66,-25.66
+2023-09-16,Man United vs Brighton,away,Model_vs_Pinnacle,2.99,3.53,3.6284,0.3623,0.325,0.0833,-0.15297,-0.17595,False,True,20.93,41.65
+2023-09-16,Newcastle vs Brentford,home,Model_vs_Pinnacle,1.54,1.66,1.6837,0.7324,0.6394,0.1279,-0.07229,-0.08535,False,True,75.0,40.5
+2023-09-16,Aston Villa vs Crystal Palace,home,Model_vs_Pinnacle,1.93,1.98,2.0109,0.599,0.5089,0.156,-0.02525,-0.04023,False,True,75.0,69.75
+2023-09-16,Fulham vs Luton,home,Model_vs_Pinnacle,1.68,1.69,1.7178,0.6491,0.585,0.0904,-0.00592,-0.022,False,True,66.5,45.22
+2023-09-18,Nott'm Forest vs Burnley,home,Model_vs_Pinnacle,2.23,2.14,2.1761,0.4984,0.439,0.1115,0.04206,0.02477,True,False,45.33,-45.33
+2023-09-23,Luton vs Wolves,home,Model_vs_Pinnacle,3.26,3.28,3.3603,0.3953,0.2974,0.2886,-0.0061,-0.02985,False,False,63.84,-63.84
+2023-09-23,Brentford vs Everton,draw,Model_vs_Pinnacle,3.8,3.53,3.6332,0.3486,0.2528,0.3248,0.07649,0.04591,True,False,58.0,-58.0
+2023-09-24,Arsenal vs Tottenham,home,Model_vs_Pinnacle,1.68,1.65,1.6761,0.7033,0.5846,0.1816,0.01818,0.00233,True,False,75.0,-75.0
+2023-09-24,Brighton vs Bournemouth,home,Model_vs_Pinnacle,1.41,1.52,1.5408,0.7308,0.6994,0.0305,-0.07237,-0.08489,False,True,37.18,15.24
+2023-09-24,Chelsea vs Aston Villa,home,Model_vs_Pinnacle,1.93,1.91,1.9368,0.5362,0.5086,0.0348,0.01047,-0.00351,True,False,18.74,-18.74
+2023-09-24,Chelsea vs Aston Villa,away,Model_vs_Pinnacle,3.93,4.1,4.2264,0.2776,0.2448,0.0908,-0.04146,-0.07013,False,True,15.49,45.39
+2023-09-30,Man United vs Crystal Palace,home,Model_vs_Pinnacle,1.57,1.58,1.6037,0.7085,0.6262,0.1123,-0.00633,-0.02101,False,False,75.0,-75.0
+2023-10-01,Nott'm Forest vs Brentford,home,Model_vs_Pinnacle,2.84,2.62,2.6716,0.3823,0.3428,0.0857,0.08397,0.06303,True,False,23.28,-23.28
+2023-10-02,Fulham vs Chelsea,home,Model_vs_Pinnacle,3.93,3.52,3.6089,0.319,0.2447,0.2536,0.11648,0.08897,True,False,43.27,-43.27
+2023-10-03,Luton vs Burnley,draw,Model_vs_Pinnacle,3.23,3.22,3.2947,0.339,0.3006,0.0949,0.00311,-0.01964,True,False,21.28,-21.28
+2023-10-07,Fulham vs Sheffield United,home,Model_vs_Pinnacle,1.64,1.52,1.5415,0.6758,0.6004,0.1083,0.07895,0.0639,True,True,75.0,48.0
+2023-10-07,Burnley vs Chelsea,draw,Model_vs_Pinnacle,3.98,4.07,4.2519,0.2938,0.2404,0.1693,-0.02211,-0.06395,False,False,28.4,-28.4
+2023-10-07,Everton vs Bournemouth,draw,Model_vs_Pinnacle,3.71,3.78,3.8893,0.2913,0.2595,0.0808,-0.01852,-0.0461,False,False,14.91,-14.91
+2023-10-08,Brighton vs Liverpool,away,Model_vs_Pinnacle,2.17,2.1,2.1324,0.5893,0.4514,0.2787,0.03333,0.01763,True,False,75.0,-75.0
+2023-10-08,West Ham vs Newcastle,away,Model_vs_Pinnacle,2.12,2.11,2.1423,0.5796,0.4621,0.2287,0.00474,-0.01041,True,False,75.0,-75.0
+2023-10-08,Wolves vs Aston Villa,away,Model_vs_Pinnacle,2.18,2.08,2.1134,0.5859,0.4492,0.2773,0.04808,0.03151,True,False,75.0,-75.0
+2023-10-21,Nott'm Forest vs Luton,home,Model_vs_Pinnacle,1.7,1.76,1.7886,0.6946,0.5787,0.1809,-0.03409,-0.04954,False,False,75.0,-75.0
+2023-10-21,Chelsea vs Arsenal,home,Model_vs_Pinnacle,3.33,3.35,3.4347,0.3382,0.2908,0.1262,-0.00597,-0.03048,False,False,27.08,-27.08
+2023-10-21,Newcastle vs Crystal Palace,home,Model_vs_Pinnacle,1.46,1.48,1.4998,0.7428,0.6754,0.0845,-0.01351,-0.02654,False,True,75.0,34.5
+2023-10-21,Bournemouth vs Wolves,away,Model_vs_Pinnacle,3.01,3.32,3.4072,0.5194,0.3232,0.5632,-0.09337,-0.11658,False,True,75.0,150.75
+2023-10-21,Liverpool vs Everton,home,Model_vs_Pinnacle,1.37,1.4,1.4185,0.7661,0.7199,0.0496,-0.02143,-0.03419,False,True,67.02,24.8
+2023-10-22,Aston Villa vs West Ham,home,Model_vs_Pinnacle,1.9,1.79,1.8194,0.5995,0.5164,0.139,0.06145,0.0443,True,True,75.0,67.5
+2023-10-23,Tottenham vs Fulham,home,Model_vs_Pinnacle,1.51,1.52,1.544,0.7241,0.6519,0.0934,-0.00658,-0.02202,False,True,75.0,38.25
+2023-10-28,Bournemouth vs Burnley,away,Model_vs_Pinnacle,3.49,3.51,3.6309,0.3256,0.2769,0.1363,-0.0057,-0.03881,False,False,27.36,-27.36
+2023-10-28,Wolves vs Newcastle,away,Model_vs_Pinnacle,1.84,1.93,1.9653,0.5942,0.5333,0.0933,-0.04663,-0.06376,False,False,55.56,-55.56
+2023-10-29,Brighton vs Fulham,home,Model_vs_Pinnacle,1.59,1.64,1.6664,0.6501,0.6193,0.0337,-0.03049,-0.04585,False,False,28.57,-28.57
+2023-10-29,West Ham vs Everton,away,Model_vs_Pinnacle,3.41,3.62,3.7435,0.41,0.2838,0.398,-0.05801,-0.08909,False,True,75.0,180.75
+2023-11-04,Newcastle vs Arsenal,home,Model_vs_Pinnacle,2.83,2.84,2.9177,0.4634,0.3424,0.3113,-0.00352,-0.03006,False,True,75.0,137.25
+2023-11-04,Sheffield United vs Wolves,away,Model_vs_Pinnacle,1.97,1.87,1.9059,0.6938,0.496,0.3668,0.05348,0.03363,True,False,75.0,-75.0
+2023-11-04,Fulham vs Man United,home,Model_vs_Pinnacle,3.22,3.03,3.1216,0.3942,0.2995,0.2693,0.06271,0.03152,True,False,60.64,-60.64
+2023-11-04,Fulham vs Man United,draw,Model_vs_Pinnacle,3.68,3.59,3.7154,0.2886,0.261,0.062,0.02507,-0.00953,True,False,11.58,-11.58
+2023-11-04,Burnley vs Crystal Palace,away,Model_vs_Pinnacle,2.65,2.31,2.3607,0.4282,0.3666,0.1348,0.14719,0.12255,True,True,40.83,67.37
+2023-11-04,Brentford vs West Ham,home,Model_vs_Pinnacle,2.07,2.16,2.2038,0.5704,0.4716,0.1807,-0.04167,-0.06071,False,True,75.0,80.25
+2023-11-04,Everton vs Brighton,home,Model_vs_Pinnacle,3.1,2.86,2.9376,0.4316,0.3112,0.3381,0.08392,0.05528,True,False,75.0,-75.0
+2023-11-04,Everton vs Brighton,draw,Model_vs_Pinnacle,3.87,3.52,3.6347,0.2849,0.2475,0.1024,0.09943,0.06474,True,True,17.84,51.2
+2023-11-05,Nott'm Forest vs Aston Villa,away,Model_vs_Pinnacle,1.89,1.95,1.9882,0.6457,0.5176,0.2204,-0.03077,-0.04939,False,False,75.0,-75.0
+2023-11-11,Wolves vs Tottenham,draw,Model_vs_Pinnacle,3.78,3.62,3.7472,0.2866,0.2533,0.0832,0.0442,0.00875,True,False,14.97,-14.97
+2023-11-11,Crystal Palace vs Everton,away,Model_vs_Pinnacle,3.19,2.96,3.0421,0.3795,0.3021,0.2106,0.0777,0.04862,True,True,48.08,105.3
+2023-11-11,Bournemouth vs Newcastle,away,Model_vs_Pinnacle,1.76,1.97,2.0093,0.6883,0.5566,0.2113,-0.1066,-0.12407,False,False,75.0,-75.0
+2023-11-12,Chelsea vs Man City,draw,Model_vs_Pinnacle,3.8,4.0,4.1531,0.2856,0.2498,0.0852,-0.05,-0.08502,False,True,15.21,42.59
+2023-11-12,Liverpool vs Brentford,home,Model_vs_Pinnacle,1.41,1.4,1.4175,0.733,0.6976,0.0335,0.00714,-0.00529,True,True,40.9,16.77
+2023-11-12,Aston Villa vs Fulham,home,Model_vs_Pinnacle,1.6,1.64,1.6679,0.7452,0.6137,0.1924,-0.02439,-0.04071,False,True,75.0,45.0
+2023-11-25,Man City vs Liverpool,home,Model_vs_Pinnacle,1.75,1.7,1.7297,0.6541,0.5597,0.1447,0.02941,0.01174,True,False,75.0,-75.0
+2023-11-25,Burnley vs West Ham,away,Model_vs_Pinnacle,2.12,2.23,2.2765,0.5937,0.4605,0.2587,-0.04933,-0.06875,False,True,75.0,84.0
+2023-11-25,Luton vs Crystal Palace,home,Model_vs_Pinnacle,3.7,4.12,4.279,0.2942,0.2594,0.0885,-0.10194,-0.13531,False,True,16.39,44.25
+2023-11-25,Luton vs Crystal Palace,draw,Model_vs_Pinnacle,3.41,3.42,3.5344,0.3187,0.2822,0.0867,-0.00292,-0.0352,False,False,17.98,-17.98
+2023-11-25,Newcastle vs Chelsea,home,Model_vs_Pinnacle,2.65,2.6,2.6669,0.4833,0.3664,0.2808,0.01923,-0.00634,True,True,75.0,123.75
+2023-11-25,Nott'm Forest vs Brighton,home,Model_vs_Pinnacle,3.32,3.69,3.829,0.3271,0.29,0.086,-0.10027,-0.13293,False,False,18.54,-18.54
+2023-11-25,Nott'm Forest vs Brighton,draw,Model_vs_Pinnacle,3.63,3.63,3.765,0.288,0.2645,0.0453,0.0,-0.03586,False,False,8.61,-8.61
+2023-11-25,Brentford vs Arsenal,draw,Model_vs_Pinnacle,3.82,4.05,4.2066,0.2737,0.2497,0.0455,-0.05679,-0.0919,False,False,8.08,-8.08
+2023-11-26,Everton vs Man United,home,Model_vs_Pinnacle,2.75,2.68,2.7459,0.3931,0.3525,0.0811,0.02612,0.00149,True,False,23.18,-23.18
+2023-11-26,Everton vs Man United,draw,Model_vs_Pinnacle,3.51,3.45,3.5569,0.3052,0.2741,0.0714,0.01739,-0.01319,True,False,14.22,-14.22
+2023-11-26,Tottenham vs Aston Villa,away,Model_vs_Pinnacle,2.82,2.58,2.6451,0.3749,0.3434,0.0571,0.09302,0.06612,True,True,15.69,28.56
+2023-11-27,Fulham vs Wolves,home,Model_vs_Pinnacle,2.45,2.43,2.4869,0.5336,0.3972,0.3073,0.00823,-0.01484,True,True,75.0,108.75
+2023-12-02,Nott'm Forest vs Everton,home,Model_vs_Pinnacle,2.85,2.88,2.9539,0.3632,0.3402,0.035,-0.01042,-0.03517,False,False,9.47,-9.47
+2023-12-02,Newcastle vs Man United,home,Model_vs_Pinnacle,1.9,2.0,2.0384,0.5562,0.5149,0.0568,-0.05,-0.0679,False,True,31.53,28.38
+2023-12-03,West Ham vs Crystal Palace,home,Model_vs_Pinnacle,2.01,1.94,1.9775,0.5822,0.4864,0.1703,0.03608,0.01643,True,False,75.0,-75.0
+2023-12-03,Bournemouth vs Aston Villa,away,Model_vs_Pinnacle,1.97,2.19,2.2367,0.5978,0.4963,0.1777,-0.10046,-0.11924,False,False,75.0,-75.0
+2023-12-03,Chelsea vs Brighton,home,Model_vs_Pinnacle,1.75,1.6,1.626,0.6298,0.5597,0.1021,0.09375,0.07626,True,True,68.08,51.06
+2023-12-05,Wolves vs Burnley,home,Model_vs_Pinnacle,1.92,1.95,1.9871,0.5365,0.5114,0.0301,-0.01538,-0.03377,False,True,16.35,15.04
+2023-12-06,Brighton vs Brentford,away,Model_vs_Pinnacle,3.79,4.57,4.7944,0.2821,0.2516,0.0692,-0.17068,-0.20949,False,False,12.4,-12.4
+2023-12-06,Crystal Palace vs Bournemouth,home,Model_vs_Pinnacle,2.3,2.36,2.4131,0.448,0.4233,0.0305,-0.02542,-0.04687,False,False,11.73,-11.73
+2023-12-06,Crystal Palace vs Bournemouth,away,Model_vs_Pinnacle,3.23,3.2,3.2979,0.343,0.2982,0.1077,0.00937,-0.02059,True,True,24.16,53.88
+2023-12-06,Fulham vs Nott'm Forest,home,Model_vs_Pinnacle,2.06,2.06,2.1008,0.5643,0.4742,0.1625,0.0,-0.01942,False,True,75.0,79.5
+2023-12-06,Man United vs Chelsea,home,Model_vs_Pinnacle,2.88,2.86,2.9402,0.4242,0.3361,0.2217,0.00699,-0.02047,True,True,58.97,110.86
+2023-12-07,Everton vs Newcastle,home,Model_vs_Pinnacle,3.17,3.28,3.3823,0.3515,0.3046,0.1143,-0.03354,-0.06277,False,True,26.34,57.16
+2023-12-07,Tottenham vs West Ham,home,Model_vs_Pinnacle,1.8,1.67,1.6974,0.5758,0.5441,0.0364,0.07784,0.06045,True,False,22.73,-22.73
+2023-12-09,Wolves vs Nott'm Forest,home,Model_vs_Pinnacle,1.89,1.99,2.0279,0.6095,0.5175,0.1519,-0.05025,-0.068,False,False,75.0,-75.0
+2023-12-09,Aston Villa vs Arsenal,home,Model_vs_Pinnacle,3.43,3.65,3.7771,0.3152,0.28,0.0812,-0.06027,-0.0919,False,True,16.71,40.61
+2023-12-09,Sheffield United vs Brentford,draw,Model_vs_Pinnacle,3.84,3.91,4.0752,0.2831,0.2478,0.0871,-0.0179,-0.05771,False,False,15.33,-15.33
+2023-12-09,Sheffield United vs Brentford,away,Model_vs_Pinnacle,1.81,1.78,1.8114,0.5792,0.5405,0.0484,0.01685,-0.00077,True,False,29.87,-29.87
+2023-12-10,Everton vs Chelsea,home,Model_vs_Pinnacle,3.03,2.55,2.6156,0.4735,0.3191,0.4348,0.18824,0.15843,True,True,75.0,152.25
+2023-12-10,Fulham vs West Ham,home,Model_vs_Pinnacle,2.44,2.19,2.2353,0.5505,0.3984,0.3432,0.11416,0.09158,True,True,75.0,108.0
+2023-12-10,Tottenham vs Newcastle,away,Model_vs_Pinnacle,3.08,3.41,3.5272,0.4366,0.3133,0.3449,-0.09677,-0.12679,False,False,75.0,-75.0
+2023-12-15,Nott'm Forest vs Tottenham,away,Model_vs_Pinnacle,1.76,1.68,1.7063,0.621,0.558,0.093,0.04762,0.03147,True,True,61.17,46.49
+2023-12-16,Burnley vs Everton,home,Model_vs_Pinnacle,3.66,3.28,3.3821,0.2906,0.2622,0.0637,0.11585,0.08217,True,False,11.97,-11.97
+2023-12-17,Arsenal vs Brighton,home,Model_vs_Pinnacle,1.48,1.47,1.4914,0.7485,0.6647,0.1078,0.0068,-0.00764,True,True,75.0,36.0
+2023-12-17,Brentford vs Aston Villa,away,Model_vs_Pinnacle,2.19,2.36,2.412,0.5024,0.4454,0.1001,-0.07203,-0.09204,False,True,42.08,50.08
+2023-12-17,West Ham vs Wolves,home,Model_vs_Pinnacle,2.12,1.9,1.9373,0.4879,0.4605,0.0344,0.11579,0.09431,True,True,15.35,17.19
+2023-12-17,West Ham vs Wolves,away,Model_vs_Pinnacle,3.5,4.34,4.5374,0.3165,0.2745,0.1079,-0.19355,-0.22863,False,False,21.58,-21.58
+2023-12-23,West Ham vs Man United,home,Model_vs_Pinnacle,2.65,2.1,2.1425,0.4158,0.3662,0.1019,0.2619,0.23687,True,True,30.88,50.95
+2023-12-23,Fulham vs Burnley,home,Model_vs_Pinnacle,1.7,1.71,1.739,0.7592,0.5766,0.2907,-0.00585,-0.02243,False,False,75.0,-75.0
+2023-12-23,Nott'm Forest vs Bournemouth,home,Model_vs_Pinnacle,2.74,2.94,3.0199,0.4131,0.3541,0.1319,-0.06803,-0.09269,False,False,37.91,-37.91
+2023-12-23,Nott'm Forest vs Bournemouth,away,Model_vs_Pinnacle,2.61,2.52,2.5786,0.4812,0.3723,0.2558,0.03571,0.01218,True,True,75.0,120.75
+2023-12-23,Tottenham vs Everton,home,Model_vs_Pinnacle,1.8,1.7,1.7298,0.5765,0.544,0.0377,0.05882,0.04058,True,True,23.55,18.84
+2023-12-23,Liverpool vs Arsenal,home,Model_vs_Pinnacle,2.47,2.52,2.5797,0.4624,0.3939,0.1421,-0.01984,-0.04252,False,False,48.32,-48.32
+2023-12-24,Wolves vs Chelsea,home,Model_vs_Pinnacle,3.77,3.34,3.4479,0.2847,0.254,0.0734,0.12874,0.09342,True,True,13.25,36.7
+2023-12-24,Wolves vs Chelsea,draw,Model_vs_Pinnacle,3.76,3.65,3.7768,0.2872,0.2547,0.08,0.03014,-0.00445,True,False,14.5,-14.5
+2023-12-26,Man United vs Aston Villa,away,Model_vs_Pinnacle,2.61,2.98,3.0614,0.4299,0.3722,0.1221,-0.12416,-0.14745,False,False,37.92,-37.92
+2023-12-26,Bournemouth vs Fulham,home,Model_vs_Pinnacle,2.22,1.92,1.9561,0.6174,0.4391,0.3706,0.15625,0.13491,True,True,75.0,91.5
+2023-12-26,Sheffield United vs Luton,away,Model_vs_Pinnacle,3.07,3.15,3.2451,0.4092,0.3146,0.2564,-0.0254,-0.05396,False,True,61.93,128.2
+2023-12-27,Brentford vs Wolves,home,Model_vs_Pinnacle,1.94,2.25,2.2993,0.5809,0.5041,0.127,-0.13778,-0.15626,False,False,67.56,-67.56
+2023-12-27,Chelsea vs Crystal Palace,home,Model_vs_Pinnacle,1.72,1.81,1.8431,0.6422,0.5697,0.1046,-0.04972,-0.06679,False,True,72.62,52.29
+2023-12-28,Brighton vs Tottenham,away,Model_vs_Pinnacle,2.56,2.71,2.78,0.4983,0.3794,0.2756,-0.05535,-0.07914,False,False,75.0,-75.0
+2023-12-30,Wolves vs Everton,home,Model_vs_Pinnacle,2.67,2.97,3.0564,0.4304,0.3635,0.1493,-0.10101,-0.12642,False,True,44.7,74.65
+2023-12-30,Crystal Palace vs Brentford,home,Model_vs_Pinnacle,2.22,2.15,2.1942,0.5076,0.4395,0.1269,0.03256,0.01176,True,True,51.99,63.43
+2024-01-01,Liverpool vs Newcastle,home,Model_vs_Pinnacle,1.45,1.38,1.3966,0.7359,0.6773,0.0671,0.05072,0.03824,True,True,74.58,33.56
+2024-01-02,West Ham vs Brighton,home,Model_vs_Pinnacle,2.52,3.19,3.2888,0.4201,0.3855,0.0587,-0.21003,-0.23376,False,False,19.32,-19.32
+2024-01-12,Burnley vs Luton,home,Model_vs_Pinnacle,2.06,2.18,2.22,0.5212,0.4761,0.0737,-0.05505,-0.07207,False,False,34.74,-34.74
+2024-01-12,Burnley vs Luton,away,Model_vs_Pinnacle,3.8,3.6,3.7092,0.3011,0.2539,0.1443,0.05556,0.02448,True,False,25.77,-25.77
+2024-01-13,Chelsea vs Fulham,home,Model_vs_Pinnacle,1.65,1.67,1.6959,0.6281,0.5939,0.0364,-0.01198,-0.02707,False,True,28.03,18.22
+2024-01-14,Everton vs Aston Villa,home,Model_vs_Pinnacle,2.81,2.55,2.612,0.4333,0.3445,0.2176,0.10196,0.0758,True,False,60.11,-60.11
+2024-01-14,Man United vs Tottenham,away,Model_vs_Pinnacle,3.01,3.59,3.7252,0.4748,0.3204,0.4293,-0.16156,-0.19199,False,False,75.0,-75.0
+2024-01-21,Sheffield United vs West Ham,away,Model_vs_Pinnacle,2.2,2.67,2.7379,0.4704,0.4436,0.0348,-0.17603,-0.19646,False,False,14.52,-14.52
+2024-01-22,Brighton vs Wolves,home,Model_vs_Pinnacle,1.66,1.67,1.6957,0.6653,0.591,0.1043,-0.00599,-0.02105,False,False,75.0,-75.0
+2024-01-30,Fulham vs Everton,away,Model_vs_Pinnacle,3.08,3.64,3.7707,0.3759,0.3139,0.1579,-0.15385,-0.18318,False,False,37.95,-37.95
+2024-01-30,Crystal Palace vs Sheffield United,home,Model_vs_Pinnacle,1.64,1.61,1.6368,0.6496,0.5981,0.0653,0.01863,0.00196,True,True,51.01,32.65
+2024-01-30,Aston Villa vs Newcastle,home,Model_vs_Pinnacle,1.85,1.86,1.8936,0.6365,0.5287,0.1775,-0.00538,-0.02302,False,False,75.0,-75.0
+2024-01-31,Tottenham vs Brentford,home,Model_vs_Pinnacle,1.69,1.62,1.6451,0.7192,0.5802,0.2154,0.04321,0.02729,True,True,75.0,51.75
+2024-02-01,West Ham vs Bournemouth,home,Model_vs_Pinnacle,2.45,2.51,2.5684,0.4758,0.3964,0.1656,-0.0239,-0.0461,False,False,57.1,-57.1
+2024-02-01,Wolves vs Man United,draw,Model_vs_Pinnacle,3.51,3.46,3.5726,0.3451,0.2738,0.2115,0.01445,-0.01752,True,False,42.12,-42.12
+2024-02-03,Everton vs Tottenham,away,Model_vs_Pinnacle,2.34,2.28,2.331,0.4852,0.416,0.1353,0.02632,0.00386,True,False,50.48,-50.48
+2024-02-03,Brighton vs Crystal Palace,home,Model_vs_Pinnacle,1.71,1.74,1.7678,0.6251,0.5724,0.0689,-0.01724,-0.0327,False,True,48.51,34.44
+2024-02-03,Burnley vs Fulham,home,Model_vs_Pinnacle,2.98,2.97,3.0539,0.3833,0.3245,0.1421,0.00337,-0.0242,True,False,35.89,-35.89
+2024-02-03,Burnley vs Fulham,draw,Model_vs_Pinnacle,3.5,3.28,3.3813,0.3102,0.275,0.0857,0.06707,0.0351,True,True,17.14,42.85
+2024-02-04,Arsenal vs Liverpool,away,Model_vs_Pinnacle,3.15,3.26,3.3634,0.4636,0.3064,0.4605,-0.03374,-0.06345,False,False,75.0,-75.0
+2024-02-04,Bournemouth vs Nott'm Forest,home,Model_vs_Pinnacle,1.71,1.66,1.6877,0.654,0.573,0.1183,0.03012,0.01321,True,False,75.0,-75.0
+2024-02-10,Fulham vs Bournemouth,home,Model_vs_Pinnacle,2.46,2.64,2.7045,0.4716,0.3955,0.1601,-0.06818,-0.0904,False,True,54.82,80.04
+2024-02-10,Tottenham vs Brighton,home,Model_vs_Pinnacle,1.81,1.72,1.7503,0.6129,0.5402,0.1093,0.05233,0.03411,True,True,67.47,54.65
+2024-02-10,Wolves vs Brentford,home,Model_vs_Pinnacle,2.14,2.27,2.3193,0.4839,0.456,0.0355,-0.05727,-0.07731,False,False,15.55,-15.55
+2024-02-10,Nott'm Forest vs Newcastle,home,Model_vs_Pinnacle,3.29,3.32,3.4276,0.5013,0.2925,0.6492,-0.00904,-0.04014,False,False,75.0,-75.0
+2024-02-11,Aston Villa vs Man United,home,Model_vs_Pinnacle,2.16,2.18,2.225,0.6214,0.4518,0.3421,-0.00917,-0.02921,False,False,75.0,-75.0
+2024-02-17,Man City vs Chelsea,home,Model_vs_Pinnacle,1.34,1.31,1.3245,0.8263,0.7344,0.1073,0.0229,0.0117,True,False,75.0,-75.0
+2024-02-17,Tottenham vs Wolves,home,Model_vs_Pinnacle,1.55,1.51,1.5337,0.6963,0.6336,0.0792,0.02649,0.01063,True,False,72.02,-72.02
+2024-02-17,Newcastle vs Bournemouth,away,Model_vs_Pinnacle,3.84,3.64,3.7722,0.3172,0.2481,0.2181,0.05495,0.01797,True,False,38.4,-38.4
+2024-02-17,Nott'm Forest vs West Ham,home,Model_vs_Pinnacle,2.47,2.29,2.34,0.4527,0.3937,0.1182,0.0786,0.05556,True,True,40.19,59.08
+2024-02-17,Fulham vs Aston Villa,home,Model_vs_Pinnacle,2.97,3.1,3.1956,0.4065,0.3253,0.2074,-0.04194,-0.0706,False,False,52.63,-52.63
+2024-02-19,Everton vs Crystal Palace,home,Model_vs_Pinnacle,1.72,1.83,1.8645,0.6193,0.5699,0.0653,-0.06011,-0.0775,False,False,45.33,-45.33
+2024-02-24,Man United vs Fulham,home,Model_vs_Pinnacle,1.61,1.65,1.678,0.6645,0.6096,0.0698,-0.02424,-0.04052,False,False,57.25,-57.25
+2024-02-24,Crystal Palace vs Burnley,home,Model_vs_Pinnacle,2.03,1.98,2.0194,0.5796,0.4814,0.1767,0.02525,0.00525,True,True,75.0,77.25
+2024-02-24,Crystal Palace vs Burnley,away,Model_vs_Pinnacle,3.98,4.13,4.3024,0.2667,0.2402,0.0616,-0.03632,-0.07493,False,False,10.33,-10.33
+2024-02-26,West Ham vs Brentford,away,Model_vs_Pinnacle,2.68,3.12,3.2126,0.4952,0.3616,0.3273,-0.14103,-0.16578,False,False,75.0,-75.0
+2024-03-02,Newcastle vs Wolves,home,Model_vs_Pinnacle,1.89,1.73,1.7596,0.625,0.5174,0.1812,0.09249,0.07411,True,True,75.0,66.75
+2024-03-02,Everton vs West Ham,home,Model_vs_Pinnacle,2.1,2.17,2.2155,0.5005,0.4653,0.051,-0.03226,-0.05213,False,False,23.19,-23.19
+2024-03-02,Brentford vs Chelsea,home,Model_vs_Pinnacle,3.04,3.28,3.3802,0.3541,0.3171,0.0764,-0.07317,-0.10064,False,False,18.73,-18.73
+2024-03-02,Fulham vs Brighton,home,Model_vs_Pinnacle,2.6,2.62,2.6869,0.4271,0.3733,0.1106,-0.00763,-0.03234,False,True,34.55,55.28
+2024-03-03,Burnley vs Bournemouth,away,Model_vs_Pinnacle,1.96,1.99,2.0286,0.6037,0.4986,0.1833,-0.01508,-0.03382,False,True,75.0,72.0
+2024-03-09,Bournemouth vs Sheffield United,home,Model_vs_Pinnacle,1.35,1.34,1.3593,0.793,0.7295,0.0705,0.00746,-0.00684,True,False,75.0,-75.0
+2024-03-09,Crystal Palace vs Luton,home,Model_vs_Pinnacle,1.77,1.92,1.9566,0.7171,0.5531,0.2692,-0.07812,-0.09537,False,False,75.0,-75.0
+2024-03-09,Wolves vs Fulham,away,Model_vs_Pinnacle,2.88,2.89,2.9688,0.4273,0.3361,0.2307,-0.00346,-0.02991,False,False,61.36,-61.36
+2024-03-10,Aston Villa vs Tottenham,home,Model_vs_Pinnacle,2.47,2.55,2.6113,0.5763,0.3935,0.4234,-0.03137,-0.05411,False,False,75.0,-75.0
+2024-03-10,Brighton vs Nott'm Forest,home,Model_vs_Pinnacle,1.81,1.63,1.6558,0.5815,0.5405,0.0526,0.11043,0.09313,True,True,32.45,26.28
+2024-03-10,Liverpool vs Man City,home,Model_vs_Pinnacle,3.02,3.48,3.6038,0.3876,0.32,0.1706,-0.13218,-0.162,False,False,42.22,-42.22
+2024-03-10,Liverpool vs Man City,draw,Model_vs_Pinnacle,3.8,3.9,4.0517,0.2721,0.2525,0.0341,-0.02564,-0.06212,False,True,6.08,17.02
+2024-03-11,Chelsea vs Newcastle,home,Model_vs_Pinnacle,1.96,1.85,1.8824,0.6915,0.4988,0.3553,0.05946,0.04122,True,True,75.0,72.0
+2024-03-16,Burnley vs Brentford,home,Model_vs_Pinnacle,3.23,3.18,3.2748,0.3488,0.2985,0.1266,0.01572,-0.01368,True,True,28.39,63.31
+2024-03-16,Luton vs Nott'm Forest,home,Model_vs_Pinnacle,2.83,2.67,2.7381,0.4044,0.3418,0.1444,0.05993,0.03356,True,False,39.45,-39.45
+2024-03-16,Fulham vs Tottenham,home,Model_vs_Pinnacle,3.42,3.45,3.5655,0.3345,0.2807,0.1441,-0.0087,-0.04081,False,True,29.78,72.07
+2024-03-17,West Ham vs Aston Villa,home,Model_vs_Pinnacle,2.66,2.48,2.5386,0.4843,0.3642,0.2881,0.07258,0.04782,True,False,75.0,-75.0
+2024-03-30,Newcastle vs West Ham,home,Model_vs_Pinnacle,1.81,1.85,1.8863,0.6226,0.5403,0.1269,-0.02162,-0.04045,False,True,75.0,60.75
+2024-03-30,Bournemouth vs Everton,home,Model_vs_Pinnacle,2.24,2.18,2.2367,0.4841,0.4353,0.0843,0.02752,0.00148,True,True,34.01,42.17
+2024-03-30,Nott'm Forest vs Crystal Palace,home,Model_vs_Pinnacle,2.29,2.25,2.3023,0.529,0.426,0.2114,0.01778,-0.00534,True,False,75.0,-75.0
+2024-03-30,Sheffield United vs Fulham,away,Model_vs_Pinnacle,1.73,1.71,1.7402,0.6097,0.5665,0.0548,0.0117,-0.00586,True,False,37.57,-37.57
+2024-03-30,Aston Villa vs Wolves,home,Model_vs_Pinnacle,1.64,1.53,1.5527,0.6362,0.5976,0.0434,0.0719,0.05622,True,True,33.92,21.71
+2024-03-30,Brentford vs Man United,home,Model_vs_Pinnacle,3.09,3.39,3.4979,0.3397,0.3124,0.0496,-0.0885,-0.11661,False,False,11.87,-11.87
+2024-03-31,Man City vs Arsenal,away,Model_vs_Pinnacle,3.94,3.72,3.8388,0.4027,0.2425,0.5865,0.05914,0.02636,True,False,75.0,-75.0
+2024-04-02,West Ham vs Tottenham,home,Model_vs_Pinnacle,3.38,3.47,3.5783,0.3953,0.2858,0.336,-0.02594,-0.05542,False,False,70.58,-70.58
+2024-04-02,Burnley vs Wolves,home,Model_vs_Pinnacle,2.55,2.36,2.4193,0.4643,0.3827,0.1839,0.08051,0.05402,True,False,59.32,-59.32
+2024-04-02,Bournemouth vs Crystal Palace,home,Model_vs_Pinnacle,2.02,1.89,1.9232,0.513,0.4853,0.0363,0.06878,0.05033,True,True,17.81,18.17
+2024-04-02,Nott'm Forest vs Fulham,away,Model_vs_Pinnacle,2.61,2.66,2.7291,0.504,0.3738,0.3155,-0.0188,-0.04364,False,False,75.0,-75.0
+2024-04-02,Newcastle vs Everton,home,Model_vs_Pinnacle,2.03,2.03,2.0663,0.5294,0.4833,0.0746,0.0,-0.01757,False,False,36.22,-36.22
+2024-04-03,Brentford vs Brighton,away,Model_vs_Pinnacle,2.86,2.75,2.824,0.3905,0.3382,0.1168,0.04,0.01275,True,False,31.39,-31.39
+2024-04-04,Chelsea vs Man United,home,Model_vs_Pinnacle,2.03,1.82,1.8503,0.5601,0.4816,0.1371,0.11538,0.09712,True,True,66.53,68.53
+2024-04-06,Everton vs Burnley,home,Model_vs_Pinnacle,1.68,1.76,1.7929,0.6754,0.584,0.1346,-0.04545,-0.06297,False,True,75.0,51.0
+2024-04-06,Fulham vs Newcastle,home,Model_vs_Pinnacle,2.35,2.47,2.5301,0.5114,0.4142,0.2019,-0.04858,-0.07118,False,False,74.77,-74.77
+2024-04-06,Luton vs Bournemouth,away,Model_vs_Pinnacle,1.93,1.92,1.9551,0.5875,0.5064,0.1338,0.00521,-0.01284,True,False,71.96,-71.96
+2024-04-06,Wolves vs West Ham,home,Model_vs_Pinnacle,2.53,2.91,2.9924,0.4703,0.384,0.1899,-0.13058,-0.15452,False,False,62.06,-62.06
+2024-04-06,Brighton vs Arsenal,away,Model_vs_Pinnacle,1.65,1.51,1.5333,0.6586,0.5948,0.0867,0.09272,0.07611,True,True,66.71,43.36
+2024-04-13,Newcastle vs Tottenham,home,Model_vs_Pinnacle,2.8,2.65,2.7101,0.3985,0.3458,0.1158,0.0566,0.03317,True,True,32.16,57.89
+2024-04-13,Brentford vs Sheffield United,home,Model_vs_Pinnacle,1.43,1.49,1.5108,0.7293,0.6871,0.0428,-0.04027,-0.05348,False,True,49.81,21.42
+2024-04-13,Burnley vs Brighton,draw,Model_vs_Pinnacle,3.8,4.06,4.233,0.4351,0.2521,0.6534,-0.06404,-0.10229,False,True,75.0,210.0
+2024-04-13,Nott'm Forest vs Wolves,draw,Model_vs_Pinnacle,3.57,3.52,3.6481,0.3118,0.2691,0.1131,0.0142,-0.02141,True,True,22.01,56.57
+2024-04-13,Bournemouth vs Man United,home,Model_vs_Pinnacle,2.42,2.38,2.4372,0.4969,0.4022,0.2026,0.01681,-0.00706,True,False,71.34,-71.34
+2024-04-14,West Ham vs Fulham,home,Model_vs_Pinnacle,2.4,2.44,2.4967,0.5032,0.4054,0.2077,-0.01639,-0.03873,False,False,74.19,-74.19
+2024-04-15,Chelsea vs Everton,home,Model_vs_Pinnacle,1.73,1.67,1.6975,0.6304,0.566,0.0907,0.03593,0.01915,True,True,62.1,45.33
+2024-04-20,Luton vs Brentford,away,Model_vs_Pinnacle,2.16,2.48,2.5397,0.494,0.4517,0.067,-0.12903,-0.14951,False,True,28.89,33.51
+2024-04-20,Sheffield United vs Burnley,home,Model_vs_Pinnacle,2.77,2.66,2.7285,0.3845,0.35,0.065,0.04135,0.01521,True,False,18.36,-18.36
+2024-04-21,Aston Villa vs Bournemouth,away,Model_vs_Pinnacle,3.83,4.03,4.1785,0.3641,0.249,0.3945,-0.04963,-0.0834,False,False,69.69,-69.69
+2024-04-21,Crystal Palace vs West Ham,home,Model_vs_Pinnacle,2.12,2.23,2.2772,0.5354,0.4601,0.1351,-0.04933,-0.06903,False,True,60.33,67.57
+2024-04-21,Everton vs Nott'm Forest,away,Model_vs_Pinnacle,3.78,3.36,3.4682,0.4229,0.2533,0.5985,0.125,0.0899,True,False,75.0,-75.0
+2024-04-24,Crystal Palace vs Newcastle,home,Model_vs_Pinnacle,2.76,3.09,3.1813,0.4032,0.3507,0.1128,-0.1068,-0.13243,False,True,32.04,56.39
+2024-04-24,Wolves vs Bournemouth,home,Model_vs_Pinnacle,2.74,2.81,2.8878,0.4333,0.3539,0.1873,-0.02491,-0.05118,False,False,53.81,-53.81
+2024-04-27,Fulham vs Crystal Palace,away,Model_vs_Pinnacle,3.43,3.78,3.9183,0.4251,0.28,0.4582,-0.09259,-0.12462,False,False,75.0,-75.0
+2024-04-27,Wolves vs Luton,home,Model_vs_Pinnacle,1.98,1.93,1.9682,0.5351,0.4933,0.0594,0.02591,0.006,True,True,30.31,29.7
+2024-04-27,Everton vs Brentford,away,Model_vs_Pinnacle,3.09,2.48,2.5377,0.4157,0.3124,0.2845,0.24597,0.21764,True,False,68.07,-68.07
+2024-04-27,Aston Villa vs Chelsea,home,Model_vs_Pinnacle,2.14,2.05,2.0849,0.5398,0.4558,0.1552,0.0439,0.02643,True,False,68.09,-68.09
+2024-04-28,Bournemouth vs Brighton,draw,Model_vs_Pinnacle,3.85,4.17,4.3487,0.3492,0.2485,0.3442,-0.07674,-0.11468,False,False,60.39,-60.39
+2024-04-28,Tottenham vs Arsenal,away,Model_vs_Pinnacle,1.81,1.78,1.8107,0.6263,0.5405,0.1336,0.01685,-0.00039,True,True,75.0,60.75
+2024-05-02,Chelsea vs Tottenham,home,Model_vs_Pinnacle,2.22,2.46,2.5172,0.4852,0.439,0.0771,-0.09756,-0.11807,False,True,31.59,38.54
+2024-05-03,Luton vs Everton,away,Model_vs_Pinnacle,2.63,2.52,2.5788,0.5034,0.369,0.324,0.04365,0.01985,True,False,75.0,-75.0
+2024-05-04,Sheffield United vs Nott'm Forest,away,Model_vs_Pinnacle,1.71,1.67,1.6972,0.62,0.5733,0.0602,0.02395,0.00754,True,True,42.39,30.1
+2024-05-04,Brentford vs Fulham,draw,Model_vs_Pinnacle,3.85,3.8,3.939,0.2972,0.2483,0.1441,0.01316,-0.02259,True,True,25.28,72.05
+2024-05-05,Brighton vs Aston Villa,away,Model_vs_Pinnacle,2.48,2.84,2.9153,0.5174,0.3921,0.2833,-0.12676,-0.14932,False,False,75.0,-75.0
+2024-05-05,Chelsea vs West Ham,home,Model_vs_Pinnacle,1.66,1.5,1.5212,0.6566,0.5907,0.09,0.10667,0.09124,True,True,68.16,44.99
+2024-05-06,Crystal Palace vs Man United,home,Model_vs_Pinnacle,2.39,1.99,2.0296,0.4684,0.4068,0.1195,0.20101,0.17757,True,True,43.0,59.77
+2024-05-11,Everton vs Sheffield United,home,Model_vs_Pinnacle,1.4,1.44,1.4617,0.7652,0.7033,0.0713,-0.02778,-0.04221,False,True,75.0,30.0
+2024-05-11,Bournemouth vs Brentford,away,Model_vs_Pinnacle,3.57,3.25,3.3549,0.3448,0.2679,0.2311,0.09846,0.06412,True,True,44.96,115.55
+2024-05-11,West Ham vs Luton,home,Model_vs_Pinnacle,1.82,1.88,1.9172,0.6329,0.5381,0.1519,-0.03191,-0.0507,False,True,75.0,61.5
+2024-05-11,Wolves vs Crystal Palace,away,Model_vs_Pinnacle,2.49,2.22,2.2673,0.5661,0.3905,0.4096,0.12162,0.09822,True,True,75.0,111.75
+2024-05-11,Nott'm Forest vs Chelsea,away,Model_vs_Pinnacle,2.04,1.88,1.9164,0.5787,0.4784,0.1805,0.08511,0.0645,True,True,75.0,78.0
+2024-05-14,Tottenham vs Man City,away,Model_vs_Pinnacle,1.36,1.38,1.3991,0.7978,0.7254,0.085,-0.01449,-0.02795,False,True,75.0,27.0
+2024-05-15,Man United vs Newcastle,away,Model_vs_Pinnacle,2.36,2.47,2.5283,0.5246,0.4125,0.238,-0.04453,-0.06657,False,False,75.0,-75.0
+2024-05-15,Brighton vs Chelsea,away,Model_vs_Pinnacle,2.04,2.09,2.1317,0.5271,0.4787,0.0752,-0.02392,-0.04302,False,True,36.16,37.61
+2024-05-19,Brentford vs Newcastle,home,Model_vs_Pinnacle,2.97,2.99,3.0774,0.3693,0.3233,0.0969,-0.00669,-0.0349,False,False,24.6,-24.6
+2024-05-19,Brentford vs Newcastle,draw,Model_vs_Pinnacle,4.0,4.05,4.2018,0.2758,0.2374,0.1034,-0.01235,-0.04803,False,False,17.23,-17.23
+2024-05-19,Brighton vs Man United,home,Model_vs_Pinnacle,2.18,2.66,2.7276,0.4819,0.4457,0.0505,-0.18045,-0.20076,False,False,21.4,-21.4
+2024-05-19,Burnley vs Nott'm Forest,home,Model_vs_Pinnacle,2.92,2.85,2.9437,0.3787,0.3291,0.1058,0.02456,-0.00805,True,False,27.56,-27.56
+2024-05-19,Chelsea vs Bournemouth,home,Model_vs_Pinnacle,1.45,1.4,1.4187,0.7505,0.6765,0.0882,0.03571,0.02206,True,True,75.0,33.75
+2024-05-19,Crystal Palace vs Aston Villa,home,Model_vs_Pinnacle,1.83,1.63,1.6553,0.5935,0.5325,0.0862,0.1227,0.10554,True,True,51.91,43.09
+2024-05-19,Luton vs Fulham,away,Model_vs_Pinnacle,2.26,2.19,2.2374,0.4953,0.4294,0.1193,0.03196,0.0101,True,True,47.34,59.65
