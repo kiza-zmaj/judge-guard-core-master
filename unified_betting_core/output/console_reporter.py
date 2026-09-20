@@ -279,3 +279,31 @@ class ConsoleReporter:
         for r in reasons:
             print(f"   • {r}")
         print("=" * 90 + "\n")
+
+    @staticmethod
+    def print_mozzart_tickets_summary(tickets: list[dict[str, Any]]):
+        """
+        Renders the compiled quantitative Mozzart betting tickets in a formatted console table.
+        """
+        if not tickets:
+            return
+
+        print("\n" + "=" * 120)
+        print("   🎟️ MOZZART KVANTITATIVNI TIKETI — GENERISANI KROZ UNIFIED BETTING CORE")
+        print("=" * 120)
+        header = f"{'#':<3} | {'Naziv Tiketa':<32} | {'Parova':<7} | {'Kvota':<8} | {'P(prolaz)':<10} | {'Ulog':<8} | {'Dobitak':<10}"
+        print(header)
+        print("-" * 120)
+        for t in tickets:
+            idx = t.get("ticket_id", "-")
+            name = t.get("title", "")[:32]
+            n_legs = len(t.get("legs", []))
+            total_odds = f"{t.get('total_odds', 0.0):.2f}"
+            joint_prob = f"{t.get('joint_prob_pct', 0.0):.1f}%"
+            stake = f"€{t.get('stake_eur', 0.0):.2f}"
+            payout = f"€{t.get('potential_payout_eur', 0.0):.2f}"
+            print(
+                f"{idx:<3} | {name:<32} | {n_legs:<7} | {total_odds:<8} | {joint_prob:<10} | {stake:<8} | {payout:<10}"
+            )
+        print("=" * 120 + "\n")
+

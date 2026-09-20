@@ -126,3 +126,110 @@ class DataPipeline:
         """
         fixtures = self.odds_fetcher.fetch_upcoming_pre_match()
         return self.get_unified_dataset(fixtures=fixtures)
+
+    def get_mozzart_dataset(
+        self,
+        mecevi_csv: str = "/home/kizamladjanijebac/Downloads/mozzart_fudbal_mecevi_2026-09-20.csv",
+        marketi_csv: str | None = "/home/kizamladjanijebac/Downloads/mozzart_fudbal_marketi_2026-09-20 (copy).csv",
+    ) -> pd.DataFrame:
+        """
+        Loads real Mozzart football matches and detailed markets from local CSV exports.
+        Estimates league-calibrated xG for Poisson modeling and attaches derivative markets.
+        """
+        import os
+
+        if not os.path.exists(mecevi_csv):
+            raise FileNotFoundError(f"Mozzart mečevi CSV not found at {mecevi_csv}")
+
+        mecevi_df = pd.read_csv(mecevi_csv)
+
+        # Parse markets if present
+        markets_by_match: dict[int, list[dict[str, Any]]] = {}
+        if marketi_csv and os.path.exists(marketi_csv):
+            marketi_df = pd.read_csv(marketi_csv)
+            for _, mrow in marketi_df.iterrows():
+                mid = int(mrow["match_id"])
+                if mid not in markets_by_match:
+                    markets_by_match[mid] = []
+                markets_by_match[mid].append(
+                    {
+                        "trziste": str(mrow.get("trziste", "")),
+                        "ishod": str(mrow.get("ishod", "")),
+                        "kvota": float(mrow.get("kvota", 1.0)),
+                        "redosled": int(mrow.get("redosled", 0)),
+                    }
+                )
+
+        LEAGUE_GOALS = {
+            "Argentina 1 - Klausura": 2.15,
+            "Argentina 2": 1.95,
+            "Argentina 4": 2.10,
+            "Azijske igre": 2.80,
+            "Bolivija Liga Kup": 3.10,
+            "Brazil 1": 2.40,
+            "Brazil 2": 2.05,
+            "Bugarska 2": 2.45,
+            "Danska 2": 2.95,
+            "Dominikanska Republika 1": 2.65,
+            "Ekvador 1": 2.60,
+            "El Salvador 1 - Apertura": 2.50,
+            "Engleska 7 - Central": 3.00,
+            "Engleska M21": 3.65,
+            "Engleska razvojna liga": 3.50,
+            "Gruzija 1": 2.50,
+            "Gvatemala 1 - Apertura": 2.35,
+            "Honduras 1 - Apertura": 2.60,
+            "Italija 3 A": 2.20,
+            "Italija 3 B": 2.15,
+            "Kolumbija 1 - Klausura": 2.25,
+            "Kolumbija 2 - Klausura": 2.20,
+        }
+
+        rows = []
+        for _, row in mecevi_df.iterrows():
+            mid = int(row["match_id"])
+            league = str(row.get("takmicenje", "Fudbal"))
+            h_raw = str(row.get("domacin", ""))
+            a_raw = str(row.get("gost", ""))
+            h_odds = float(row.get("1", 2.0))
+            x_odds = float(row.get("X", 3.2))
+            a_odds = float(row.get("2", 3.5))
+
+            # Expected goals estimation based on league prior and odds ratio
+            tot_goals = LEAGUE_GOALS.get(league, 2.50)
+            inv_h = 1.0 / max(h_odds, 1.01)
+            inv_a = 1.0 / max(a_odds, 1.01)
+            p_tot = inv_h + inv_a
+            ratio_h = inv_h / p_tot if p_tot > 0 else 0.55
+
+            # Incorporate home advantage (+0.25 goal baseline)
+            h_xg = round(max(0.3, min(3.8, tot_goals * ratio_h * 1.12)), 2)
+            a_xg = round(max(0.2, min(3.5, tot_goals * (1.0 - ratio_h) * 0.88)), 2)
+
+            rows.append(
+                {
+                    "id": mid,
+                    "date": f"{row.get('dan_label', '')} {row.get('vreme', '')}".strip(),
+                    "league": league,
+                    "home_team": normalize_name(h_raw),
+                    "away_team": normalize_name(a_raw),
+                    "home_team_raw": h_raw,
+                    "away_team_raw": a_raw,
+                    "home_odds": h_odds,
+                    "draw_odds": x_odds,
+                    "away_odds": a_odds,
+                    "bookmaker": "Mozzart",
+                    "home_xg": h_xg,
+                    "away_xg": a_xg,
+                    "is_live": False,
+                    "current_score": {},
+                    "elapsed_minutes": 0.0,
+                    "markets": markets_by_match.get(mid, []),
+                    "match_id": mid,
+                    "favorit": row.get("favorit", ""),
+                    "favorit_kvota": float(row.get("favorit_kvota", h_odds)),
+                    "trziste_marza": float(row.get("trziste_marza", 0.07)),
+                }
+            )
+
+        return pd.DataFrame(rows)
