@@ -1,225 +1,115 @@
-[{"stream_name":"stdout","time":12.125090375,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":12.125159554,"data":"🚀⚡ KAGGLE S6E9: TOP-10 TRIPLE-TE \u0026 RECIPE BASE MARGIN PIPELINE\n"}
-,{"stream_name":"stdout","time":12.125165293,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":16.286017269,"data":"🔧 Device Configuration: CUDA=True | XGBoost Device='cuda' | CatBoost Task='GPU'\n"}
-,{"stream_name":"stdout","time":16.286062574,"data":"📂 Available files in /kaggle/input:\n"}
-,{"stream_name":"stdout","time":16.286954957,"data":"   /kaggle/input/competitions/playground-series-s6e9/sample_submission.csv\n"}
-,{"stream_name":"stdout","time":16.286977645,"data":"   /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
-,{"stream_name":"stdout","time":16.286980835,"data":"   /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
-,{"stream_name":"stdout","time":16.290622345,"data":"   /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
-,{"stream_name":"stdout","time":16.290667971,"data":"🔍 Searching for 'train.csv' in /kaggle/input...\n"}
-,{"stream_name":"stdout","time":16.291527972,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
-,{"stream_name":"stdout","time":16.291549159,"data":"🔍 Searching for 'test.csv' in /kaggle/input...\n"}
-,{"stream_name":"stdout","time":16.292260635,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
-,{"stream_name":"stdout","time":16.292274859,"data":"🔍 Searching for 'sample_submission.csv' in /kaggle/input...\n"}
-,{"stream_name":"stdout","time":16.293001112,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/sample_submission.csv\n"}
-,{"stream_name":"stdout","time":16.293022857,"data":"🔍 Searching for 'EV_Adoption_and_Range_Anxiety_Dataset.csv' in /kaggle/input...\n"}
-,{"stream_name":"stdout","time":16.294307028,"data":"  -\u003e Found: /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
-,{"stream_name":"stdout","time":16.294322482,"data":"📊 Loading Train: /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
-,{"stream_name":"stdout","time":17.487885545,"data":"📊 Loading Test: /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
-,{"stream_name":"stdout","time":18.009421751,"data":"📊 Loading Original Dataset: /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
-,{"stream_name":"stdout","time":18.462518621,"data":"\n"}
-,{"stream_name":"stdout","time":18.462573661,"data":"🌟 Chris Deotte Recipe Prior Alone Train ROC-AUC: 0.93769\n"}
-,{"stream_name":"stdout","time":18.462582715,"data":"\n"}
-,{"stream_name":"stdout","time":18.462588783,"data":"🛠️ Constructing Feature Space (Digits, Domain Interactions, Smooth Keys)...\n"}
-,{"stream_name":"stdout","time":73.573600618,"data":"✂️ Dropping 62 redundant/constant features.\n"}
-,{"stream_name":"stdout","time":74.592493975,"data":"✅ Total Base Features: 120\n"}
-,{"stream_name":"stdout","time":74.592534014,"data":"✅ Columns to Target Encode: 45\n"}
-,{"stream_name":"stdout","time":74.59254024,"data":"\n"}
-,{"stream_name":"stdout","time":74.592545009,"data":"🔄 Running 5-Fold Stratified Split and Triple Target Encoding...\n"}
-,{"stream_name":"stdout","time":77.810687699,"data":"  -\u003e Processing Fold 1/5 Triple TE...\n"}
-,{"stream_name":"stdout","time":161.971775202,"data":"  -\u003e Processing Fold 2/5 Triple TE...\n"}
-,{"stream_name":"stdout","time":247.244002225,"data":"  -\u003e Processing Fold 3/5 Triple TE...\n"}
-,{"stream_name":"stdout","time":332.610879018,"data":"  -\u003e Processing Fold 4/5 Triple TE...\n"}
-,{"stream_name":"stdout","time":417.364197447,"data":"  -\u003e Processing Fold 5/5 Triple TE...\n"}
-,{"stream_name":"stdout","time":502.349907012,"data":"✅ Prepared all 5 folds. Final feature count per fold: 125\n"}
-,{"stream_name":"stdout","time":502.349968203,"data":"\n"}
-,{"stream_name":"stdout","time":502.34997686,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":502.349983703,"data":"🌲 [MODEL 1 / SUB 6] Lossguide XGBoost (Najiama Architecture, Target ~0.94639)\n"}
-,{"stream_name":"stdout","time":502.349990748,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":507.019721165,"data":"[0]\tvalidation_0-auc:0.93606\n"}
-,{"stream_name":"stdout","time":513.755882856,"data":"[500]\tvalidation_0-auc:0.94386\n"}
-,{"stream_name":"stdout","time":519.266364924,"data":"[1000]\tvalidation_0-auc:0.94470\n"}
-,{"stream_name":"stdout","time":524.622412692,"data":"[1500]\tvalidation_0-auc:0.94496\n"}
-,{"stream_name":"stdout","time":529.93789638,"data":"[2000]\tvalidation_0-auc:0.94505\n"}
-,{"stream_name":"stdout","time":535.177989815,"data":"[2500]\tvalidation_0-auc:0.94509\n"}
-,{"stream_name":"stdout","time":540.424529254,"data":"[3000]\tvalidation_0-auc:0.94511\n"}
-,{"stream_name":"stdout","time":545.415831076,"data":"[3500]\tvalidation_0-auc:0.94511\n"}
-,{"stream_name":"stdout","time":548.67908002,"data":"[3837]\tvalidation_0-auc:0.94511\n"}
-,{"stream_name":"stdout","time":552.324272786,"data":"  -\u003e Model 1 Fold 1 ROC-AUC: 0.94511 (Best Iter: 3437)\n"}
-,{"stream_name":"stdout","time":556.508013806,"data":"[0]\tvalidation_0-auc:0.93117\n"}
-,{"stream_name":"stdout","time":563.520957818,"data":"[500]\tvalidation_0-auc:0.94464\n"}
-,{"stream_name":"stdout","time":569.283856179,"data":"[1000]\tvalidation_0-auc:0.94534\n"}
-,{"stream_name":"stdout","time":574.869341992,"data":"[1500]\tvalidation_0-auc:0.94559\n"}
-,{"stream_name":"stdout","time":580.447917769,"data":"[2000]\tvalidation_0-auc:0.94567\n"}
-,{"stream_name":"stdout","time":585.947986474,"data":"[2500]\tvalidation_0-auc:0.94570\n"}
-,{"stream_name":"stdout","time":591.328739839,"data":"[3000]\tvalidation_0-auc:0.94571\n"}
-,{"stream_name":"stdout","time":596.575806605,"data":"[3500]\tvalidation_0-auc:0.94571\n"}
-,{"stream_name":"stdout","time":600.253799175,"data":"[3857]\tvalidation_0-auc:0.94571\n"}
-,{"stream_name":"stdout","time":603.936361131,"data":"  -\u003e Model 1 Fold 2 ROC-AUC: 0.94571 (Best Iter: 3457)\n"}
-,{"stream_name":"stdout","time":608.173949292,"data":"[0]\tvalidation_0-auc:0.93410\n"}
-,{"stream_name":"stdout","time":615.566961116,"data":"[500]\tvalidation_0-auc:0.94578\n"}
-,{"stream_name":"stdout","time":621.671998572,"data":"[1000]\tvalidation_0-auc:0.94652\n"}
-,{"stream_name":"stdout","time":627.677306552,"data":"[1500]\tvalidation_0-auc:0.94675\n"}
-,{"stream_name":"stdout","time":633.622065352,"data":"[2000]\tvalidation_0-auc:0.94682\n"}
-,{"stream_name":"stdout","time":639.503971952,"data":"[2500]\tvalidation_0-auc:0.94685\n"}
-,{"stream_name":"stdout","time":645.303078868,"data":"[3000]\tvalidation_0-auc:0.94686\n"}
-,{"stream_name":"stdout","time":650.86281023,"data":"[3500]\tvalidation_0-auc:0.94689\n"}
-,{"stream_name":"stdout","time":656.149013804,"data":"[4000]\tvalidation_0-auc:0.94689\n"}
-,{"stream_name":"stdout","time":659.657778774,"data":"[4352]\tvalidation_0-auc:0.94689\n"}
-,{"stream_name":"stdout","time":663.701127956,"data":"  -\u003e Model 1 Fold 3 ROC-AUC: 0.94689 (Best Iter: 3952)\n"}
-,{"stream_name":"stdout","time":667.90459289,"data":"[0]\tvalidation_0-auc:0.93396\n"}
-,{"stream_name":"stdout","time":675.343708191,"data":"[500]\tvalidation_0-auc:0.94548\n"}
-,{"stream_name":"stdout","time":681.42797729,"data":"[1000]\tvalidation_0-auc:0.94611\n"}
-,{"stream_name":"stdout","time":687.342058741,"data":"[1500]\tvalidation_0-auc:0.94630\n"}
-,{"stream_name":"stdout","time":693.202229648,"data":"[2000]\tvalidation_0-auc:0.94637\n"}
-,{"stream_name":"stdout","time":698.960664762,"data":"[2500]\tvalidation_0-auc:0.94638\n"}
-,{"stream_name":"stdout","time":704.560088172,"data":"[3000]\tvalidation_0-auc:0.94638\n"}
-,{"stream_name":"stdout","time":708.804524844,"data":"[3389]\tvalidation_0-auc:0.94638\n"}
-,{"stream_name":"stdout","time":712.146500992,"data":"  -\u003e Model 1 Fold 4 ROC-AUC: 0.94639 (Best Iter: 2989)\n"}
-,{"stream_name":"stdout","time":716.33848556,"data":"[0]\tvalidation_0-auc:0.93341\n"}
-,{"stream_name":"stdout","time":723.877500238,"data":"[500]\tvalidation_0-auc:0.94495\n"}
-,{"stream_name":"stdout","time":730.104234876,"data":"[1000]\tvalidation_0-auc:0.94573\n"}
-,{"stream_name":"stdout","time":736.200810103,"data":"[1500]\tvalidation_0-auc:0.94602\n"}
-,{"stream_name":"stdout","time":742.157721131,"data":"[2000]\tvalidation_0-auc:0.94611\n"}
-,{"stream_name":"stdout","time":747.967992925,"data":"[2500]\tvalidation_0-auc:0.94614\n"}
-,{"stream_name":"stdout","time":753.690859651,"data":"[3000]\tvalidation_0-auc:0.94615\n"}
-,{"stream_name":"stdout","time":755.70851592,"data":"[3183]\tvalidation_0-auc:0.94615\n"}
-,{"stream_name":"stdout","time":758.915019043,"data":"  -\u003e Model 1 Fold 5 ROC-AUC: 0.94615 (Best Iter: 2783)\n"}
-,{"stream_name":"stdout","time":759.064296928,"data":"🏆 MODEL 1 OOF ROC-AUC: 0.94604\n"}
-,{"stream_name":"stdout","time":759.064362365,"data":"\n"}
-,{"stream_name":"stdout","time":759.064369725,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":759.064374506,"data":"⚡ [MODEL 2 / SUB 7] Lossguide XGBoost + Recipe Base Margin (Target \u003e=0.94660)\n"}
-,{"stream_name":"stdout","time":759.064379536,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":763.427488383,"data":"[0]\tvalidation_0-auc:0.93635\n"}
-,{"stream_name":"stdout","time":770.031893294,"data":"[500]\tvalidation_0-auc:0.94475\n"}
-,{"stream_name":"stdout","time":776.020470358,"data":"[1000]\tvalidation_0-auc:0.94512\n"}
-,{"stream_name":"stdout","time":781.860516686,"data":"[1500]\tvalidation_0-auc:0.94518\n"}
-,{"stream_name":"stdout","time":787.639980743,"data":"[2000]\tvalidation_0-auc:0.94519\n"}
-,{"stream_name":"stdout","time":792.345267129,"data":"[2406]\tvalidation_0-auc:0.94518\n"}
-,{"stream_name":"stdout","time":794.947184621,"data":"  -\u003e Model 2 Fold 1 (Recipe Margin) ROC-AUC: 0.94519 (Best Iter: 2006)\n"}
-,{"stream_name":"stdout","time":799.258341299,"data":"[0]\tvalidation_0-auc:0.93774\n"}
-,{"stream_name":"stdout","time":805.933643386,"data":"[500]\tvalidation_0-auc:0.94541\n"}
-,{"stream_name":"stdout","time":811.939178296,"data":"[1000]\tvalidation_0-auc:0.94569\n"}
-,{"stream_name":"stdout","time":817.792564141,"data":"[1500]\tvalidation_0-auc:0.94575\n"}
-,{"stream_name":"stdout","time":823.731044572,"data":"[2000]\tvalidation_0-auc:0.94576\n"}
-,{"stream_name":"stdout","time":829.502395351,"data":"[2500]\tvalidation_0-auc:0.94574\n"}
-,{"stream_name":"stdout","time":830.262650522,"data":"[2566]\tvalidation_0-auc:0.94573\n"}
-,{"stream_name":"stdout","time":832.984975679,"data":"  -\u003e Model 2 Fold 2 (Recipe Margin) ROC-AUC: 0.94576 (Best Iter: 2166)\n"}
-,{"stream_name":"stdout","time":837.233188081,"data":"[0]\tvalidation_0-auc:0.93873\n"}
-,{"stream_name":"stdout","time":843.822323514,"data":"[500]\tvalidation_0-auc:0.94661\n"}
-,{"stream_name":"stdout","time":849.828801401,"data":"[1000]\tvalidation_0-auc:0.94688\n"}
-,{"stream_name":"stdout","time":855.707591672,"data":"[1500]\tvalidation_0-auc:0.94693\n"}
-,{"stream_name":"stdout","time":861.457603096,"data":"[2000]\tvalidation_0-auc:0.94694\n"}
-,{"stream_name":"stdout","time":865.383161076,"data":"[2346]\tvalidation_0-auc:0.94693\n"}
-,{"stream_name":"stdout","time":867.939503118,"data":"  -\u003e Model 2 Fold 3 (Recipe Margin) ROC-AUC: 0.94694 (Best Iter: 1946)\n"}
-,{"stream_name":"stdout","time":872.287460728,"data":"[0]\tvalidation_0-auc:0.93844\n"}
-,{"stream_name":"stdout","time":878.966087354,"data":"[500]\tvalidation_0-auc:0.94607\n"}
-,{"stream_name":"stdout","time":885.045806898,"data":"[1000]\tvalidation_0-auc:0.94631\n"}
-,{"stream_name":"stdout","time":890.863158338,"data":"[1500]\tvalidation_0-auc:0.94634\n"}
-,{"stream_name":"stdout","time":896.502210432,"data":"[1990]\tvalidation_0-auc:0.94633\n"}
-,{"stream_name":"stdout","time":898.75764658,"data":"  -\u003e Model 2 Fold 4 (Recipe Margin) ROC-AUC: 0.94635 (Best Iter: 1590)\n"}
-,{"stream_name":"stdout","time":903.117900028,"data":"[0]\tvalidation_0-auc:0.93786\n"}
-,{"stream_name":"stdout","time":909.826964167,"data":"[500]\tvalidation_0-auc:0.94584\n"}
-,{"stream_name":"stdout","time":915.868033428,"data":"[1000]\tvalidation_0-auc:0.94615\n"}
-,{"stream_name":"stdout","time":921.797582326,"data":"[1500]\tvalidation_0-auc:0.94619\n"}
-,{"stream_name":"stdout","time":926.77858699,"data":"[1927]\tvalidation_0-auc:0.94618\n"}
-,{"stream_name":"stdout","time":928.966485065,"data":"  -\u003e Model 2 Fold 5 (Recipe Margin) ROC-AUC: 0.94619 (Best Iter: 1527)\n"}
-,{"stream_name":"stdout","time":929.113674676,"data":"🏆 MODEL 2 OOF ROC-AUC: 0.94608\n"}
-,{"stream_name":"stdout","time":929.113737198,"data":"\n"}
-,{"stream_name":"stdout","time":929.113745323,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":929.113750825,"data":"💡 [MODEL 3 / SUB 8] LightGBM Triple-TE + Recipe init_score (Target ~0.94655)\n"}
-,{"stream_name":"stdout","time":929.113780943,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":986.724722822,"data":"[500]\tvalid_0's auc: 0.944992\n"}
-,{"stream_name":"stdout","time":1031.474911663,"data":"[1000]\tvalid_0's auc: 0.945126\n"}
-,{"stream_name":"stdout","time":1072.370792163,"data":"[1500]\tvalid_0's auc: 0.945148\n"}
-,{"stream_name":"stdout","time":1115.076228261,"data":"  -\u003e Model 3 Fold 1 ROC-AUC: 0.94516 (Best Iter: 1320)\n"}
-,{"stream_name":"stdout","time":1172.479576001,"data":"[500]\tvalid_0's auc: 0.945636\n"}
-,{"stream_name":"stdout","time":1216.860137341,"data":"[1000]\tvalid_0's auc: 0.945732\n"}
-,{"stream_name":"stdout","time":1261.383552824,"data":"  -\u003e Model 3 Fold 2 ROC-AUC: 0.94574 (Best Iter: 959)\n"}
-,{"stream_name":"stdout","time":1318.505101573,"data":"[500]\tvalid_0's auc: 0.946861\n"}
-,{"stream_name":"stdout","time":1363.077021402,"data":"[1000]\tvalid_0's auc: 0.946977\n"}
-,{"stream_name":"stdout","time":1408.138273194,"data":"  -\u003e Model 3 Fold 3 ROC-AUC: 0.94698 (Best Iter: 957)\n"}
-,{"stream_name":"stdout","time":1465.823561832,"data":"[500]\tvalid_0's auc: 0.946294\n"}
-,{"stream_name":"stdout","time":1510.699716174,"data":"[1000]\tvalid_0's auc: 0.946376\n"}
-,{"stream_name":"stdout","time":1570.273249854,"data":"  -\u003e Model 3 Fold 4 ROC-AUC: 0.94638 (Best Iter: 1098)\n"}
-,{"stream_name":"stdout","time":1627.915253989,"data":"[500]\tvalid_0's auc: 0.945998\n"}
-,{"stream_name":"stdout","time":1672.578194919,"data":"[1000]\tvalid_0's auc: 0.946113\n"}
-,{"stream_name":"stdout","time":1728.786027962,"data":"  -\u003e Model 3 Fold 5 ROC-AUC: 0.94612 (Best Iter: 1056)\n"}
-,{"stream_name":"stdout","time":1728.931556615,"data":"🏆 MODEL 3 OOF ROC-AUC: 0.94607\n"}
-,{"stream_name":"stdout","time":1728.931612803,"data":"\n"}
-,{"stream_name":"stdout","time":1728.931623476,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":1728.931632707,"data":"🐱 [MODEL 4 / SUB 9] CatBoost Oblivious Trees (Target ~0.94650)\n"}
-,{"stream_name":"stdout","time":1728.931641625,"data":"================================================================================\n"}
-,{"stream_name":"stderr","time":1730.566772108,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
-,{"stream_name":"stdout","time":1731.026095075,"data":"0:\ttest: 0.9295170\tbest: 0.9295170 (0)\ttotal: 310ms\tremaining: 18m 5s\n"}
-,{"stream_name":"stdout","time":1742.82281326,"data":"1000:\ttest: 0.9447514\tbest: 0.9447514 (1000)\ttotal: 12.1s\tremaining: 30.1s\n"}
-,{"stream_name":"stdout","time":1750.551117961,"data":"bestTest = 0.9447941184\n"}
-,{"stream_name":"stdout","time":1750.551198252,"data":"bestIteration = 1328\n"}
-,{"stream_name":"stdout","time":1750.551204834,"data":"Shrink model to first 1329 iterations.\n"}
-,{"stream_name":"stdout","time":1751.679378553,"data":"  -\u003e Model 4 Fold 1 ROC-AUC: 0.94479\n"}
-,{"stream_name":"stderr","time":1753.121615298,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
-,{"stream_name":"stdout","time":1753.253134767,"data":"0:\ttest: 0.9313240\tbest: 0.9313240 (0)\ttotal: 20.9ms\tremaining: 1m 13s\n"}
-,{"stream_name":"stdout","time":1765.137345331,"data":"1000:\ttest: 0.9454511\tbest: 0.9454523 (986)\ttotal: 11.9s\tremaining: 29.6s\n"}
-,{"stream_name":"stdout","time":1774.56220722,"data":"bestTest = 0.9454926252\n"}
-,{"stream_name":"stdout","time":1774.562285845,"data":"bestIteration = 1504\n"}
-,{"stream_name":"stdout","time":1774.562292306,"data":"Shrink model to first 1505 iterations.\n"}
-,{"stream_name":"stdout","time":1775.459568659,"data":"  -\u003e Model 4 Fold 2 ROC-AUC: 0.94549\n"}
-,{"stream_name":"stderr","time":1776.775582395,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
-,{"stream_name":"stdout","time":1776.905814497,"data":"0:\ttest: 0.9386254\tbest: 0.9386254 (0)\ttotal: 20.6ms\tremaining: 1m 12s\n"}
-,{"stream_name":"stdout","time":1788.664903798,"data":"1000:\ttest: 0.9465700\tbest: 0.9465705 (998)\ttotal: 11.7s\tremaining: 29.3s\n"}
-,{"stream_name":"stdout","time":1800.631588367,"data":"2000:\ttest: 0.9466119\tbest: 0.9466156 (1784)\ttotal: 23.7s\tremaining: 17.7s\n"}
-,{"stream_name":"stdout","time":1805.178299468,"data":"bestTest = 0.9466159344\n"}
-,{"stream_name":"stdout","time":1805.178330059,"data":"bestIteration = 2059\n"}
-,{"stream_name":"stdout","time":1805.178475128,"data":"Shrink model to first 2060 iterations.\n"}
-,{"stream_name":"stdout","time":1806.175043161,"data":"  -\u003e Model 4 Fold 3 ROC-AUC: 0.94662\n"}
-,{"stream_name":"stderr","time":1807.519079455,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
-,{"stream_name":"stdout","time":1807.649989077,"data":"0:\ttest: 0.9280778\tbest: 0.9280778 (0)\ttotal: 20.8ms\tremaining: 1m 12s\n"}
-,{"stream_name":"stdout","time":1819.574246579,"data":"1000:\ttest: 0.9461172\tbest: 0.9461178 (974)\ttotal: 11.9s\tremaining: 29.7s\n"}
-,{"stream_name":"stdout","time":1829.65338173,"data":"bestTest = 0.94614923\n"}
-,{"stream_name":"stdout","time":1829.65370399,"data":"bestIteration = 1546\n"}
-,{"stream_name":"stdout","time":1829.654030233,"data":"Shrink model to first 1547 iterations.\n"}
-,{"stream_name":"stdout","time":1830.38316357,"data":"  -\u003e Model 4 Fold 4 ROC-AUC: 0.94615\n"}
-,{"stream_name":"stderr","time":1831.823584813,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
-,{"stream_name":"stdout","time":1831.921037174,"data":"0:\ttest: 0.9345728\tbest: 0.9345728 (0)\ttotal: 16.1ms\tremaining: 56.4s\n"}
-,{"stream_name":"stdout","time":1844.083803455,"data":"1000:\ttest: 0.9456986\tbest: 0.9456986 (1000)\ttotal: 12.1s\tremaining: 30.3s\n"}
-,{"stream_name":"stdout","time":1853.94947493,"data":"bestTest = 0.9457422495\n"}
-,{"stream_name":"stdout","time":1853.949618536,"data":"bestIteration = 1500\n"}
-,{"stream_name":"stdout","time":1853.949852598,"data":"Shrink model to first 1501 iterations.\n"}
-,{"stream_name":"stdout","time":1854.857315348,"data":"  -\u003e Model 4 Fold 5 ROC-AUC: 0.94574\n"}
-,{"stream_name":"stdout","time":1855.004033353,"data":"🏆 MODEL 4 OOF ROC-AUC: 0.94575\n"}
-,{"stream_name":"stdout","time":1855.004153072,"data":"\n"}
-,{"stream_name":"stdout","time":1855.004164362,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":1855.004170427,"data":"👑 [MODEL 5 / SUB 10] Master Nelder-Mead Rank Blend (Target \u003e=0.94670 — Top 10)\n"}
-,{"stream_name":"stdout","time":1855.004177214,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":1855.43726785,"data":"Correlation Matrix (OOF Ranks):\n"}
-,{"stream_name":"stdout","time":1855.488614631,"data":"            XGB_Base  XGB_Margin  LGB_Margin  CatBoost\n"}
-,{"stream_name":"stdout","time":1855.488654155,"data":"XGB_Base      1.0000      0.9981      0.9977    0.9857\n"}
-,{"stream_name":"stdout","time":1855.488660526,"data":"XGB_Margin    0.9981      1.0000      0.9992    0.9851\n"}
-,{"stream_name":"stdout","time":1855.488665547,"data":"LGB_Margin    0.9977      0.9992      1.0000    0.9846\n"}
-,{"stream_name":"stdout","time":1855.48867047,"data":"CatBoost      0.9857      0.9851      0.9846    1.0000\n"}
-,{"stream_name":"stdout","time":1875.593007511,"data":"\n"}
-,{"stream_name":"stdout","time":1875.593067965,"data":"🎯 Optimal Blend Weights:\n"}
-,{"stream_name":"stdout","time":1875.593075614,"data":"   XGBoost Base (Sub 6):   0.2857\n"}
-,{"stream_name":"stdout","time":1875.59308094,"data":"   XGBoost Margin (Sub 7): 0.3044\n"}
-,{"stream_name":"stdout","time":1875.593086774,"data":"   LightGBM Margin (Sub 8):0.3459\n"}
-,{"stream_name":"stdout","time":1875.593091368,"data":"   CatBoost (Sub 9):       0.0640\n"}
-,{"stream_name":"stdout","time":1875.593096402,"data":"🏆 MASTER BLEND OOF ROC-AUC: 0.94612\n"}
-,{"stream_name":"stdout","time":1875.766305647,"data":"\n"}
-,{"stream_name":"stdout","time":1875.766381156,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":1875.766388395,"data":"💾 VERIFYING AND SAVING SUBMISSIONS 6 THROUGH 10\n"}
-,{"stream_name":"stdout","time":1875.766393439,"data":"================================================================================\n"}
-,{"stream_name":"stdout","time":1876.357516819,"data":"✅ Saved \u0026 Verified: submission_6_xgb_triple_te.csv | Sub 6: Lossguide XGBoost Triple TE (CV 0.94604) | Mean: 0.1754 | Std: 0.2756\n"}
-,{"stream_name":"stdout","time":1876.934812427,"data":"✅ Saved \u0026 Verified: submission_7_xgb_recipe_base_margin.csv | Sub 7: Lossguide XGBoost Recipe Margin (CV 0.94608) | Mean: 0.1756 | Std: 0.2756\n"}
-,{"stream_name":"stdout","time":1877.505169654,"data":"✅ Saved \u0026 Verified: submission_8_lgbm_triple_te_init_score.csv | Sub 8: LightGBM Triple TE Recipe Prior (CV 0.94607) | Mean: 0.1747 | Std: 0.2750\n"}
-,{"stream_name":"stdout","time":1878.074000265,"data":"✅ Saved \u0026 Verified: submission_9_catboost_triple_te.csv | Sub 9: CatBoost Triple TE Oblivious (CV 0.94575) | Mean: 0.1750 | Std: 0.2748\n"}
-,{"stream_name":"stdout","time":1878.611441403,"data":"✅ Saved \u0026 Verified: submission_10_top10_master_blend.csv | Sub 10: Master Rank Nelder-Mead Blend (CV 0.94612) | Mean: 0.5000 | Std: 0.2883\n"}
-,{"stream_name":"stdout","time":1878.611482995,"data":"\n"}
-,{"stream_name":"stdout","time":1878.611486768,"data":"🎉 ALL 5 TOP-10 SUBMISSIONS GENERATED AND VERIFIED SUCCESSFULLY!\n"}
-,{"stream_name":"stderr","time":1884.950734747,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
-,{"stream_name":"stderr","time":1884.950804619,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
-,{"stream_name":"stderr","time":1885.199070535,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
-,{"stream_name":"stderr","time":1885.199105937,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
-,{"stream_name":"stderr","time":1885.921301228,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
-,{"stream_name":"stderr","time":1886.805072955,"data":"[NbConvertApp] Writing 401783 bytes to __results__.html\n"}
+[{"stream_name":"stdout","time":10.925478609,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":10.925525598,"data":"🚀⚡ KAGGLE S6E9: TOP-10 ASSAULT (10-FOLD MULTI-SEED 5-SUBMISSION PIPELINE)\n"}
+,{"stream_name":"stdout","time":10.92553195,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":14.667208481,"data":"🔧 Device Configuration: CUDA=True | XGBoost Device='cuda' | CatBoost Task='GPU'\n"}
+,{"stream_name":"stdout","time":14.667245562,"data":"🔍 Searching for 'train.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":14.668349708000001,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
+,{"stream_name":"stdout","time":14.668363735,"data":"🔍 Searching for 'test.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":14.669196759,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
+,{"stream_name":"stdout","time":14.669210514,"data":"🔍 Searching for 'sample_submission.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":14.669987809,"data":"  -\u003e Found: /kaggle/input/competitions/playground-series-s6e9/sample_submission.csv\n"}
+,{"stream_name":"stdout","time":14.66999981,"data":"🔍 Searching for 'EV_Adoption_and_Range_Anxiety_Dataset.csv' in /kaggle/input...\n"}
+,{"stream_name":"stdout","time":14.674194548,"data":"  -\u003e Found: /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
+,{"stream_name":"stdout","time":14.674212761,"data":"📊 Loading Train: /kaggle/input/competitions/playground-series-s6e9/train.csv\n"}
+,{"stream_name":"stdout","time":15.795576839,"data":"📊 Loading Test: /kaggle/input/competitions/playground-series-s6e9/test.csv\n"}
+,{"stream_name":"stdout","time":16.396013431,"data":"📊 Loading Original Dataset: /kaggle/input/datasets/itzzomkar/ev-adoption-behavior-and-range-anxiety/EV_Adoption_and_Range_Anxiety_Dataset.csv\n"}
+,{"stream_name":"stdout","time":16.841661342,"data":"🔬 Chris Deotte Latent Recipe Standalone ROC-AUC: 0.93769\n"}
+,{"stream_name":"stdout","time":16.841714611,"data":"\n"}
+,{"stream_name":"stdout","time":16.8417189,"data":"🛠️ Constructing Feature Space (Clean Digits, Interactions, Markus Keys)...\n"}
+,{"stream_name":"stdout","time":21.901033883,"data":"✂️ Dropping 2 constant features: ['Daily_Commute_km_digit2', 'Daily_Commute_km_digit2_fe']\n"}
+,{"stream_name":"stdout","time":22.23117844,"data":"✅ Total Base Features: 59\n"}
+,{"stream_name":"stdout","time":22.231216111,"data":"✅ Columns to Target Encode: 18\n"}
+,{"stream_name":"stdout","time":22.231221897,"data":"\n"}
+,{"stream_name":"stdout","time":22.231226243,"data":"🔄 Running 10-Fold Stratified Split and Triple Target Encoding...\n"}
+,{"stream_name":"stdout","time":23.188472191,"data":"  -\u003e Processing Fold 1/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":45.168837045,"data":"  -\u003e Processing Fold 2/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":67.291607104,"data":"  -\u003e Processing Fold 3/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":89.258546275,"data":"  -\u003e Processing Fold 4/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":110.538443844,"data":"  -\u003e Processing Fold 5/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":132.317720912,"data":"  -\u003e Processing Fold 6/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":154.012622004,"data":"  -\u003e Processing Fold 7/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":175.707595924,"data":"  -\u003e Processing Fold 8/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":197.231343788,"data":"  -\u003e Processing Fold 9/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":218.946001377,"data":"  -\u003e Processing Fold 10/10 Triple TE...\n"}
+,{"stream_name":"stdout","time":240.632668555,"data":"✅ Prepared all 10 folds. Feature count per fold: 95\n"}
+,{"stream_name":"stdout","time":240.632711751,"data":"\n"}
+,{"stream_name":"stdout","time":240.632731633,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":240.632737259,"data":"💡 [MODEL 1 / SUB 11] Refined 10-Fold LightGBM + Recipe init_score (Target ~0.94648)\n"}
+,{"stream_name":"stdout","time":240.632742891,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":419.083638554,"data":"  -\u003e LGBM Fold 1 ROC-AUC: 0.94501 (Best Iter: 1580)\n"}
+,{"stream_name":"stdout","time":639.772148845,"data":"  -\u003e LGBM Fold 2 ROC-AUC: 0.94517 (Best Iter: 2065)\n"}
+,{"stream_name":"stdout","time":896.813286167,"data":"  -\u003e LGBM Fold 3 ROC-AUC: 0.94546 (Best Iter: 2436)\n"}
+,{"stream_name":"stdout","time":1092.445067378,"data":"  -\u003e LGBM Fold 4 ROC-AUC: 0.94610 (Best Iter: 1763)\n"}
+,{"stream_name":"stdout","time":1309.939613219,"data":"  -\u003e LGBM Fold 5 ROC-AUC: 0.94690 (Best Iter: 2013)\n"}
+,{"stream_name":"stdout","time":1503.365881568,"data":"  -\u003e LGBM Fold 6 ROC-AUC: 0.94702 (Best Iter: 1751)\n"}
+,{"stream_name":"stdout","time":1648.185554524,"data":"  -\u003e LGBM Fold 7 ROC-AUC: 0.94586 (Best Iter: 1222)\n"}
+,{"stream_name":"stdout","time":1847.691181467,"data":"  -\u003e LGBM Fold 8 ROC-AUC: 0.94689 (Best Iter: 1807)\n"}
+,{"stream_name":"stdout","time":2062.689256173,"data":"  -\u003e LGBM Fold 9 ROC-AUC: 0.94723 (Best Iter: 1932)\n"}
+,{"stream_name":"stdout","time":2241.810660604,"data":"  -\u003e LGBM Fold 10 ROC-AUC: 0.94502 (Best Iter: 1536)\n"}
+,{"stream_name":"stdout","time":2241.959804658,"data":"🏆 SUBMISSION 11 (10-Fold LightGBM) OOF ROC-AUC: 0.94606\n"}
+,{"stream_name":"stdout","time":2241.95985414,"data":"\n"}
+,{"stream_name":"stdout","time":2241.959858922,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":2241.959862316,"data":"🌲 [MODEL 2 / SUB 12] Refined 10-Fold Lossguide XGBoost + Recipe Margin (Target ~0.94652)\n"}
+,{"stream_name":"stdout","time":2241.95986565,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":2273.0585502,"data":"  -\u003e XGBoost Fold 1 ROC-AUC: 0.94498 (Best Iter: 2215)\n"}
+,{"stream_name":"stdout","time":2309.225630391,"data":"  -\u003e XGBoost Fold 2 ROC-AUC: 0.94520 (Best Iter: 2711)\n"}
+,{"stream_name":"stdout","time":2368.500821403,"data":"  -\u003e XGBoost Fold 3 ROC-AUC: 0.94543 (Best Iter: 5133)\n"}
+,{"stream_name":"stdout","time":2416.704595765,"data":"  -\u003e XGBoost Fold 4 ROC-AUC: 0.94612 (Best Iter: 3658)\n"}
+,{"stream_name":"stdout","time":2462.291311647,"data":"  -\u003e XGBoost Fold 5 ROC-AUC: 0.94684 (Best Iter: 3392)\n"}
+,{"stream_name":"stdout","time":2495.735072201,"data":"  -\u003e XGBoost Fold 6 ROC-AUC: 0.94701 (Best Iter: 2162)\n"}
+,{"stream_name":"stdout","time":2528.67429652,"data":"  -\u003e XGBoost Fold 7 ROC-AUC: 0.94583 (Best Iter: 2127)\n"}
+,{"stream_name":"stdout","time":2572.735940803,"data":"  -\u003e XGBoost Fold 8 ROC-AUC: 0.94688 (Best Iter: 3189)\n"}
+,{"stream_name":"stdout","time":2613.300317814,"data":"  -\u003e XGBoost Fold 9 ROC-AUC: 0.94718 (Best Iter: 2896)\n"}
+,{"stream_name":"stdout","time":2651.065097034,"data":"  -\u003e XGBoost Fold 10 ROC-AUC: 0.94501 (Best Iter: 2583)\n"}
+,{"stream_name":"stdout","time":2651.220812273,"data":"🏆 SUBMISSION 12 (10-Fold XGBoost) OOF ROC-AUC: 0.94604\n"}
+,{"stream_name":"stdout","time":2651.220879026,"data":"\n"}
+,{"stream_name":"stdout","time":2651.220886565,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":2651.220892199,"data":"⚡ [MODEL 3 / SUB 13] Elite Dual-Engine Rank Blend (Target \u003e=0.94660)\n"}
+,{"stream_name":"stdout","time":2651.220897319,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":2655.335205854,"data":"🎯 Optimal Dual Blend Weight: LGBM=0.6376 | XGBoost=0.3624\n"}
+,{"stream_name":"stdout","time":2655.335264895,"data":"🏆 SUBMISSION 13 OOF ROC-AUC: 0.94607\n"}
+,{"stream_name":"stdout","time":2655.429248424,"data":"\n"}
+,{"stream_name":"stdout","time":2655.429334234,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":2655.429341177,"data":"🌱 [MODEL 4 / SUB 14] Multi-Seed Tri-Engine Averaging (Seeds 42 \u0026 101, Target ~0.94668)\n"}
+,{"stream_name":"stdout","time":2655.429345944,"data":"================================================================================\n"}
+,{"stream_name":"stderr","time":2847.561996705,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":3163.812723591,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":3473.510129787,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":3794.148223421,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":4076.458351081,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":4344.994890555,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":4569.857130927,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":4807.159619626,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":5056.517841635,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stderr","time":5329.300447458,"data":"Default metric period is 5 because AUC is/are not implemented for GPU\n"}
+,{"stream_name":"stdout","time":5359.619384337,"data":"  -\u003e LGBM Multi-Seed OOF ROC-AUC: 0.94607\n"}
+,{"stream_name":"stdout","time":5359.802003339,"data":"  -\u003e XGBoost Multi-Seed OOF ROC-AUC: 0.94605\n"}
+,{"stream_name":"stdout","time":5359.947518583,"data":"  -\u003e CatBoost OOF ROC-AUC: 0.94567\n"}
+,{"stream_name":"stdout","time":5372.804731584,"data":"🎯 Tri-Engine Blend Weights: LGBM=0.7587 | XGB=0.2413 | CB=0.0000\n"}
+,{"stream_name":"stdout","time":5372.804815979,"data":"🏆 SUBMISSION 14 (Multi-Seed Tri-Engine) OOF ROC-AUC: 0.94608\n"}
+,{"stream_name":"stdout","time":5372.936203245,"data":"\n"}
+,{"stream_name":"stdout","time":5372.936258294,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":5372.93626649,"data":"👑 [MODEL 5 / SUB 15] Master Top-10 Assault: Physics Shifts \u0026 Zero-Tie Lexsort (Target \u003e=0.94672)\n"}
+,{"stream_name":"stdout","time":5372.936273161,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":5373.01807624,"data":"🎯 Zero-Tie Ordinal Rank Status:\n"}
+,{"stream_name":"stdout","time":5373.029805404,"data":"  • Unique Predicted Ranks: 286,571 / 286,571 (100% Zero Ties)\n"}
+,{"stream_name":"stdout","time":5373.02984065,"data":"  • Min Rank Score: 0.000002\n"}
+,{"stream_name":"stdout","time":5373.029980224,"data":"  • Max Rank Score: 0.999998\n"}
+,{"stream_name":"stdout","time":5373.030020008,"data":"\n"}
+,{"stream_name":"stdout","time":5373.03004635,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":5373.030157048,"data":"💾 VERIFYING AND SAVING SUBMISSIONS 11 THROUGH 15\n"}
+,{"stream_name":"stdout","time":5373.030199694,"data":"================================================================================\n"}
+,{"stream_name":"stdout","time":5373.632178314,"data":"✅ Saved \u0026 Verified: submission_11_lgbm_refined_10fold.csv | Sub 11: 10-Fold LightGBM (CV 0.94606) | Mean: 0.1749 | Std: 0.2753\n"}
+,{"stream_name":"stdout","time":5374.240236339,"data":"✅ Saved \u0026 Verified: submission_12_xgb_lossguide_10fold.csv | Sub 12: 10-Fold Lossguide XGBoost (CV 0.94604) | Mean: 0.1758 | Std: 0.2760\n"}
+,{"stream_name":"stdout","time":5374.771750831,"data":"✅ Saved \u0026 Verified: submission_13_dual_engine_rank_blend.csv | Sub 13: Dual-Engine Rank Blend (CV 0.94607) | Mean: 0.5000 | Std: 0.2887\n"}
+,{"stream_name":"stdout","time":5375.302923524,"data":"✅ Saved \u0026 Verified: submission_14_multiseed_tri_engine.csv | Sub 14: Multi-Seed Tri-Engine Blend (CV 0.94608) | Mean: 0.5000 | Std: 0.2887\n"}
+,{"stream_name":"stdout","time":5375.864137514,"data":"✅ Saved \u0026 Verified: submission_15_top10_master_assault.csv | Sub 15: Master Top-10 Assault (CV 0.94608 + Physics) | Mean: 0.5000 | Std: 0.2887\n"}
+,{"stream_name":"stdout","time":5375.864169888,"data":"\n"}
+,{"stream_name":"stdout","time":5375.864190935,"data":"🎉 ALL 5 PROGRESSIVE SUBMISSIONS GENERATED AND VERIFIED SUCCESSFULLY!\n"}
+,{"stream_name":"stderr","time":5380.483940635,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":5380.483973713,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":5380.680194596,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":5380.680232721,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":5381.371581765,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":5382.215616848,"data":"[NbConvertApp] Writing 403151 bytes to __results__.html\n"}
 ]

@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-Kaggle Kernel: S6E9 Top-10 Triple-TE & Recipe Base Margin Pipeline
-Target: Break 0.94660 into Public Leaderboard Top 10
-Architecture:
-  - Folds: 5-Fold StratifiedKFold
-  - Feature Engineering: Full Digit Decomposition (-4 to 3), Domain Interactions, 
-    Original Dataset Target Means, Markus Smooth Keys, Global Frequency Encodings
-  - In-Fold Triple Target Encoding: smooth='auto', smooth=10.0, smooth=100.0
-  - Dynamic Noise Pruning (88 noise features removed)
-  - Models:
-    1. Lossguide XGBoost (Najiama baseline, target ~0.94639)
-    2. Lossguide XGBoost + Chris Deotte Recipe Base Margin (target ~0.94665)
-    3. LightGBM + Recipe init_score (target ~0.94655)
-    4. CatBoost Oblivious Trees (target ~0.94650)
-    5. Master Rank Nelder-Mead Blend across all 4 models (target >=0.94670)
-Platform: Kaggle Cloud GPU
+Kaggle Kernel: S6E9 Top-10 Assault Pipeline (Submissions 11 through 15)
+Target: Break >=0.94660 into Public Leaderboard Top 10
+
+Key Enhancements over Submissions 6-10:
+1. Fix IEEE-754 bug: string/integer digit extraction on Annual_Income_USD only (k=0..5).
+2. Pruned noisy digit decompositions (Age, commute fractional digits, count columns).
+3. 10-Fold Stratified K-Fold CV (upgraded from 5-fold to eliminate test estimation noise).
+4. Deotte Latent Utility Formula as base_margin (XGBoost) and init_score (LightGBM).
+5. High-resolution numerical binning (max_bin=1024).
+6. In-Fold Multi-Scale Target Encoding (auto, 10, 100).
+7. Multi-Seed Averaging across Seeds 42 & 101.
+8. Nelder-Mead Rank-Space Ensembling on OOF ROC-AUC.
+9. Deterministic Physics Boundary Corrections & Zero-Tie Ordinal Sorting.
+10. Output 5 progressive submission files (Submissions 11 through 15).
+
+Platform: Kaggle Cloud GPU (CUDA)
 """
 
 import os
@@ -33,20 +34,19 @@ from sklearn.metrics import roc_auc_score
 
 import xgboost as xgb
 import lightgbm as lgb
-from catboost import CatBoostClassifier, Pool
+from catboost import CatBoostClassifier
 
 warnings.filterwarnings('ignore')
 
 print("=" * 80)
-print("🚀⚡ KAGGLE S6E9: TOP-10 TRIPLE-TE & RECIPE BASE MARGIN PIPELINE")
+print("🚀⚡ KAGGLE S6E9: TOP-10 ASSAULT (10-FOLD MULTI-SEED 5-SUBMISSION PIPELINE)")
 print("=" * 80)
 
-OUTPUT_DIR = Path("/kaggle/working")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+# Detect runtime environment
+IN_KAGGLE = os.path.exists("/kaggle")
+OUTPUT_DIR = Path("/kaggle/working") if IN_KAGGLE else Path(__file__).resolve().parent
 
-# -------------------------------------------------------------
-# 0. HARDWARE ACCELERATION DETECTION
-# -------------------------------------------------------------
+# Check GPU availability
 try:
     import torch
     HAS_CUDA = torch.cuda.is_available()
@@ -58,7 +58,7 @@ CAT_TASK = "GPU" if HAS_CUDA else "CPU"
 print(f"🔧 Device Configuration: CUDA={HAS_CUDA} | XGBoost Device='{XGB_DEVICE}' | CatBoost Task='{CAT_TASK}'")
 
 # -------------------------------------------------------------
-# 1. ROBUST INPUT LOCATOR
+# 1. INPUT LOCATOR & DATA INGESTION
 # -------------------------------------------------------------
 def find_input_file(name: str) -> Path:
     print(f"🔍 Searching for '{name}' in /kaggle/input...")
@@ -72,12 +72,11 @@ def find_input_file(name: str) -> Path:
             p = Path(root) / name
             print(f"  -> Found in /kaggle: {p}")
             return p
-    raise FileNotFoundError(f"Could not locate '{name}' in /kaggle environment!")
-
-print("📂 Available files in /kaggle/input:")
-for root, dirs, files in os.walk("/kaggle/input"):
-    for f in files:
-        print("  ", os.path.join(root, f))
+    # Fallback to local data dir if not on Kaggle
+    local_p = Path(__file__).resolve().parent.parent / "data" / name
+    if local_p.exists():
+        return local_p
+    raise FileNotFoundError(f"Could not locate '{name}' in environment!")
 
 TRAIN_PATH = find_input_file("train.csv")
 TEST_PATH = find_input_file("test.csv")
@@ -101,23 +100,25 @@ if ORIG_PATH is not None:
     print(f"📊 Loading Original Dataset: {ORIG_PATH}")
     orig = pd.read_csv(ORIG_PATH)
 else:
-    print("⚠️ Original dataset not found, generating synthetic baseline for priors.")
+    print("⚠️ Original dataset not found, using sampled train for priors.")
     orig = train.sample(frac=0.1, random_state=42).copy()
 
 TARGET = 'Will_Buy_EV'
-train[TARGET] = train[TARGET].map({'Yes': 1, 'No': 0})
-orig[TARGET] = orig[TARGET].map({'Yes': 1, 'No': 0})
+train[TARGET] = train[TARGET].map({'Yes': 1, 'No': 0, 1: 1, 0: 0})
+orig[TARGET] = orig[TARGET].map({'Yes': 1, 'No': 0, 1: 1, 0: 0})
 
 train_id = train['id'].copy()
 test_id = test['id'].copy()
 
 # -------------------------------------------------------------
-# 2. CHRIS DEOTTE EV RECIPE SCORE & BASE MARGIN LOGIT
+# 2. CHRIS DEOTTE LATENT RECIPE PRIOR (BASE_MARGIN / INIT_SCORE)
 # -------------------------------------------------------------
 def compute_recipe_prior(df: pd.DataFrame):
     """
-    Computes exact EV generation latent utility:
-    utility = 1.2 * Income/1e5 + 0.6 * EnvConcern + 2.0 * Subsidy - 1.0 * MedAnxiety - 3.0 * HighAnxiety
+    Computes exact latent utility from reverse-engineered generator:
+    score = 1.2 * Income/1e5 + 0.6 * EnvConcern + 2.0 * Subsidy - 1.0 * MedAnxiety - 3.0 * HighAnxiety
+    p = Phi(score - 5.5)
+    logit = log(p / (1 - p))
     """
     income = df["Annual_Income_USD"].astype(float) / 100000.0
     env = df["Environmental_Concern_Level"].astype(float)
@@ -133,152 +134,116 @@ def compute_recipe_prior(df: pd.DataFrame):
 score_train, margin_train = compute_recipe_prior(train)
 score_test, margin_test = compute_recipe_prior(test)
 
-recipe_auc = roc_auc_score(train[TARGET], score_train)
-print(f"\n🌟 Chris Deotte Recipe Prior Alone Train ROC-AUC: {recipe_auc:.5f}")
+raw_recipe_auc = roc_auc_score(train[TARGET], score_train)
+print(f"🔬 Chris Deotte Latent Recipe Standalone ROC-AUC: {raw_recipe_auc:.5f}")
 
 # -------------------------------------------------------------
-# 3. COMPREHENSIVE FEATURE ENGINEERING (TRIPLE TE + DIGIT DECOMPOSITION)
+# 3. FEATURE ENGINEERING: CLEAN INTEGER DIGITS & DOMAIN INTERACTIONS
 # -------------------------------------------------------------
-print("\n🛠️ Constructing Feature Space (Digits, Domain Interactions, Smooth Keys)...")
+print("\n🛠️ Constructing Feature Space (Clean Digits, Interactions, Markus Keys)...")
 
 train['is_train'] = 1
 test['is_train'] = 0
 test[TARGET] = np.nan
 combined = pd.concat([train, test], ignore_index=True)
 
-# Drop irrelevant / zero-importance column
+# Drop zero-importance column
 combined.drop(columns=['Number_of_Cars_Owned'], inplace=True, errors='ignore')
 
-# Add Chris Deotte domain interactions
+# Domain physics & generator interaction features
 home = (combined['Home_Charging_Possible'] == "Yes").astype(int)
 subsidy = (combined['Subsidy_Available'] == "Yes").astype(int)
 
 combined["worry_score"] = (
     combined['Daily_Commute_km'] 
-    - 5 * combined['Charging_Stations_Near_Home'] 
-    - 5 * combined['Charging_Stations_Near_Work'] 
-    - 150 * home
+    - 5.0 * combined['Charging_Stations_Near_Home'] 
+    - 5.0 * combined['Charging_Stations_Near_Work'] 
+    - 150.0 * home
 )
 combined["chargers_total"] = combined['Charging_Stations_Near_Home'] + combined['Charging_Stations_Near_Work']
 combined["income_x_subsidy"] = (combined['Annual_Income_USD'] / 1e5) * subsidy
 combined["concern_x_subsidy"] = combined['Environmental_Concern_Level'] * subsidy
 combined["recipe_score"] = np.concatenate([score_train, score_test])
 
+# Deterministic boundary indicators
+combined["is_millionaire_cliff"] = (combined['Annual_Income_USD'] >= 170537.0).astype('int8')
+combined["is_dead_zone"] = (
+    (combined['Annual_Income_USD'] >= 31004.0) & (combined['Annual_Income_USD'] <= 41970.0)
+).astype('int8')
+combined["is_commute_cliff"] = (combined['Daily_Commute_km'] >= 83.0).astype('int8')
+combined["is_30k_spike"] = (combined['Annual_Income_USD'] == 30000.0).astype('int8')
+
+# Clean Integer Digit Decomposition for Annual_Income_USD (k=0..5)
+# Eliminates IEEE-754 float division bug completely
+income_ints = combined['Annual_Income_USD'].fillna(0).round().astype(np.int64)
+digit_cols = []
+for k in range(6):
+    col_name = f"Annual_Income_USD_digit{k}"
+    combined[col_name] = ((income_ints // (10**k)) % 10).astype('int8')
+    digit_cols.append(col_name)
+
+# Integer commute digits (0..2)
+commute_ints = combined['Daily_Commute_km'].fillna(0).round().astype(np.int64)
+for k in range(3):
+    col_name = f"Daily_Commute_km_digit{k}"
+    combined[col_name] = ((commute_ints // (10**k)) % 10).astype('int8')
+    digit_cols.append(col_name)
+
 cat_cols = combined.select_dtypes(include=['object', 'string']).columns.tolist()
 num_cols = [c for c in combined.columns if c not in cat_cols + ['id', 'is_train', TARGET]]
 
-# Extract digits from 10^-4 place up to 10^3 place
-digit_features = []
-for c in ['Age', 'Annual_Income_USD', 'Daily_Commute_km', 'Charging_Stations_Near_Home', 'Charging_Stations_Near_Work']:
-    if c in combined.columns:
-        for k in range(-4, 4):
-            col_name = f"{c}_digit{k}"
-            combined[col_name] = (combined[c].fillna(0) // (10**k) % 10).astype('int8')
-            digit_features.append(col_name)
-
-num_cols.extend(digit_features)
-
 # Map original dataset target means
 orig_global_mean = float(orig[TARGET].mean())
-for col in cat_cols + num_cols:
+for col in cat_cols + ['Annual_Income_USD', 'Daily_Commute_km']:
     if col in orig.columns:
         real_world_stats = orig.groupby(col, observed=False)[TARGET].mean()
         combined[f"{col}_org_mean"] = combined[col].map(real_world_stats).fillna(orig_global_mean).astype(float)
 
-# Convert numerics to string categories for frequency & target encoding
-num_to_cat_cols = []
-for col in num_cols:
-    cat_name = f"{col}_cat"
-    combined[cat_name] = combined[col].fillna('NaN').astype(str)
-    num_to_cat_cols.append(cat_name)
+# Markus's Smooth Keys (binned numerics for categorical frequency encoding)
+combined['income_exact_int'] = income_ints.astype(str)
+combined['income100_floor']  = (income_ints // 100).astype(str)
+combined['income1000_floor'] = (income_ints // 1000).astype(str)
+combined['commute_integer']  = commute_ints.astype(str)
+
+encode_cats = cat_cols + ['income_exact_int', 'income100_floor', 'income1000_floor', 'commute_integer'] + digit_cols
 
 # Global Frequency Encoding
-all_cats = cat_cols + num_to_cat_cols
-for col in all_cats:
+for col in encode_cats:
     freq_mapping = combined[col].value_counts(normalize=True).to_dict()
     combined[f"{col}_fe"] = combined[col].map(freq_mapping).astype(float).fillna(0.0)
-
-# Environmental concern extreme
-combined['is_env_hater'] = (combined['Environmental_Concern_Level'] == 1).astype('int8')
-
-# Markus's Smooth Keys (binned numerics)
-combined['income_exact_int'] = np.floor(combined['Annual_Income_USD']).astype(str)
-combined['income100_floor']  = np.floor(combined['Annual_Income_USD'] / 100.0).astype(str)
-combined['income1000_floor'] = np.floor(combined['Annual_Income_USD'] / 1000.0).astype(str)
-combined['commute_integer']  = np.floor(combined['Daily_Commute_km']).astype(str)
-all_cats.extend(['income_exact_int', 'income100_floor', 'income1000_floor', 'commute_integer'])
 
 # Separate back to train and test
 train_proc = combined[combined['is_train'] == 1].drop(columns=['is_train'])
 test_proc = combined[combined['is_train'] == 0].drop(columns=['is_train', TARGET])
 
-# Feature dropping: constant and perfectly correlated
+# Drop constant or duplicated features
 eval_cols = [c for c in train_proc.columns if c not in ['id', TARGET] and pd.api.types.is_numeric_dtype(train_proc[c])]
-corr_matrix = train_proc[eval_cols].corr().abs()
-upper_tri = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
-to_drop_corr = [column for column in upper_tri.columns if any(upper_tri[column] == 1.0)]
 to_drop_const = [c for c in train_proc.columns if train_proc[c].nunique() == 1] + [c for c in test_proc.columns if test_proc[c].nunique() == 1]
-
-DROP = list(set(to_drop_corr).union(set(to_drop_const)))
+DROP = list(set(to_drop_const))
 DROP = [c for c in DROP if c not in ['id', TARGET]]
 
-if len(DROP) > 0:
-    print(f"✂️ Dropping {len(DROP)} redundant/constant features.")
+if DROP:
+    print(f"✂️ Dropping {len(DROP)} constant features: {DROP}")
     train_proc.drop(columns=DROP, inplace=True, errors='ignore')
     test_proc.drop(columns=DROP, inplace=True, errors='ignore')
 
 FEATURES = [c for c in test_proc.columns if c != 'id']
-TARGET_ENCODE_COLS = [c for c in all_cats if c not in DROP and c in train_proc.columns]
+TARGET_ENCODE_COLS = [c for c in encode_cats if c in train_proc.columns and c not in DROP]
 
 print(f"✅ Total Base Features: {len(FEATURES)}")
 print(f"✅ Columns to Target Encode: {len(TARGET_ENCODE_COLS)}")
 
-# 88-Feature Dynamic Pruning List (Najiama Gain Thresholding)
-features_to_drop = [
-    'Age', 'Daily_Commute_km_digit-3_cat_TE_100', 'Charging_Stations_Near_Home_digit0',
-    'Daily_Commute_km_digit1_cat_TE_100', 'Annual_Income_USD_digit1', 'Charging_Stations_Near_Work_digit1_cat_TE_auto',
-    'Daily_Commute_km_digit1_cat_TE_auto', 'Daily_Commute_km_digit0_cat_TE_10', 'Gender_org_mean',
-    'Daily_Commute_km_digit-4_cat_TE_100', 'Daily_Commute_km_digit0_cat_TE_auto', 'Daily_Commute_km_digit-4_cat_TE_auto',
-    'Daily_Commute_km_cat_fe', 'Annual_Income_USD_digit1_cat_fe', 'Charging_Stations_Near_Work_digit0_cat_TE_100',
-    'Annual_Income_USD_digit2_cat_TE_100', 'Annual_Income_USD_digit0', 'Charging_Stations_Near_Home_digit-3_cat_TE_auto',
-    'Gender_TE_100', 'Current_Car_Type_TE_10', 'Age_digit1_cat_fe', 'Charging_Stations_Near_Work_digit1_cat_TE_100',
-    'Annual_Income_USD_digit0_cat_TE_10', 'Daily_Commute_km_digit-3_cat_TE_10', 'Charging_Stations_Near_Work_digit0_cat_TE_10',
-    'Gender_TE_auto', 'Daily_Commute_km_digit0_cat_TE_100', 'Charging_Stations_Near_Home_digit-4_cat_TE_auto',
-    'Daily_Commute_km_digit-1_cat_TE_10', 'Charging_Stations_Near_Work_digit0_cat_TE_auto', 'Daily_Commute_km_digit-1',
-    'Charging_Stations_Near_Work_digit0', 'Annual_Income_USD_digit0_cat_TE_auto', 'Daily_Commute_km_digit-4_cat_TE_10',
-    'Charging_Stations_Near_Work_digit-3_cat_TE_auto', 'Charging_Stations_Near_Work_org_mean', 'Age_digit0_cat_TE_auto',
-    'Age_digit0_cat_fe', 'Annual_Income_USD_digit0_cat_fe', 'Charging_Stations_Near_Home_digit-4_cat_TE_100',
-    'Daily_Commute_km_digit-3_cat_TE_auto', 'Age_digit0', 'Annual_Income_USD_digit2_cat_TE_auto',
-    'Annual_Income_USD_digit0_cat_TE_100', 'Daily_Commute_km_org_mean', 'Age_digit0_cat_TE_10',
-    'Current_Car_Type_TE_auto', 'Current_Car_Type_TE_100', 'Age_digit1_cat_TE_auto', 'Charging_Stations_Near_Home_digit-4',
-    'Annual_Income_USD_digit2_cat_TE_10', 'Daily_Commute_km_digit-1_cat_TE_100', 'Age_cat_fe',
-    'Daily_Commute_km_digit0_cat_fe', 'Daily_Commute_km_digit-1_cat_fe', 'Daily_Commute_km_digit-1_cat_TE_auto',
-    'Daily_Commute_km_digit-2_cat_TE_10', 'Age_digit1', 'Age_digit1_cat_TE_100', 'Gender_TE_10', 'Age_digit1_cat_TE_10',
-    'Age_digit0_cat_TE_100', 'Daily_Commute_km_digit-3', 'Charging_Stations_Near_Home_digit-3_cat_TE_100', 'Gender_fe',
-    'Charging_Stations_Near_Home_digit-3_cat_TE_10', 'Daily_Commute_km_digit-4_cat_fe', 'Daily_Commute_km_digit-4',
-    'Daily_Commute_km_digit-3_cat_fe', 'Charging_Stations_Near_Work_digit-3_cat_TE_10', 'Daily_Commute_km_digit-2_cat_TE_100',
-    'Charging_Stations_Near_Home_digit-2_cat_TE_auto', 'Charging_Stations_Near_Home_digit-1_cat_TE_auto',
-    'Charging_Stations_Near_Work_digit1_cat_fe', 'Charging_Stations_Near_Work_digit-2_cat_TE_100',
-    'Charging_Stations_Near_Home_digit-2_cat_TE_100', 'Charging_Stations_Near_Work_digit-3_cat_TE_100', 'is_dead_zone',
-    'is_millionaire_cliff', 'is_30k_spike', 'Charging_Stations_Near_Home_digit-1_cat_TE_100',
-    'Charging_Stations_Near_Home_digit-1_cat_TE_10', 'Charging_Stations_Near_Home_digit-2_cat_TE_10',
-    'Charging_Stations_Near_Work_digit-1_cat_TE_10', 'Charging_Stations_Near_Work_digit-2_cat_TE_auto',
-    'Charging_Stations_Near_Work_digit-1_cat_TE_auto', 'Charging_Stations_Near_Work_digit-1_cat_TE_100',
-    'Charging_Stations_Near_Work_digit-2_cat_TE_10'
-]
-
 # -------------------------------------------------------------
-# 4. CROSS-VALIDATION ENCODING & PREPARATION (5 FOLDS)
+# 4. CROSS-VALIDATION ENCODING & PREPARATION (10 FOLDS)
 # -------------------------------------------------------------
-FOLDS = 5
-print(f"\n🔄 Running 5-Fold Stratified Split and Triple Target Encoding...")
+FOLDS = 10
+print(f"\n🔄 Running {FOLDS}-Fold Stratified Split and Triple Target Encoding...")
 skf = StratifiedKFold(n_splits=FOLDS, shuffle=True, random_state=42)
 
 X_raw = train_proc[FEATURES].copy()
 y = train_proc[TARGET].values
 X_test_raw = test_proc[FEATURES].copy()
 
-# Store transformed fold datasets
 fold_datasets = []
 
 for fold, (train_idx, valid_idx) in enumerate(skf.split(X_raw, y), 1):
@@ -290,9 +255,9 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(X_raw, y), 1):
     X_test_f = X_test_raw.copy()
 
     # Triple Target Encoders (Auto, Strict 10, Massive 100)
-    te_auto = TargetEncoder(smooth='auto', cv=FOLDS)
-    te_10   = TargetEncoder(smooth=10.0, cv=FOLDS)
-    te_100  = TargetEncoder(smooth=100.0, cv=FOLDS)
+    te_auto = TargetEncoder(smooth='auto', cv=FOLDS, random_state=42)
+    te_10   = TargetEncoder(smooth=10.0, cv=FOLDS, random_state=42)
+    te_100  = TargetEncoder(smooth=100.0, cv=FOLDS, random_state=42)
 
     X_tr_enc_auto = te_auto.fit_transform(X_train_f[TARGET_ENCODE_COLS], y_train_f)
     X_va_enc_auto = te_auto.transform(X_valid_f[TARGET_ENCODE_COLS])
@@ -323,12 +288,6 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(X_raw, y), 1):
         X_valid_f.drop(columns=[col], inplace=True, errors='ignore')
         X_test_f.drop(columns=[col], inplace=True, errors='ignore')
 
-    # Apply dynamic feature pruning
-    safe_to_drop = [c for c in features_to_drop if c in X_train_f.columns]
-    X_train_f.drop(columns=safe_to_drop, inplace=True, errors='ignore')
-    X_valid_f.drop(columns=safe_to_drop, inplace=True, errors='ignore')
-    X_test_f.drop(columns=safe_to_drop, inplace=True, errors='ignore')
-
     fold_datasets.append({
         'fold': fold,
         'train_idx': train_idx,
@@ -343,133 +302,27 @@ for fold, (train_idx, valid_idx) in enumerate(skf.split(X_raw, y), 1):
         'margin_test': margin_test
     })
 
-print(f"✅ Prepared all {FOLDS} folds. Final feature count per fold: {fold_datasets[0]['X_train'].shape[1]}")
+print(f"✅ Prepared all {FOLDS} folds. Feature count per fold: {fold_datasets[0]['X_train'].shape[1]}")
 
 # -------------------------------------------------------------
-# 5. MODEL 1: LOSSGUIDE XGBOOST (TRIPLE-TE + DYNAMIC PRUNING) -> SUB 6
-# -------------------------------------------------------------
-print("\n" + "=" * 80)
-print("🌲 [MODEL 1 / SUB 6] Lossguide XGBoost (Najiama Architecture, Target ~0.94639)")
-print("=" * 80)
-
-oof_m1 = np.zeros(len(train))
-test_m1 = np.zeros(len(test))
-
-for f_data in fold_datasets:
-    fold = f_data['fold']
-    X_tr, y_tr = f_data['X_train'], f_data['y_train']
-    X_va, y_va = f_data['X_valid'], f_data['y_valid']
-    X_te = f_data['X_test']
-
-    clf = xgb.XGBClassifier(
-        n_estimators=10000,
-        learning_rate=0.01,
-        max_depth=4,
-        max_leaves=16,
-        grow_policy='lossguide',
-        gamma=3.673225596759869,
-        min_child_weight=4.532387806880492,
-        subsample=0.7400402414525654,
-        colsample_bytree=0.5695776529558766,
-        alpha=0.7523885021652775,
-        reg_lambda=0.6189949691705282,
-        max_bin=1024,
-        random_state=42 + fold,
-        eval_metric='auc',
-        early_stopping_rounds=400,
-        tree_method='hist',
-        device=XGB_DEVICE,
-        n_jobs=-1
-    )
-
-    clf.fit(X_tr, y_tr, eval_set=[(X_va, y_va)], verbose=500)
-    va_prob = clf.predict_proba(X_va)[:, 1]
-    te_prob = clf.predict_proba(X_te)[:, 1]
-
-    oof_m1[f_data['valid_idx']] = va_prob
-    test_m1 += te_prob / FOLDS
-
-    f_auc = roc_auc_score(y_va, va_prob)
-    print(f"  -> Model 1 Fold {fold} ROC-AUC: {f_auc:.5f} (Best Iter: {clf.best_iteration})")
-
-cv_m1 = roc_auc_score(y, oof_m1)
-print(f"🏆 MODEL 1 OOF ROC-AUC: {cv_m1:.5f}")
-
-# -------------------------------------------------------------
-# 6. MODEL 2: LOSSGUIDE XGBOOST WITH RECIPE BASE_MARGIN -> SUB 7
+# 5. MODEL 1: REFINED 10-FOLD LIGHTGBM (INIT_SCORE) -> SUB 11
 # -------------------------------------------------------------
 print("\n" + "=" * 80)
-print("⚡ [MODEL 2 / SUB 7] Lossguide XGBoost + Recipe Base Margin (Target >=0.94660)")
+print("💡 [MODEL 1 / SUB 11] Refined 10-Fold LightGBM + Recipe init_score (Target ~0.94648)")
 print("=" * 80)
 
-oof_m2 = np.zeros(len(train))
-test_m2 = np.zeros(len(test))
-
-for f_data in fold_datasets:
-    fold = f_data['fold']
-    X_tr, y_tr = f_data['X_train'], f_data['y_train']
-    X_va, y_va = f_data['X_valid'], f_data['y_valid']
-    X_te = f_data['X_test']
-    m_tr, m_va, m_te = f_data['margin_train'], f_data['margin_valid'], f_data['margin_test']
-
-    clf = xgb.XGBClassifier(
-        n_estimators=10000,
-        learning_rate=0.015,
-        max_depth=4,
-        max_leaves=16,
-        grow_policy='lossguide',
-        gamma=3.0,
-        min_child_weight=4.0,
-        subsample=0.75,
-        colsample_bytree=0.60,
-        alpha=0.6,
-        reg_lambda=0.7,
-        max_bin=1024,
-        random_state=142 + fold,
-        eval_metric='auc',
-        early_stopping_rounds=400,
-        tree_method='hist',
-        device=XGB_DEVICE,
-        n_jobs=-1
-    )
-
-    clf.fit(
-        X_tr, y_tr, 
-        eval_set=[(X_va, y_va)], 
-        base_margin=m_tr, 
-        base_margin_eval_set=[m_va], 
-        verbose=500
-    )
-    va_prob = clf.predict_proba(X_va, base_margin=m_va)[:, 1]
-    te_prob = clf.predict_proba(X_te, base_margin=m_te)[:, 1]
-
-    oof_m2[f_data['valid_idx']] = va_prob
-    test_m2 += te_prob / FOLDS
-
-    f_auc = roc_auc_score(y_va, va_prob)
-    print(f"  -> Model 2 Fold {fold} (Recipe Margin) ROC-AUC: {f_auc:.5f} (Best Iter: {clf.best_iteration})")
-
-cv_m2 = roc_auc_score(y, oof_m2)
-print(f"🏆 MODEL 2 OOF ROC-AUC: {cv_m2:.5f}")
-
-# -------------------------------------------------------------
-# 7. MODEL 3: LIGHTGBM WITH RECIPE INIT_SCORE -> SUB 8
-# -------------------------------------------------------------
-print("\n" + "=" * 80)
-print("💡 [MODEL 3 / SUB 8] LightGBM Triple-TE + Recipe init_score (Target ~0.94655)")
-print("=" * 80)
-
-oof_m3 = np.zeros(len(train))
-test_m3 = np.zeros(len(test))
+oof_sub11 = np.zeros(len(train))
+test_sub11 = np.zeros(len(test))
 
 lgb_params = {
     'objective': 'binary',
     'metric': 'auc',
     'boosting_type': 'gbdt',
     'learning_rate': 0.015,
-    'num_leaves': 31,
-    'max_depth': 6,
-    'feature_fraction': 0.60,
+    'num_leaves': 32,
+    'max_depth': 5,
+    'max_bin': 1024,
+    'feature_fraction': 0.65,
     'bagging_fraction': 0.80,
     'bagging_freq': 1,
     'min_child_samples': 30,
@@ -477,7 +330,7 @@ lgb_params = {
     'lambda_l2': 1.0,
     'verbosity': -1,
     'n_jobs': -1,
-    'random_state': 242
+    'random_state': 42
 }
 
 for f_data in fold_datasets:
@@ -490,7 +343,7 @@ for f_data in fold_datasets:
     trn_data = lgb.Dataset(X_tr, label=y_tr, init_score=m_tr)
     val_data = lgb.Dataset(X_va, label=y_va, init_score=m_va, reference=trn_data)
 
-    callbacks = [lgb.early_stopping(stopping_rounds=300, verbose=False), lgb.log_evaluation(period=500)]
+    callbacks = [lgb.early_stopping(stopping_rounds=300, verbose=False), lgb.log_evaluation(period=0)]
     bst = lgb.train(
         lgb_params,
         trn_data,
@@ -505,117 +358,225 @@ for f_data in fold_datasets:
     va_prob = expit(m_va + va_raw)
     te_prob = expit(m_te + te_raw)
 
-    oof_m3[f_data['valid_idx']] = va_prob
-    test_m3 += te_prob / FOLDS
+    oof_sub11[f_data['valid_idx']] = va_prob
+    test_sub11 += te_prob / FOLDS
 
     f_auc = roc_auc_score(y_va, va_prob)
-    print(f"  -> Model 3 Fold {fold} ROC-AUC: {f_auc:.5f} (Best Iter: {bst.best_iteration})")
+    print(f"  -> LGBM Fold {fold} ROC-AUC: {f_auc:.5f} (Best Iter: {bst.best_iteration})")
 
-cv_m3 = roc_auc_score(y, oof_m3)
-print(f"🏆 MODEL 3 OOF ROC-AUC: {cv_m3:.5f}")
+cv_sub11 = roc_auc_score(y, oof_sub11)
+print(f"🏆 SUBMISSION 11 (10-Fold LightGBM) OOF ROC-AUC: {cv_sub11:.5f}")
 
 # -------------------------------------------------------------
-# 8. MODEL 4: CATBOOST OBLIVIOUS TREES ON TRIPLE-TE -> SUB 9
+# 6. MODEL 2: REFINED 10-FOLD LOSSGUIDE XGBOOST (BASE_MARGIN) -> SUB 12
 # -------------------------------------------------------------
 print("\n" + "=" * 80)
-print("🐱 [MODEL 4 / SUB 9] CatBoost Oblivious Trees (Target ~0.94650)")
+print("🌲 [MODEL 2 / SUB 12] Refined 10-Fold Lossguide XGBoost + Recipe Margin (Target ~0.94652)")
 print("=" * 80)
 
-oof_m4 = np.zeros(len(train))
-test_m4 = np.zeros(len(test))
+oof_sub12 = np.zeros(len(train))
+test_sub12 = np.zeros(len(test))
 
 for f_data in fold_datasets:
     fold = f_data['fold']
     X_tr, y_tr = f_data['X_train'], f_data['y_train']
     X_va, y_va = f_data['X_valid'], f_data['y_valid']
     X_te = f_data['X_test']
+    m_tr, m_va, m_te = f_data['margin_train'], f_data['margin_valid'], f_data['margin_test']
 
-    cb = CatBoostClassifier(
-        iterations=3500,
-        learning_rate=0.03,
-        depth=6,
-        l2_leaf_reg=5.0,
-        eval_metric='AUC',
-        random_seed=342 + fold,
-        early_stopping_rounds=300,
-        task_type=CAT_TASK,
-        verbose=1000
+    clf = xgb.XGBClassifier(
+        n_estimators=10000,
+        learning_rate=0.012,
+        max_depth=5,
+        max_leaves=16,
+        grow_policy='lossguide',
+        gamma=3.0,
+        min_child_weight=4.0,
+        subsample=0.74,
+        colsample_bytree=0.57,
+        alpha=0.6,
+        reg_lambda=0.7,
+        max_bin=1024,
+        random_state=42 + fold,
+        eval_metric='auc',
+        early_stopping_rounds=350,
+        tree_method='hist',
+        device=XGB_DEVICE,
+        n_jobs=-1
     )
 
-    cb.fit(X_tr, y_tr, eval_set=(X_va, y_va), verbose=1000)
-    va_prob = cb.predict_proba(X_va)[:, 1]
-    te_prob = cb.predict_proba(X_te)[:, 1]
+    clf.fit(
+        X_tr, y_tr, 
+        eval_set=[(X_va, y_va)], 
+        base_margin=m_tr, 
+        base_margin_eval_set=[m_va], 
+        verbose=False
+    )
+    va_prob = clf.predict_proba(X_va, base_margin=m_va)[:, 1]
+    te_prob = clf.predict_proba(X_te, base_margin=m_te)[:, 1]
 
-    oof_m4[f_data['valid_idx']] = va_prob
-    test_m4 += te_prob / FOLDS
+    oof_sub12[f_data['valid_idx']] = va_prob
+    test_sub12 += te_prob / FOLDS
 
     f_auc = roc_auc_score(y_va, va_prob)
-    print(f"  -> Model 4 Fold {fold} ROC-AUC: {f_auc:.5f}")
+    print(f"  -> XGBoost Fold {fold} ROC-AUC: {f_auc:.5f} (Best Iter: {clf.best_iteration})")
 
-cv_m4 = roc_auc_score(y, oof_m4)
-print(f"🏆 MODEL 4 OOF ROC-AUC: {cv_m4:.5f}")
+cv_sub12 = roc_auc_score(y, oof_sub12)
+print(f"🏆 SUBMISSION 12 (10-Fold XGBoost) OOF ROC-AUC: {cv_sub12:.5f}")
 
 # -------------------------------------------------------------
-# 9. MODEL 5: MASTER NELDER-MEAD RANK BLEND -> SUB 10 (TOP 10 TARGET)
+# 7. MODEL 3: ELITE DUAL-ENGINE RANK BLEND -> SUB 13 (TOP 10 CROSSOVER)
 # -------------------------------------------------------------
 print("\n" + "=" * 80)
-print("👑 [MODEL 5 / SUB 10] Master Nelder-Mead Rank Blend (Target >=0.94670 — Top 10)")
+print("⚡ [MODEL 3 / SUB 13] Elite Dual-Engine Rank Blend (Target >=0.94660)")
 print("=" * 80)
 
-r_m1 = rankdata(oof_m1) / len(oof_m1)
-r_m2 = rankdata(oof_m2) / len(oof_m2)
-r_m3 = rankdata(oof_m3) / len(oof_m3)
-r_m4 = rankdata(oof_m4) / len(oof_m4)
+r_oof11 = rankdata(oof_sub11) / len(oof_sub11)
+r_oof12 = rankdata(oof_sub12) / len(oof_sub12)
 
-print(f"Correlation Matrix (OOF Ranks):")
-corr_df = pd.DataFrame({
-    'XGB_Base': r_m1,
-    'XGB_Margin': r_m2,
-    'LGB_Margin': r_m3,
-    'CatBoost': r_m4
-}).corr()
-print(corr_df.round(4))
+def dual_blend_objective(w):
+    blended = w[0] * r_oof11 + (1.0 - w[0]) * r_oof12
+    return -roc_auc_score(y, blended)
 
-def blend_objective(weights):
-    w = np.array(weights)
-    if w.sum() == 0:
-        return 0.0
-    w = w / w.sum()
-    blended_rank = w[0] * r_m1 + w[1] * r_m2 + w[2] * r_m3 + w[3] * r_m4
-    return -roc_auc_score(y, blended_rank)
+opt_dual = minimize(dual_blend_objective, [0.5], method='Nelder-Mead', bounds=[(0.0, 1.0)])
+w_dual = opt_dual.x[0]
+cv_sub13 = -opt_dual.fun
 
-init_weights = [0.25, 0.40, 0.20, 0.15]
-bounds = [(0.0, 1.0)] * 4
-res = minimize(blend_objective, init_weights, method='Nelder-Mead', bounds=bounds)
+print(f"🎯 Optimal Dual Blend Weight: LGBM={w_dual:.4f} | XGBoost={1.0 - w_dual:.4f}")
+print(f"🏆 SUBMISSION 13 OOF ROC-AUC: {cv_sub13:.5f}")
 
-best_w = res.x / res.x.sum()
-cv_m5 = -res.fun
-
-print(f"\n🎯 Optimal Blend Weights:")
-print(f"   XGBoost Base (Sub 6):   {best_w[0]:.4f}")
-print(f"   XGBoost Margin (Sub 7): {best_w[1]:.4f}")
-print(f"   LightGBM Margin (Sub 8):{best_w[2]:.4f}")
-print(f"   CatBoost (Sub 9):       {best_w[3]:.4f}")
-print(f"🏆 MASTER BLEND OOF ROC-AUC: {cv_m5:.5f}")
-
-# Compute final test predictions via rank aggregation
-r_test_m1 = rankdata(test_m1) / len(test_m1)
-r_test_m2 = rankdata(test_m2) / len(test_m2)
-r_test_m3 = rankdata(test_m3) / len(test_m3)
-r_test_m4 = rankdata(test_m4) / len(test_m4)
-
-test_m5 = (
-    best_w[0] * r_test_m1 +
-    best_w[1] * r_test_m2 +
-    best_w[2] * r_test_m3 +
-    best_w[3] * r_test_m4
-)
+r_te11 = rankdata(test_sub11) / len(test_sub11)
+r_te12 = rankdata(test_sub12) / len(test_sub12)
+test_sub13 = w_dual * r_te11 + (1.0 - w_dual) * r_te12
 
 # -------------------------------------------------------------
-# 10. VERIFICATION & EXPORT OF ALL 5 SUBMISSION TIERS
+# 8. MODEL 4: MULTI-SEED TRI-ENGINE AVERAGING (SEEDS 42 & 101) -> SUB 14
 # -------------------------------------------------------------
 print("\n" + "=" * 80)
-print("💾 VERIFYING AND SAVING SUBMISSIONS 6 THROUGH 10")
+print("🌱 [MODEL 4 / SUB 14] Multi-Seed Tri-Engine Averaging (Seeds 42 & 101, Target ~0.94668)")
+print("=" * 80)
+
+# Run Seed 101 for LightGBM & XGBoost
+oof_lgb_s101 = np.zeros(len(train))
+test_lgb_s101 = np.zeros(len(test))
+oof_xgb_s101 = np.zeros(len(train))
+test_xgb_s101 = np.zeros(len(test))
+oof_cb = np.zeros(len(train))
+test_cb = np.zeros(len(test))
+
+lgb_params_s101 = lgb_params.copy()
+lgb_params_s101['random_state'] = 101
+
+for f_data in fold_datasets:
+    fold = f_data['fold']
+    X_tr, y_tr = f_data['X_train'], f_data['y_train']
+    X_va, y_va = f_data['X_valid'], f_data['y_valid']
+    X_te = f_data['X_test']
+    m_tr, m_va, m_te = f_data['margin_train'], f_data['margin_valid'], f_data['margin_test']
+
+    # LightGBM Seed 101
+    trn_data = lgb.Dataset(X_tr, label=y_tr, init_score=m_tr)
+    val_data = lgb.Dataset(X_va, label=y_va, init_score=m_va, reference=trn_data)
+    callbacks = [lgb.early_stopping(stopping_rounds=300, verbose=False)]
+    bst101 = lgb.train(lgb_params_s101, trn_data, num_boost_round=8000, valid_sets=[val_data], callbacks=callbacks)
+    oof_lgb_s101[f_data['valid_idx']] = expit(m_va + bst101.predict(X_va, raw_score=True))
+    test_lgb_s101 += expit(m_te + bst101.predict(X_te, raw_score=True)) / FOLDS
+
+    # XGBoost Seed 101
+    clf101 = xgb.XGBClassifier(
+        n_estimators=10000, learning_rate=0.012, max_depth=5, max_leaves=16,
+        grow_policy='lossguide', gamma=3.0, min_child_weight=4.0, subsample=0.74,
+        colsample_bytree=0.57, alpha=0.6, reg_lambda=0.7, max_bin=1024,
+        random_state=101 + fold, eval_metric='auc', early_stopping_rounds=350,
+        tree_method='hist', device=XGB_DEVICE, n_jobs=-1
+    )
+    clf101.fit(X_tr, y_tr, eval_set=[(X_va, y_va)], base_margin=m_tr, base_margin_eval_set=[m_va], verbose=False)
+    oof_xgb_s101[f_data['valid_idx']] = clf101.predict_proba(X_va, base_margin=m_va)[:, 1]
+    test_xgb_s101 += clf101.predict_proba(X_te, base_margin=m_te)[:, 1] / FOLDS
+
+    # CatBoost Oblivious Model
+    cb = CatBoostClassifier(
+        iterations=3000, learning_rate=0.03, depth=6, l2_leaf_reg=5.0,
+        eval_metric='AUC', random_seed=101 + fold, early_stopping_rounds=300,
+        task_type=CAT_TASK, verbose=False
+    )
+    cb.fit(X_tr, y_tr, eval_set=(X_va, y_va), verbose=False)
+    oof_cb[f_data['valid_idx']] = cb.predict_proba(X_va)[:, 1]
+    test_cb += cb.predict_proba(X_te)[:, 1] / FOLDS
+
+# Seed-averaged legs
+oof_lgb_avg = 0.5 * (oof_sub11 + oof_lgb_s101)
+test_lgb_avg = 0.5 * (test_sub11 + test_lgb_s101)
+
+oof_xgb_avg = 0.5 * (oof_sub12 + oof_xgb_s101)
+test_xgb_avg = 0.5 * (test_sub12 + test_xgb_s101)
+
+print(f"  -> LGBM Multi-Seed OOF ROC-AUC: {roc_auc_score(y, oof_lgb_avg):.5f}")
+print(f"  -> XGBoost Multi-Seed OOF ROC-AUC: {roc_auc_score(y, oof_xgb_avg):.5f}")
+print(f"  -> CatBoost OOF ROC-AUC: {roc_auc_score(y, oof_cb):.5f}")
+
+# Tri-engine Rank Blend
+r_lgb = rankdata(oof_lgb_avg) / len(oof_lgb_avg)
+r_xgb = rankdata(oof_xgb_avg) / len(oof_xgb_avg)
+r_cb  = rankdata(oof_cb) / len(oof_cb)
+
+def tri_objective(w):
+    w_arr = np.array(w)
+    if w_arr.sum() == 0: return 0.0
+    w_norm = w_arr / w_arr.sum()
+    b = w_norm[0] * r_lgb + w_norm[1] * r_xgb + w_norm[2] * r_cb
+    return -roc_auc_score(y, b)
+
+opt_tri = minimize(tri_objective, [0.45, 0.45, 0.10], method='Nelder-Mead', bounds=[(0.0, 1.0)]*3)
+w_tri = opt_tri.x / opt_tri.x.sum()
+cv_sub14 = -opt_tri.fun
+
+print(f"🎯 Tri-Engine Blend Weights: LGBM={w_tri[0]:.4f} | XGB={w_tri[1]:.4f} | CB={w_tri[2]:.4f}")
+print(f"🏆 SUBMISSION 14 (Multi-Seed Tri-Engine) OOF ROC-AUC: {cv_sub14:.5f}")
+
+r_te_lgb = rankdata(test_lgb_avg) / len(test_lgb_avg)
+r_te_xgb = rankdata(test_xgb_avg) / len(test_xgb_avg)
+r_te_cb  = rankdata(test_cb) / len(test_cb)
+test_sub14 = w_tri[0] * r_te_lgb + w_tri[1] * r_te_xgb + w_tri[2] * r_te_cb
+
+# -------------------------------------------------------------
+# 9. MODEL 5: MASTER TOP-10 ASSAULT (PHYSICS BOUNDARIES + ZERO TIES) -> SUB 15
+# -------------------------------------------------------------
+print("\n" + "=" * 80)
+print("👑 [MODEL 5 / SUB 15] Master Top-10 Assault: Physics Shifts & Zero-Tie Lexsort (Target >=0.94672)")
+print("=" * 80)
+
+test_incomes = test['Annual_Income_USD'].values
+test_commute = test['Daily_Commute_km'].values
+test_subsidy_no = (test['Subsidy_Available'] == "No").values
+test_env_1 = (test['Environmental_Concern_Level'] == 1).values
+test_anx_high = (test['Range_Anxiety_Level'] == "High").values
+
+# Base normalized ranks
+calibrated_preds = test_sub14.copy()
+
+# Deterministic Boundary Physics Shifts
+calibrated_preds[test_incomes >= 170537.0] += 10.0
+calibrated_preds[(test_incomes >= 31004.0) & (test_incomes <= 41970.0)] -= 10.0
+calibrated_preds[test_commute >= 83.0] -= 5.0
+calibrated_preds[(test_incomes == 30000.0) & test_subsidy_no & (test_env_1 | test_anx_high)] -= 5.0
+
+# Zero-Tie Ordinal Sorting via Lexsort
+order_final = np.lexsort((test_sub14, calibrated_preds))
+ranks_final = np.empty(len(order_final), dtype=np.int64)
+ranks_final[order_final] = np.arange(1, len(order_final) + 1)
+test_sub15 = (ranks_final - 0.5) / len(ranks_final)
+
+print(f"🎯 Zero-Tie Ordinal Rank Status:")
+print(f"  • Unique Predicted Ranks: {pd.Series(test_sub15).nunique():,} / {len(test_sub15):,} (100% Zero Ties)")
+print(f"  • Min Rank Score: {test_sub15.min():.6f}")
+print(f"  • Max Rank Score: {test_sub15.max():.6f}")
+
+# -------------------------------------------------------------
+# 10. 6-POINT INTEGRITY VERIFICATION & SAVING ALL 5 TIERS
+# -------------------------------------------------------------
+print("\n" + "=" * 80)
+print("💾 VERIFYING AND SAVING SUBMISSIONS 11 THROUGH 15")
 print("=" * 80)
 
 def save_and_verify(preds: np.ndarray, filename: str, desc: str):
@@ -635,10 +596,10 @@ def save_and_verify(preds: np.ndarray, filename: str, desc: str):
     std_val = sub[TARGET].std()
     print(f"✅ Saved & Verified: {filename} | {desc} | Mean: {mean_val:.4f} | Std: {std_val:.4f}")
 
-save_and_verify(test_m1, "submission_6_xgb_triple_te.csv", f"Sub 6: Lossguide XGBoost Triple TE (CV {cv_m1:.5f})")
-save_and_verify(test_m2, "submission_7_xgb_recipe_base_margin.csv", f"Sub 7: Lossguide XGBoost Recipe Margin (CV {cv_m2:.5f})")
-save_and_verify(test_m3, "submission_8_lgbm_triple_te_init_score.csv", f"Sub 8: LightGBM Triple TE Recipe Prior (CV {cv_m3:.5f})")
-save_and_verify(test_m4, "submission_9_catboost_triple_te.csv", f"Sub 9: CatBoost Triple TE Oblivious (CV {cv_m4:.5f})")
-save_and_verify(test_m5, "submission_10_top10_master_blend.csv", f"Sub 10: Master Rank Nelder-Mead Blend (CV {cv_m5:.5f})")
+save_and_verify(test_sub11, "submission_11_lgbm_refined_10fold.csv", f"Sub 11: 10-Fold LightGBM (CV {cv_sub11:.5f})")
+save_and_verify(test_sub12, "submission_12_xgb_lossguide_10fold.csv", f"Sub 12: 10-Fold Lossguide XGBoost (CV {cv_sub12:.5f})")
+save_and_verify(test_sub13, "submission_13_dual_engine_rank_blend.csv", f"Sub 13: Dual-Engine Rank Blend (CV {cv_sub13:.5f})")
+save_and_verify(test_sub14, "submission_14_multiseed_tri_engine.csv", f"Sub 14: Multi-Seed Tri-Engine Blend (CV {cv_sub14:.5f})")
+save_and_verify(test_sub15, "submission_15_top10_master_assault.csv", f"Sub 15: Master Top-10 Assault (CV {cv_sub14:.5f} + Physics)")
 
-print("\n🎉 ALL 5 TOP-10 SUBMISSIONS GENERATED AND VERIFIED SUCCESSFULLY!")
+print("\n🎉 ALL 5 PROGRESSIVE SUBMISSIONS GENERATED AND VERIFIED SUCCESSFULLY!")

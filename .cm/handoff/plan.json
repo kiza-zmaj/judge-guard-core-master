@@ -1,14 +1,13 @@
 {
   "schema": "plan@1",
-  "goal": "Aim for a Top-10 Finish in Kaggle S6E9 Using Five Kaggle Submissions and Kaggle Resources Only",
+  "goal": "Aim for a Top-10 Finish Using Five Kaggle Submissions and Kaggle Resources Only",
   "decisions": [
-    "Execute 100% on Kaggle Cloud GPU via Kaggle CLI kernel push",
-    "Fix IEEE-754 negative digit float bug and isolate income integer digits (0..5)",
-    "Upgrade from 5-fold to 10-fold Stratified CV to reduce test estimation variance",
-    "Integrate Chris Deotte latent recipe base_margin / init_score priors",
-    "Eliminate weak CatBoost leg and focus on multi-seed dual-engine GBDTs + rank ensembling",
-    "Apply deterministic physics boundaries and zero-tie ordinal ranking for Sub 15"
+    "Fixed IEEE-754 floating-point bug on negative digit extraction, using clean string/integer parsing for Annual_Income_USD (k=0..5)",
+    "Adopted Chris Deotte latent utility generator prior as init_score (LightGBM) and base_margin (XGBoost)",
+    "Upgraded from 5-fold to 10-fold Stratified CV with multi-seed averaging (Seeds 42 & 101) to suppress test estimation variance",
+    "Implemented deterministic boundary physics corrections and zero-tie ordinal sorting for peak Public LB assault",
+    "Preserved uncalibrated multi-seed rank blend as safe Private LB submission pair"
   ],
-  "first_tasks": ["1.1", "1.2", "1.3"],
+  "first_tasks": ["1.8", "1.9", "1.10"],
   "openspec_path": "openspec/changes/s6e9-top10-assault/"
 }

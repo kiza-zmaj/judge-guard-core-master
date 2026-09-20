@@ -93,13 +93,13 @@ def main():
         print("Failed to download kernel outputs.")
         sys.exit(1)
         
-    # Verify and submit all 5 submission files for Round 2 (Top 10 Assault)
+    # Verify and submit all 5 progressive submission files for Round 3 (Top-10 Assault)
     submission_files = [
-        ("submission_6_xgb_triple_te.csv", "Sub 6: Lossguide XGBoost with Triple Target Encoding (Najiama ~0.94639)"),
-        ("submission_7_xgb_recipe_base_margin.csv", "Sub 7: Lossguide XGBoost + Chris Deotte Recipe base_margin (Top 10 Target)"),
-        ("submission_8_lgbm_triple_te_init_score.csv", "Sub 8: LightGBM Triple TE with Recipe init_score"),
-        ("submission_9_catboost_triple_te.csv", "Sub 9: CatBoost Oblivious Trees on Triple TE Features"),
-        ("submission_10_top10_master_blend.csv", "Sub 10: Master Rank Nelder-Mead Blend (Top 10 Target >=0.94670)")
+        ("submission_11_lgbm_refined_10fold.csv", "Sub 11: Refined 10-Fold LightGBM Single Model (Target ~0.94648)"),
+        ("submission_12_xgb_lossguide_10fold.csv", "Sub 12: Refined 10-Fold Lossguide XGBoost Single Model (Target ~0.94652)"),
+        ("submission_13_dual_engine_rank_blend.csv", "Sub 13: Elite Dual-Engine Rank Blend (Target >=0.94660 Top 10)"),
+        ("submission_14_multiseed_tri_engine.csv", "Sub 14: Multi-Seed Tri-Engine Averaging (Seeds 42 & 101, Target ~0.94668)"),
+        ("submission_15_top10_master_assault.csv", "Sub 15: Master Top-10 Assault: Physics Shifts & Zero-Tie Lexsort (Target >=0.94672)")
     ]
     
     for filename, message in submission_files:
@@ -107,7 +107,7 @@ def main():
         if file_path.exists():
             verify_submission_file(file_path, SAMPLE_SUB_PATH)
             submit_to_competition(file_path, message)
-            time.sleep(5)
+            time.sleep(10)
         else:
             print(f"⚠️ Warning: File {filename} not found in outputs directory.")
             
