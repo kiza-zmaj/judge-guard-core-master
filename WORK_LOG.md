@@ -333,3 +333,5 @@
 ✅ Completed Deploy Kaggle v12 Halftime Goals Audit Kernel
 🟡 Starting Refactor SharpBet v13 Real MLE & Rigorous Governance
 ✅ Completed Refactor SharpBet v13 Real MLE & Rigorous Governance
+🟡 Starting Apply Peer-Review Upgrades to SharpBet v13.1
+✅ Completed Apply Peer-Review Upgrades to SharpBet v13.1
