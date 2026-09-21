@@ -2,7 +2,7 @@
   "pipeline_version": "14.0.0",
   "kaggle_execution": "cloud_gpu",
   "dataset_source": "kiza123123/mozzart-historical-odds",
-  "total_mozzart_records": 83995,
+  "total_mozzart_records": 344005,
   "holdout_season": "2024/25 (380 matches)",
   "holdout_sha256": "45981e847e9769643d1c806d092bf4b6a31ff829f23092407215b2feda40dd4a",
   "total_holdout_matches": 380,
@@ -15,24 +15,24 @@
   },
   "gate_b_market_alpha": {
     "status": "BLOCKED",
-    "mean_clv": -0.0808,
+    "mean_clv": -0.0982,
     "clv_cluster_95_ci": [
-      -0.0908,
-      -0.0721
+      -0.1091,
+      -0.0879
     ],
     "p_value": 0.0,
     "methodology": "Real market CLV benchmarked against Power De-Vigged closing lines under Mozzart retail overround."
   },
   "gate_c_economics": {
     "status": "PASSED",
-    "wagers_placed": 112,
-    "yield": 0.0204,
+    "wagers_placed": 89,
+    "yield": 0.0066,
     "yield_cluster_95_ci": [
-      -0.1744,
-      0.2297
+      -0.2331,
+      0.2576
     ],
-    "total_pnl_eur": 22.8,
-    "max_drawdown_eur": 109.5,
+    "total_pnl_eur": 5.9,
+    "max_drawdown_eur": 91.2,
     "methodology": "Empirical retail backtest incorporating verified Mozzart margins."
   },
   "final_verdict": "FAIL_CLOSED_BLOCKED",

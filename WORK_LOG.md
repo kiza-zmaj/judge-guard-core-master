@@ -342,3 +342,6 @@
 🟡 Starting Full Mozzart Archive Download and Ingestion
 🟡 Starting Deploy SharpBet v14 Direct Mozzart Kaggle Ingestion and Audit
 ✅ Completed Deploy SharpBet v14 Direct Mozzart Kaggle Ingestion and Audit
+✅ Completed Dataset v2 Upload (344k matches)
+🟡 Starting Kernel v8 Execution on Kaggle GPU
+✅ Completed Kernel v8 Execution (344k matches)
