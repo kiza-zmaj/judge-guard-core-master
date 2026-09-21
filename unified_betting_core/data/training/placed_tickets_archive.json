@@ -12,7 +12,7 @@
       "ticket_id": "1137024777052893",
       "timestamp": "2026-09-21 00:39:15",
       "bookmaker": "Mozzart Bet",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "name": "SIGURICA / VALUE BANKERI",
       "max_payout_rsd": 99.28,
       "total_odds": 1.9934,
@@ -118,7 +118,7 @@
       "ticket_id": "1137024772928642",
       "timestamp": "2026-09-21 00:44:34",
       "bookmaker": "Mozzart Bet",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "name": "MEGA KOMBO VALUE (Top Picks)",
       "max_payout_rsd": 40388.5,
       "total_odds_raw": 42.4293,
@@ -139,8 +139,8 @@
           "xg_home": 1.5,
           "xg_away": 0.95,
           "predicted_score": "1-0",
-          "actual_score": null,
-          "outcome": null
+          "actual_score": "2-0",
+          "outcome": 1
         },
         {
           "match": "Malacateco vs Deportivo Mixco",

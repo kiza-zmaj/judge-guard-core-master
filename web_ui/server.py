@@ -34,6 +34,8 @@ try:
     from src.kick import oauth as kick_oauth
     from src.kick import webhook as kick_webhook
     from src.kick import events as kick_events
+    from src.kick.client import KickClient
+    from src.kick.stream import KickStreamManager
     KICK_ENABLED = bool(os.getenv("KICK_CLIENT_ID"))
 except ImportError:
     KICK_ENABLED = False
@@ -126,19 +128,69 @@ class GuardianHandler(BaseHTTPRequestHandler):
 
             try:
                 tokens = kick_oauth.exchange_code(code, state)
-                # Store session — NEVER log token values
                 session_id = str(uuid.uuid4())
                 _kick_sessions[session_id] = {
                     "access_token":  tokens["access_token"],
                     "refresh_token": tokens.get("refresh_token"),
                     "expires_at":    time.time() + tokens.get("expires_in", 3600),
                 }
-                # Return session ID to frontend (not the token itself)
-                self.json_response({"kick": True, "session_id": session_id})
+
+                # Persist token for CLI and background workers
+                token_file = os.path.join(PROJECT_ROOT_FOR_IMPORT, ".kick_token.json")
+                with open(token_file, "w") as tf:
+                    json.dump(_kick_sessions[session_id], tf, indent=2)
+                try:
+                    os.chmod(token_file, 0o600)
+                except Exception:
+                    pass
+
+                # Auto-initialize Stream Manager
+                client = KickClient(
+                    client_id=os.environ["KICK_CLIENT_ID"],
+                    access_token=tokens["access_token"],
+                )
+                stream_mgr = KickStreamManager(client)
+                title = "🧠 Kaggle S6 Challenge | JudgeGuard AI Live Coding Session"
+                try:
+                    stream_mgr.update_channel(title=title)
+                except Exception as ex:
+                    logging.warning(f"Could not update channel title: {ex}")
+
+                stream_key = None
+                obs_launched = False
+                try:
+                    stream_key = stream_mgr.get_stream_key()
+                    if stream_key:
+                        obs_launched = stream_mgr.launch_obs(stream_key)
+                except Exception as ex:
+                    logging.warning(f"Could not fetch stream key or launch OBS: {ex}")
+
+                html_resp = f"""<!DOCTYPE html>
+<html>
+<head><title>Kick Stream Ready</title><style>
+body {{ font-family: -apple-system, sans-serif; background: #0b0e14; color: #00ff88; text-align: center; padding: 50px; }}
+.card {{ background: #151921; border: 1px solid #222a36; border-radius: 12px; padding: 30px; max-width: 600px; margin: auto; }}
+h1 {{ color: #ffffff; }}
+.btn {{ background: #00ff88; color: #000; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 20px; }}
+</style></head>
+<body>
+<div class="card">
+  <h1>✅ Kick Authorized & Stream Ready!</h1>
+  <p>Channel Title set: <strong>{title}</strong></p>
+  <p>OBS Studio: <strong>{'🚀 Launched with KizaGuard Profile' if obs_launched else '⚠️ Profile generated (~/.config/obs-studio)'}</strong></p>
+  <a class="btn" href="https://kick.com/dashboard" target="_blank">Open Kick Dashboard (Go Live)</a>
+</div>
+</body>
+</html>"""
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(html_resp.encode("utf-8"))))
+                self.end_headers()
+                self.wfile.write(html_resp.encode("utf-8"))
             except ValueError as e:
-                # State mismatch / CSRF / expired
                 self.json_response({"error": str(e), "kick": False}, status=403)
             except Exception as e:
+                logging.error(f"Token exchange failed: {e}")
                 self.json_response({"error": "Token exchange failed", "kick": False}, status=500)
 
         else:

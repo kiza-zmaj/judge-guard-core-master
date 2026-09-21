@@ -413,6 +413,8 @@ for seed in SEEDS:
     print(f"  -> LGBM Seed {seed} OOF ROC-AUC: {roc_auc_score(y, oof_seed):.5f}")
 
 print(f"\n🏆 LIGHTGBM MULTI-SEED ENSEMBLE OOF ROC-AUC: {roc_auc_score(y, oof_lgb_avg):.5f}")
+np.save(OUTPUT_DIR / "oof_lgb.npy", oof_lgb_avg)
+np.save(OUTPUT_DIR / "test_lgb.npy", test_lgb_avg)
 
 # -------------------------------------------------------------
 # 6. MODEL 2: DEEPER MULTI-SEED XGBOOST
@@ -472,6 +474,8 @@ for seed in SEEDS:
     print(f"  -> XGBoost Seed {seed} OOF ROC-AUC: {roc_auc_score(y, oof_seed):.5f}")
 
 print(f"\n🏆 XGBOOST MULTI-SEED ENSEMBLE OOF ROC-AUC: {roc_auc_score(y, oof_xgb_avg):.5f}")
+np.save(OUTPUT_DIR / "oof_xgb.npy", oof_xgb_avg)
+np.save(OUTPUT_DIR / "test_xgb.npy", test_xgb_avg)
 
 # -------------------------------------------------------------
 # 7. MODEL 3: DEEPER CATBOOST
@@ -506,6 +510,8 @@ for f_data in fold_datasets:
     print(f"  -> CatBoost Fold {fold} ROC-AUC: {roc_auc_score(y_va, oof_cb[f_data['valid_idx']]):.5f}")
 
 print(f"\n🏆 CATBOOST OOF ROC-AUC: {roc_auc_score(y, oof_cb):.5f}")
+np.save(OUTPUT_DIR / "oof_cb.npy", oof_cb)
+np.save(OUTPUT_DIR / "test_cb.npy", test_cb)
 
 # -------------------------------------------------------------
 # 8. NELDER-MEAD TRI-ENGINE RANK BLEND
@@ -536,6 +542,10 @@ r_te_lgb = rankdata(test_lgb_avg) / len(test_lgb_avg)
 r_te_xgb = rankdata(test_xgb_avg) / len(test_xgb_avg)
 r_te_cb  = rankdata(test_cb) / len(test_cb)
 test_blend = w_tri[0] * r_te_lgb + w_tri[1] * r_te_xgb + w_tri[2] * r_te_cb
+np.save(OUTPUT_DIR / "test_blend.npy", test_blend)
+raw_sub_p = OUTPUT_DIR / "submission_raw_blend.csv"
+pd.DataFrame({'id': test_id_orig, TARGET: test_blend}).to_csv(raw_sub_p, index=False)
+print(f"💾 Backup raw blend submission saved to: {raw_sub_p}")
 
 # -------------------------------------------------------------
 # 9. MASTER TOP-10 ASSAULT (PHYSICS BOUNDARIES + ZERO TIES)
@@ -565,7 +575,7 @@ ranks_final = np.empty(len(order_final), dtype=np.int64)
 ranks_final[order_final] = np.arange(1, len(order_final) + 1)
 test_final = (ranks_final - 0.5) / len(ranks_final)
 
-print(f"🎯 Zero-Tie Ordinal Rank Status:")
+print("🎯 Zero-Tie Ordinal Rank Status:")
 print(f"  • Unique Predicted Ranks: {pd.Series(test_final).nunique():,} / {len(test_final):,} (100% Zero Ties)")
 print(f"  • Min Rank Score: {test_final.min():.6f}")
 print(f"  • Max Rank Score: {test_final.max():.6f}")
@@ -577,15 +587,18 @@ filename = "submission_v2_ultimate.csv"
 p = OUTPUT_DIR / filename
 sub = pd.DataFrame({'id': test_id_orig, TARGET: test_final})
 
-# Integrity Verification
-assert len(sub) == len(test_df), f"Row count mismatch: {len(sub)} != {len(test_df)}"
+# 1. Save submission immediately
+sub.to_csv(p, index=False)
+print(f"\n💾 Successfully saved final submission to: {p}")
+
+# 2. Integrity Verification
+assert len(sub) == len(test), f"Row count mismatch: {len(sub)} != {len(test)}"
 assert list(sub.columns) == ['id', TARGET], f"Columns mismatch: {list(sub.columns)}"
 assert (sub['id'] == test_id_orig).all(), "ID alignment mismatch!"
 assert not sub[TARGET].isna().any(), "Found NaNs in predictions!"
 assert not np.isinf(sub[TARGET]).any(), "Found infinite values in predictions!"
 assert sub[TARGET].min() >= 0.0 and sub[TARGET].max() <= 1.0, f"Predictions out of [0, 1] range: min={sub[TARGET].min()}, max={sub[TARGET].max()}"
 
-sub.to_csv(p, index=False)
-print(f"\n✅ Saved & Verified Final Submission: {p}")
-print(f"   Mean: {sub[TARGET].mean():.4f} | Std: {sub[TARGET].std():.4f}")
+print(f"✅ Verified submission: {p}")
+print(f"   Rows: {len(sub):,} | Mean: {sub[TARGET].mean():.4f} | Std: {sub[TARGET].std():.4f}")
 print("🎉 EXECUTION COMPLETE!")

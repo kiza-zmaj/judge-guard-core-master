@@ -1,0 +1,14 @@
+{
+  "temperature": 1.0,
+  "fitted_samples": 1,
+  "last_trained_at": "2026-09-21T00:52:05.544611",
+  "metrics": {
+    "sample_count": 1,
+    "win_rate": 1.0,
+    "brier_score_model": 0.2153,
+    "brier_score_bookmaker": 0.245,
+    "brier_skill_score": 0.1213,
+    "log_loss": 0.6236,
+    "model_beats_bookmaker": true
+  }
+}
