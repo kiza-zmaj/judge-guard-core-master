@@ -60,13 +60,31 @@ def setup_obs_profile(stream_key: str):
 
 
 def launch_obs():
-    """Launch OBS Studio."""
+    """Launch OBS Studio with correct Wayland/PipeWire environment."""
     obs_paths = ["/usr/bin/obs", "/usr/local/bin/obs", "/snap/bin/obs-studio"]
     obs_bin = next((p for p in obs_paths if Path(p).exists()), "obs")
     print(f"🚀 Launching OBS Studio ({obs_bin})...")
     obs_env = os.environ.copy()
-    obs_env["QT_QPA_PLATFORM"] = "xcb"
-    obs_env["DISPLAY"] = obs_env.get("DISPLAY", ":0")
+
+    # Detect display server and set correct platform
+    wayland_display = obs_env.get("WAYLAND_DISPLAY", "")
+    xdg_session = obs_env.get("XDG_SESSION_TYPE", "").lower()
+
+    if wayland_display or xdg_session == "wayland":
+        # Wayland session: use native Wayland + PipeWire for screen capture
+        print("🖥️  Wayland session detected — enabling PipeWire screen capture")
+        obs_env["QT_QPA_PLATFORM"] = "wayland"
+        obs_env["OBS_USE_EGL"] = "1"
+        # Keep DISPLAY for XWayland fallback
+        obs_env.setdefault("DISPLAY", ":0")
+        # Ensure PipeWire portal is accessible
+        obs_env.setdefault("WAYLAND_DISPLAY", "wayland-0")
+    else:
+        # X11 session fallback
+        print("🖥️  X11 session detected — using XShm screen capture")
+        obs_env["QT_QPA_PLATFORM"] = "xcb"
+        obs_env.setdefault("DISPLAY", ":0")
+
     return subprocess.Popen([obs_bin, "--profile", "KizaGuard"], env=obs_env)
 
 
