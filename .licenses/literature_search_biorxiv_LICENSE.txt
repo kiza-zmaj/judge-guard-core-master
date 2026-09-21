@@ -1,0 +1,2 @@
+Notification: Please check the terms at https://api.biorxiv.org/ and https://www.biorxiv.org/content/about-biorxiv and always check the license of papers retrieved by bioRxiv/medRxiv tools for any restrictions.
+Acknowledged on: 2026-09-21T09:36:20+02:00
