@@ -1,21 +1,38 @@
 {
-  "pipeline_version": "12.1.0",
+  "pipeline_version": "13.0.0",
   "kaggle_execution": "cloud_gpu",
   "holdout_season": "2024/25 (380 matches)",
-  "holdout_sha256": "fe934e6bf2567891787e555736fa22f0d5bfa7a2d74a63fdda7071d8ebf1a307",
+  "holdout_sha256": "45981e847e9769643d1c806d092bf4b6a31ff829f23092407215b2feda40dd4a",
+  "total_holdout_matches": 380,
   "gate_a_calibration": {
     "status": "PASSED",
-    "ece": 0.0416,
-    "brier": 0.1107
+    "sample_size": 1140,
+    "macro_ece": 0.0378,
+    "macro_brier": 0.2171,
+    "notes": "Calculated on all 380 holdout matches across 3 markets with zero selection bias."
   },
   "gate_b_market_alpha": {
-    "status": "PASSED",
-    "mean_clv": 0.0355
+    "status": "BLOCKED",
+    "mean_real_clv": -0.068,
+    "clv_95_ci": [
+      -0.0754,
+      -0.0612
+    ],
+    "p_value": 0.0,
+    "notes": "Benchmarked against independent Pinnacle closing odds de-vigged with Shin/Power."
   },
   "gate_c_economics": {
     "status": "PASSED",
-    "roi": 0.0825,
-    "bets": 16
+    "wagers_placed": 137,
+    "yield": 0.0548,
+    "yield_95_ci": [
+      -0.1303,
+      0.2462
+    ],
+    "total_pnl_eur": 75.1,
+    "max_drawdown_eur": 104.6,
+    "notes": "Multi-market simulation with independent retail opening consensus pricing."
   },
-  "final_verdict": "APPROVED"
+  "final_verdict": "FAIL_CLOSED_BLOCKED",
+  "governance_rationale": "FAIL_CLOSED_BLOCKED: Although calibration (Gate A) and economic yield (Gate C) were verified, the strategy did not overcome the retail bookmaker overround relative to Pinnacle closing lines (Gate B). Capital allocation halted pursuant to fail-closed safety protocol."
 }

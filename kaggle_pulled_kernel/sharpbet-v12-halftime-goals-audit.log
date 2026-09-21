@@ -1,51 +1,72 @@
-[{"stream_name":"stderr","time":6.740337814,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
-,{"stream_name":"stderr","time":6.740402652,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
-,{"stream_name":"stderr","time":6.7404071089999995,"data":"0.00s - to python to disable frozen modules.\n"}
-,{"stream_name":"stderr","time":6.740409749,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
-,{"stream_name":"stderr","time":7.316311163,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
-,{"stream_name":"stderr","time":7.316340738,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
-,{"stream_name":"stderr","time":7.316348848,"data":"0.00s - to python to disable frozen modules.\n"}
-,{"stream_name":"stderr","time":7.316351449,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
-,{"stream_name":"stdout","time":10.384147285,"data":"✅ SharpBet Core v12 Environment Initialized.\n"}
-,{"stream_name":"stdout","time":10.384211496,"data":"NumPy: 2.0.2 | Pandas: 2.3.3\n"}
-,{"stream_name":"stdout","time":10.402365886,"data":"✅ Power De-Vig \u0026 CLV functions compiled.\n"}
-,{"stream_name":"stdout","time":10.584197872,"data":"Fetching Season 2223 from https://www.football-data.co.uk/mmz4281/2223/E0.csv...\n"}
-,{"stream_name":"stdout","time":11.883431753,"data":"Loaded 380 matches for season 2223.\n"}
-,{"stream_name":"stdout","time":11.883467766,"data":"Fetching Season 2324 from https://www.football-data.co.uk/mmz4281/2324/E0.csv...\n"}
-,{"stream_name":"stdout","time":13.067958913,"data":"Loaded 380 matches for season 2324.\n"}
-,{"stream_name":"stdout","time":13.067994954,"data":"Fetching Season 2425 from https://www.football-data.co.uk/mmz4281/2425/E0.csv...\n"}
-,{"stream_name":"stdout","time":14.112689819,"data":"Loaded 380 matches for season 2425.\n"}
-,{"stream_name":"stdout","time":14.112726618,"data":"Total verified matches loaded: 1140\n"}
-,{"stream_name":"stdout","time":14.326111795,"data":"✅ Rolling 1H \u0026 FT pre-match indicators computed successfully.\n"}
-,{"stream_name":"stdout","time":14.355461062,"data":"Sample 1H 0-0 Prob: 0.3465 | 1H Over 0.5 Prob: 0.6535\n"}
-,{"stream_name":"stdout","time":14.390051861,"data":"Sample Mozzart Multi-Bet Probabilities:\n"}
-,{"stream_name":"stdout","time":14.390072996,"data":"  I1+        : Prob = 0.6535 | Fair Odds = 1.53\n"}
-,{"stream_name":"stdout","time":14.39008071,"data":"  I2+        : Prob = 0.3146 | Fair Odds = 3.18\n"}
-,{"stream_name":"stdout","time":14.390087087,"data":"  I_1-2      : Prob = 0.5540 | Fair Odds = 1.81\n"}
-,{"stream_name":"stdout","time":14.390092692,"data":"  I\u003cII       : Prob = 0.5070 | Fair Odds = 1.97\n"}
-,{"stream_name":"stdout","time":14.390098633,"data":"  I1+\u0026II1+   : Prob = 0.5340 | Fair Odds = 1.87\n"}
-,{"stream_name":"stdout","time":14.390103751,"data":"  1\u0026I1+      : Prob = 0.3156 | Fair Odds = 3.17\n"}
-,{"stream_name":"stdout","time":14.405359893,"data":"✅ Calibration and Fractional Kelly algorithms ready.\n"}
-,{"stream_name":"stdout","time":14.789711391,"data":"🔒 Sacred Holdout Season 2425 Fingerprint: fe934e6bf2567891787e555736fa22f0d5bfa7a2d74a63fdda7071d8ebf1a307\n"}
-,{"stream_name":"stdout","time":14.789738692,"data":"Train matches: 760 | Holdout matches: 380\n"}
-,{"stream_name":"stdout","time":19.116097845,"data":"Total wagers placed in out-of-sample holdout: 16\n"}
-,{"stream_name":"stdout","time":19.116139436,"data":"Holdout PnL: €9.28 | Yield: 8.25%\n"}
-,{"stream_name":"stdout","time":19.116164005,"data":"Macro ECE: 4.16% | Brier Score: 0.1107 | Mean Fair CLV: 3.55%\n"}
-,{"stream_name":"stdout","time":19.139082692,"data":"======================================================================\n"}
-,{"stream_name":"stdout","time":19.139106606,"data":"🛡️ SHARPBET CORE v12: THREE-GATE GOVERNANCE AUDIT\n"}
-,{"stream_name":"stdout","time":19.139112538,"data":"Gate A (Calibration) : ✅ PASSED (ECE: 4.16%, Brier: 0.1107)\n"}
-,{"stream_name":"stdout","time":19.139117017,"data":"Gate B (Market Alpha): ✅ PASSED (Mean Fair CLV: 3.55%)\n"}
-,{"stream_name":"stdout","time":19.139121344,"data":"Gate C (Economics)   : ✅ PASSED (Yield: 8.25%, Bets: 16)\n"}
-,{"stream_name":"stdout","time":19.139125866,"data":"======================================================================\n"}
-,{"stream_name":"stdout","time":19.139130208,"data":"✅ gate_verdicts.json generated and persisted.\n"}
-,{"stream_name":"stdout","time":19.139134425,"data":"🔐 Holdout SHA-256: fe934e6bf2567891...\n"}
-,{"stream_name":"stdout","time":19.139138428,"data":"🏁 FINAL VERDICT: APPROVED\n"}
-,{"stream_name":"stderr","time":21.638348774,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
-,{"stream_name":"stderr","time":21.638377083,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
-,{"stream_name":"stderr","time":21.789822261,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
-,{"stream_name":"stderr","time":21.789843779,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
-,{"stream_name":"stderr","time":22.371547085,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
-,{"stream_name":"stderr","time":22.668381064,"data":"[NbConvertApp] Writing 34256 bytes to __notebook__.ipynb\n"}
-,{"stream_name":"stderr","time":24.93843329,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
-,{"stream_name":"stderr","time":25.799855112,"data":"[NbConvertApp] Writing 386195 bytes to __results__.html\n"}
+[{"stream_name":"stderr","time":6.91065203,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":6.910719274,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":6.910723755,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":6.910726529,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":7.502848085,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":7.502880755,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":7.502884856,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":7.502887472,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":10.566587429,"data":"✅ SharpBet Core v13 Environment Initialized.\n"}
+,{"stream_name":"stdout","time":10.56664415,"data":"NumPy: 2.0.2 | Pandas: 2.3.3 | Python: 3.12.13\n"}
+,{"stream_name":"stdout","time":10.767314789,"data":"Fetching Season 2223 from https://www.football-data.co.uk/mmz4281/2223/E0.csv...\n"}
+,{"stream_name":"stdout","time":11.943196887,"data":"Loaded 380 verified matches for season 2223.\n"}
+,{"stream_name":"stdout","time":11.943234214,"data":"Fetching Season 2324 from https://www.football-data.co.uk/mmz4281/2324/E0.csv...\n"}
+,{"stream_name":"stdout","time":13.051499517,"data":"Loaded 380 verified matches for season 2324.\n"}
+,{"stream_name":"stdout","time":13.051531617,"data":"Fetching Season 2425 from https://www.football-data.co.uk/mmz4281/2425/E0.csv...\n"}
+,{"stream_name":"stdout","time":14.01147246,"data":"Loaded 380 verified matches for season 2425.\n"}
+,{"stream_name":"stdout","time":14.011507377,"data":"Total verified matches loaded: 1140\n"}
+,{"stream_name":"stdout","time":14.212395386,"data":"Train matches: 760 (2022/23 \u0026 2023/24)\n"}
+,{"stream_name":"stdout","time":14.212439231,"data":"Holdout matches: 380 (2024/25)\n"}
+,{"stream_name":"stdout","time":14.212445686,"data":"🔒 Sacred Holdout Fingerprint (SHA-256): 45981e847e9769643d1c806d092bf4b6a31ff829f23092407215b2feda40dd4a\n"}
+,{"stream_name":"stdout","time":14.212451859,"data":"Fitting Dixon-Coles 1H parameters via L-BFGS-B numerical optimization...\n"}
+,{"stream_name":"stdout","time":14.559406676,"data":"✅ Dixon-Coles 1H Optimization Success: True (Iterations: 29)\n"}
+,{"stream_name":"stdout","time":14.559439433,"data":"   Baseline 1H Intensity (mu): -0.584 (Exp: 0.558 goals/team)\n"}
+,{"stream_name":"stdout","time":14.559445046,"data":"   Home Advantage (gamma)    : 0.227 (+25.5%)\n"}
+,{"stream_name":"stdout","time":14.559450028,"data":"   Halftime Correlation (rho): -0.0213\n"}
+,{"stream_name":"stdout","time":14.584726763,"data":"✅ Multi-bet Mozzart probability engine ready.\n"}
+,{"stream_name":"stdout","time":14.604834604,"data":"✅ Independent Pinnacle Sharp Benchmark compiled.\n"}
+,{"stream_name":"stdout","time":17.055999811,"data":"======================================================================\n"}
+,{"stream_name":"stdout","time":17.056036276,"data":"🛡️ GATE A AUDIT: FULL-SAMPLE OUT-OF-SAMPLE CALIBRATION (380 MATCHES)\n"}
+,{"stream_name":"stdout","time":17.056042963,"data":"  Market I1+   : ECE = 3.46% | Brier = 0.1776\n"}
+,{"stream_name":"stdout","time":17.056047179,"data":"  Market I2+   : ECE = 4.92% | Brier = 0.2334\n"}
+,{"stream_name":"stdout","time":17.05605078,"data":"  Market I 1-2 : ECE = 2.95% | Brier = 0.2404\n"}
+,{"stream_name":"stdout","time":17.056074824,"data":"  MACRO ECE    : 3.78% (Threshold: \u003c= 6.00%)\n"}
+,{"stream_name":"stdout","time":17.056080163,"data":"  MACRO BRIER  : 0.2171 (Threshold: \u003c= 0.2200)\n"}
+,{"stream_name":"stdout","time":17.056083991,"data":"GATE A STATUS  : ✅ PASSED\n"}
+,{"stream_name":"stdout","time":17.056087441,"data":"======================================================================\n"}
+,{"stream_name":"stdout","time":20.357590739,"data":"Total wagers placed across holdout: 137\n"}
+,{"stream_name":"stdout","time":20.357628269,"data":"Wagers distribution by market:\n"}
+,{"stream_name":"stdout","time":20.357633845,"data":"  I2+   : 104 wagers\n"}
+,{"stream_name":"stdout","time":20.357637866,"data":"  I1+   : 33 wagers\n"}
+,{"stream_name":"stdout","time":20.435001698,"data":"======================================================================\n"}
+,{"stream_name":"stdout","time":20.435026104,"data":"🛡️ GATE B AUDIT: MARKET ALPHA (TRUE PINNACLE CLOSING LINE VALUE)\n"}
+,{"stream_name":"stdout","time":20.435032438,"data":"  Mean Real CLV     : -6.80% (H0: CLV \u003c= 0, t = -18.89, p-value = 0.0000)\n"}
+,{"stream_name":"stdout","time":20.435037663,"data":"  Bootstrap 95% CI  : [-7.54%, -6.12%]\n"}
+,{"stream_name":"stdout","time":20.435041977,"data":"GATE B STATUS       : 🛑 BLOCKED (Retail juice hurdle not cleared)\n"}
+,{"stream_name":"stdout","time":20.435046096,"data":"======================================================================\n"}
+,{"stream_name":"stdout","time":20.435053878,"data":"🛡️ GATE C AUDIT: ECONOMIC VIABILITY \u0026 DRAWDOWN\n"}
+,{"stream_name":"stdout","time":20.435058018,"data":"  Total Wagers      : 137 (Threshold: \u003e= 30)\n"}
+,{"stream_name":"stdout","time":20.435061973,"data":"  Holdout PnL       : €75.10\n"}
+,{"stream_name":"stdout","time":20.4350661,"data":"  Yield (ROI)       : 5.48%\n"}
+,{"stream_name":"stdout","time":20.435070347,"data":"  Bootstrap 95% CI  : [-13.03%, 24.62%]\n"}
+,{"stream_name":"stdout","time":20.43507476,"data":"  Max Drawdown      : €104.60\n"}
+,{"stream_name":"stdout","time":20.435078647,"data":"GATE C STATUS       : ✅ PASSED\n"}
+,{"stream_name":"stdout","time":20.435082344,"data":"======================================================================\n"}
+,{"stream_name":"stdout","time":20.451568483,"data":"======================================================================\n"}
+,{"stream_name":"stdout","time":20.451589343,"data":"🏁 FINAL GOVERNANCE AUDIT SUMMARY\n"}
+,{"stream_name":"stdout","time":20.451594813,"data":"Gate A (Calibration) : ✅ PASSED\n"}
+,{"stream_name":"stdout","time":20.451598718,"data":"Gate B (Market Alpha): 🛑 BLOCKED\n"}
+,{"stream_name":"stdout","time":20.451602751,"data":"Gate C (Economics)   : ✅ PASSED\n"}
+,{"stream_name":"stdout","time":20.451606736,"data":"FINAL VERDICT        : FAIL_CLOSED_BLOCKED\n"}
+,{"stream_name":"stdout","time":20.451611466,"data":"RATIONALE            : FAIL_CLOSED_BLOCKED: Although calibration (Gate A) and economic yield (Gate C) were verified, the strategy did not overcome the retail bookmaker overround relative to Pinnacle closing lines (Gate B). Capital allocation halted pursuant to fail-closed safety protocol.\n"}
+,{"stream_name":"stdout","time":20.451617342,"data":"======================================================================\n"}
+,{"stream_name":"stdout","time":20.451621052,"data":"✅ gate_verdicts.json successfully exported.\n"}
+,{"stream_name":"stderr","time":23.004366429,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":23.004404356,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":23.160108101,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":23.160152008,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":23.766178705,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":24.073419742,"data":"[NbConvertApp] Writing 34138 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":26.419894764,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":27.345851902,"data":"[NbConvertApp] Writing 382193 bytes to __results__.html\n"}
 ]
