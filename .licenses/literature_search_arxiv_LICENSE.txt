@@ -1,0 +1,4 @@
+ArXiv Literature Search License Notification
+Date: 2026-09-21
+User notified to check: https://info.arxiv.org/help/api/index.html
+Always check the license of papers retrieved for any restrictions.
