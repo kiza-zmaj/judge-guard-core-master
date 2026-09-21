@@ -64,7 +64,10 @@ def launch_obs():
     obs_paths = ["/usr/bin/obs", "/usr/local/bin/obs", "/snap/bin/obs-studio"]
     obs_bin = next((p for p in obs_paths if Path(p).exists()), "obs")
     print(f"🚀 Launching OBS Studio ({obs_bin})...")
-    return subprocess.Popen([obs_bin, "--profile", "KizaGuard"])
+    obs_env = os.environ.copy()
+    obs_env["QT_QPA_PLATFORM"] = "xcb"
+    obs_env["DISPLAY"] = obs_env.get("DISPLAY", ":0")
+    return subprocess.Popen([obs_bin, "--profile", "KizaGuard"], env=obs_env)
 
 
 def main():
