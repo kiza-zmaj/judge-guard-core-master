@@ -190,6 +190,22 @@ class RealDataProvider:
             ftag = int(row.get("FTAG", 0))
             ftr = str(row["FTR"]).strip().upper()
 
+            # Halftime goals and results
+            hthg = int(row.get("HTHG", 0) if pd.notna(row.get("HTHG")) else 0)
+            htag = int(row.get("HTAG", 0) if pd.notna(row.get("HTAG")) else 0)
+            htr_val = str(row.get("HTR", "")).strip().upper()
+            if htr_val == "H":
+                ht_result = "home"
+            elif htr_val == "D":
+                ht_result = "draw"
+            elif htr_val == "A":
+                ht_result = "away"
+            else:
+                ht_result = "draw" if hthg == htag else ("home" if hthg > htag else "away")
+
+            sh_home = max(0, fthg - hthg)
+            sh_away = max(0, ftag - htag)
+
             # Map FTR to canonical outcome
             if ftr == "H":
                 result = "home"
@@ -262,6 +278,14 @@ class RealDataProvider:
                     "home_goals": fthg,
                     "away_goals": ftag,
                     "result": result,
+                    # Halftime & 2nd half metrics
+                    "ht_home_goals": hthg,
+                    "ht_away_goals": htag,
+                    "ht_result": ht_result,
+                    "sh_home_goals": sh_home,
+                    "sh_away_goals": sh_away,
+                    "ht_total_goals": hthg + htag,
+                    "sh_total_goals": sh_home + sh_away,
                     # Real pre-match available opening odds (Market Max)
                     "home_odds": round(open_h, 3),
                     "draw_odds": round(open_d, 3),
@@ -322,26 +346,38 @@ class RealDataProvider:
             a_past = team_history.get(a_team, [])
 
             if len(h_past) >= 3:
-                h_scored = np.mean([m["goals_for"] for m in h_past[-15:]])
-                h_conceded = np.mean([m["goals_against"] for m in h_past[-15:]])
+                h_scored = float(np.mean([m["goals_for"] for m in h_past[-15:]]))
+                h_conceded = float(np.mean([m["goals_against"] for m in h_past[-15:]]))
+                h_1h_scored = float(np.mean([m.get("ht_goals_for", m["goals_for"] * 0.43) for m in h_past[-15:]]))
+                h_1h_conceded = float(np.mean([m.get("ht_goals_against", m["goals_against"] * 0.43) for m in h_past[-15:]]))
             else:
                 h_scored = 1.45  # League baseline
                 h_conceded = 1.35
+                h_1h_scored = 0.62
+                h_1h_conceded = 0.58
 
             if len(a_past) >= 3:
-                a_scored = np.mean([m["goals_for"] for m in a_past[-15:]])
-                a_conceded = np.mean([m["goals_against"] for m in a_past[-15:]])
+                a_scored = float(np.mean([m["goals_for"] for m in a_past[-15:]]))
+                a_conceded = float(np.mean([m["goals_against"] for m in a_past[-15:]]))
+                a_1h_scored = float(np.mean([m.get("ht_goals_for", m["goals_for"] * 0.43) for m in a_past[-15:]]))
+                a_1h_conceded = float(np.mean([m.get("ht_goals_against", m["goals_against"] * 0.43) for m in a_past[-15:]]))
             else:
                 a_scored = 1.20  # League baseline
                 a_conceded = 1.45
+                a_1h_scored = 0.52
+                a_1h_conceded = 0.62
 
             # Poisson rate parameter lambda based strictly on past stats
             home_xg = max(round((h_scored + a_conceded) / 2.0, 2), 0.3)
             away_xg = max(round((a_scored + h_conceded) / 2.0, 2), 0.2)
+            home_1h_xg = max(round((h_1h_scored + a_1h_conceded) / 2.0, 2), 0.15)
+            away_1h_xg = max(round((a_1h_scored + h_1h_conceded) / 2.0, 2), 0.10)
 
             row_dict = dict(row)
             row_dict["home_xg"] = home_xg
             row_dict["away_xg"] = away_xg
+            row_dict["home_1h_xg"] = home_1h_xg
+            row_dict["away_1h_xg"] = away_1h_xg
             enriched_rows.append(row_dict)
 
             # Now, AFTER making the pre-match prediction record, record actual outcome into history
@@ -352,6 +388,8 @@ class RealDataProvider:
                     "date": row["date"],
                     "goals_for": row["home_goals"],
                     "goals_against": row["away_goals"],
+                    "ht_goals_for": row.get("ht_home_goals", 0),
+                    "ht_goals_against": row.get("ht_away_goals", 0),
                 }
             )
 
@@ -362,6 +400,8 @@ class RealDataProvider:
                     "date": row["date"],
                     "goals_for": row["away_goals"],
                     "goals_against": row["home_goals"],
+                    "ht_goals_for": row.get("ht_away_goals", 0),
+                    "ht_goals_against": row.get("ht_home_goals", 0),
                 }
             )
 

@@ -25,19 +25,28 @@ MODELS_STORE = os.path.join(BASE_DIR, "models_store")
 CALIBRATION_FILE = os.path.join(MODELS_STORE, "mozzart_calibration_weights.json")
 
 
-def evaluate_selection_outcome(market_type: str, selection: str, home_goals: int, away_goals: int) -> int:
+def evaluate_selection_outcome(
+    market_type: str,
+    selection: str,
+    home_goals: int,
+    away_goals: int,
+    ht_home_goals: int = 0,
+    ht_away_goals: int = 0,
+) -> int:
     """
-    Evaluates whether a selection won (1) or lost (0) based on actual score.
+    Evaluates whether a selection won (1) or lost (0) based on actual score and halftime score.
     """
     sel = selection.strip().upper()
     tot_goals = home_goals + away_goals
+    tot_ht = ht_home_goals + ht_away_goals
+    tot_sh = (home_goals - ht_home_goals) + (away_goals - ht_away_goals)
 
     if market_type == "1X2":
-        if sel == "1" or sel == "HOME":
+        if sel in ["1", "HOME"]:
             return 1 if home_goals > away_goals else 0
-        elif sel == "X" or sel == "DRAW":
+        elif sel in ["X", "DRAW"]:
             return 1 if home_goals == away_goals else 0
-        elif sel == "2" or sel == "AWAY":
+        elif sel in ["2", "AWAY"]:
             return 1 if away_goals > home_goals else 0
 
     elif market_type == "double_chance":
@@ -55,6 +64,58 @@ def evaluate_selection_outcome(market_type: str, selection: str, home_goals: int
             return 1 if tot_goals <= 2 else 0
         elif sel in ["3+", "VIŠE 2.5", "OVER 2.5"]:
             return 1 if tot_goals >= 3 else 0
+        elif sel in ["0-1", "UNDER 1.5"]:
+            return 1 if tot_goals <= 1 else 0
+        elif sel in ["4+", "OVER 3.5"]:
+            return 1 if tot_goals >= 4 else 0
+
+    elif market_type in ["halftime_goals", "first_half_goals", "prvo_poluvreme_golovi"]:
+        if sel in ["I1+", "1+I", "OVER 0.5 HT", "I 1+"]:
+            return 1 if tot_ht >= 1 else 0
+        elif sel in ["I2+", "2+I", "OVER 1.5 HT", "I 2+"]:
+            return 1 if tot_ht >= 2 else 0
+        elif sel in ["I 0-1", "0-1 I", "UNDER 1.5 HT"]:
+            return 1 if tot_ht <= 1 else 0
+        elif sel in ["I 1-2", "1-2 I", "1-2"]:
+            return 1 if 1 <= tot_ht <= 2 else 0
+
+    elif market_type in ["second_half_goals", "drugo_poluvreme_golovi"]:
+        if sel in ["II1+", "1+II", "OVER 0.5 2H", "II 1+"]:
+            return 1 if tot_sh >= 1 else 0
+        elif sel in ["II2+", "2+II", "OVER 1.5 2H", "II 2+"]:
+            return 1 if tot_sh >= 2 else 0
+
+    elif market_type in ["goals_both_halves", "golovi_oba_poluvremena"]:
+        if sel in ["I1+&II1+", "1+I&1+II", "1+FH&1+SH"]:
+            return 1 if (tot_ht >= 1 and tot_sh >= 1) else 0
+        elif sel in ["I2+&II2+", "2+I&2+II", "2+FH&2+SH"]:
+            return 1 if (tot_ht >= 2 and tot_sh >= 2) else 0
+        elif sel in ["I1+&II2+", "1+I&2+II", "1+FH&2+SH"]:
+            return 1 if (tot_ht >= 1 and tot_sh >= 2) else 0
+
+    elif market_type in ["half_with_more_goals", "poluvreme_vise_golova"]:
+        if sel in ["I<II", "2", "2H", "II"]:
+            return 1 if tot_sh > tot_ht else 0
+        elif sel in ["I=II", "X", "EQUAL", "="]:
+            return 1 if tot_sh == tot_ht else 0
+        elif sel in ["I>II", "1", "1H", "I"]:
+            return 1 if tot_ht > tot_sh else 0
+
+    elif market_type in ["combo_result_ht_goals", "mozzart_combinations"]:
+        if sel in ["1&I1+", "1&1+I", "1&OV 0.5FH"]:
+            return 1 if (home_goals > away_goals and tot_ht >= 1) else 0
+        elif sel in ["2&I1+", "2&1+I", "2&OV 0.5FH"]:
+            return 1 if (away_goals > home_goals and tot_ht >= 1) else 0
+        elif sel in ["GG&I1+", "GG&1+I"]:
+            return 1 if (home_goals >= 1 and away_goals >= 1 and tot_ht >= 1) else 0
+        elif sel in ["1&I2+", "1&2+I"]:
+            return 1 if (home_goals > away_goals and tot_ht >= 2) else 0
+
+    elif market_type in ["both_teams_to_score", "btts"]:
+        if sel in ["GG", "DA", "YES"]:
+            return 1 if (home_goals >= 1 and away_goals >= 1) else 0
+        elif sel in ["NG", "NE", "NO"]:
+            return 1 if (home_goals == 0 or away_goals == 0) else 0
 
     raise ValueError(f"Unknown market_type '{market_type}' with selection '{selection}'")
 
