@@ -1,4 +1,2 @@
-ArXiv Literature Search License Notification
-Date: 2026-09-21
-User notified to check: https://info.arxiv.org/help/api/index.html
-Always check the license of papers retrieved for any restrictions.
+Terms of Use check: Please check the arXiv API terms of use at https://info.arxiv.org/help/api/index.html and always check the individual licenses of the papers retrieved by the skill for any restrictions.
+Timestamp: 2026-09-21T15:35:00Z
