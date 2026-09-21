@@ -12,6 +12,9 @@ import os
 import sys
 import json
 import time
+import queue
+import threading
+import logging
 from dotenv import load_dotenv
 
 # Load .env file automatically
@@ -20,7 +23,46 @@ import subprocess
 import uuid
 import jwt
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
+
+# ── Kick modules (PYTHONPATH must include project root) ───────────────────────
+PROJECT_ROOT_FOR_IMPORT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT_FOR_IMPORT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT_FOR_IMPORT)
+
+try:
+    from src.kick import oauth as kick_oauth
+    from src.kick import webhook as kick_webhook
+    from src.kick import events as kick_events
+    KICK_ENABLED = bool(os.getenv("KICK_CLIENT_ID"))
+except ImportError:
+    KICK_ENABLED = False
+    logging.warning("Kick modules not found — Kick integration disabled.")
+
+# ── Webhook processing queue (fast-ack architecture) ─────────────────────────
+_webhook_queue: queue.Queue = queue.Queue(maxsize=1000)
+
+
+def _webhook_worker():
+    """Background thread: drain webhook queue and process events."""
+    while True:
+        try:
+            item = _webhook_queue.get(timeout=5)
+            meta, payload = item
+            kick_events.handle_event(meta, payload)
+        except queue.Empty:
+            continue
+        except Exception:
+            logging.exception("Webhook worker error")
+
+
+if KICK_ENABLED:
+    _wh_thread = threading.Thread(target=_webhook_worker, daemon=True)
+    _wh_thread.start()
+
+# ── In-memory Kick session store (replace with encrypted DB in prod) ──────────
+# { state: { "access_token": ..., "refresh_token": ..., "expires_at": ... } }
+_kick_sessions: dict = {}
 
 PORT = int(os.getenv("PORT", 8080))
 WEB_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -39,17 +81,85 @@ class GuardianHandler(BaseHTTPRequestHandler):
         print(f"[{time.strftime('%H:%M:%S')}] {format % args}")
 
     def do_GET(self):
-        path = urlparse(self.path).path
+        parsed = urlparse(self.path)
+        path   = parsed.path
+        params = parse_qs(parsed.query)
 
         if path == "/" or path == "/index.html":
             self.serve_file(os.path.join(WEB_DIR, "index.html"), "text/html")
+
         elif path == "/health":
             self.json_response({
                 "status": "ok",
                 "agent": "JudgeGuard v2.0",
                 "python": PYTHON_BIN,
-                "mode": "100% PRODUCT"
+                "mode": "100% PRODUCT",
+                "kick_enabled": KICK_ENABLED,
             })
+
+        # ── Kick: Start OAuth flow ────────────────────────────────────────────
+        elif path == "/kick/login" and KICK_ENABLED:
+            try:
+                url, state = kick_oauth.build_authorize_url()
+                self.send_response(302)
+                self.send_header("Location", url)
+                self.send_header("Cache-Control", "no-store")
+                self.end_headers()
+            except Exception as e:
+                self.json_response({"error": str(e)}, status=500)
+
+        # ── Kick: OAuth callback ──────────────────────────────────────────────
+        # Kick redirect URL is localhost:3000/callback
+        # This handler covers if you run a second server on 3000, OR you
+        # proxy /callback from port 3000 to here.
+        elif path == "/callback" and KICK_ENABLED:
+            code  = (params.get("code")  or [None])[0]
+            state = (params.get("state") or [None])[0]
+            error = (params.get("error") or [None])[0]
+
+            if error:
+                self.json_response({"error": error, "kick": False}, status=400)
+                return
+            if not code or not state:
+                self.json_response({"error": "Missing code or state"}, status=400)
+                return
+
+            try:
+                tokens = kick_oauth.exchange_code(code, state)
+                # Store session — NEVER log token values
+                session_id = str(uuid.uuid4())
+                _kick_sessions[session_id] = {
+                    "access_token":  tokens["access_token"],
+                    "refresh_token": tokens.get("refresh_token"),
+                    "expires_at":    time.time() + tokens.get("expires_in", 3600),
+                }
+                # Return session ID to frontend (not the token itself)
+                self.json_response({"kick": True, "session_id": session_id})
+            except ValueError as e:
+                # State mismatch / CSRF / expired
+                self.json_response({"error": str(e), "kick": False}, status=403)
+            except Exception as e:
+                self.json_response({"error": "Token exchange failed", "kick": False}, status=500)
+
+        else:
+            self.send_error(404, "Not Found")
+
+    def do_DELETE(self):
+        path = urlparse(self.path).path
+
+        # ── Kick: Disconnect / revoke tokens ─────────────────────────────────
+        if path == "/kick/disconnect" and KICK_ENABLED:
+            length = int(self.headers.get("Content-Length", 0))
+            body   = json.loads(self.rfile.read(length)) if length else {}
+            sid    = body.get("session_id", "")
+            sess   = _kick_sessions.pop(sid, None)
+
+            if sess and sess.get("access_token"):
+                kick_oauth.revoke_token(sess["access_token"], "access_token")
+                if sess.get("refresh_token"):
+                    kick_oauth.revoke_token(sess["refresh_token"], "refresh_token")
+
+            self.json_response({"kick": False, "disconnected": True})
         else:
             self.send_error(404, "Not Found")
 
@@ -68,14 +178,41 @@ class GuardianHandler(BaseHTTPRequestHandler):
 
             result = self.run_judgeguard(action, scope)
             self.json_response(result)
+
+        # ── Kick: Webhook endpoint ────────────────────────────────────────────
+        elif path == "/kick/webhook" and KICK_ENABLED:
+            # Read raw bytes BEFORE any parsing (P0 audit requirement)
+            length   = int(self.headers.get("Content-Length", 0))
+            raw_body = self.rfile.read(length)
+
+            # Fast-ack immediately — processing goes to queue
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", "2")
+            self.end_headers()
+            self.wfile.write(b"{}")
+
+            # Now validate + enqueue (after 200 is sent)
+            try:
+                headers_dict = dict(self.headers)
+                meta = kick_webhook.validate_webhook(raw_body, headers_dict)
+                payload = json.loads(raw_body)
+                _webhook_queue.put_nowait((meta, payload))
+            except kick_webhook.WebhookError as e:
+                logging.warning("Webhook rejected: %s", e)
+            except queue.Full:
+                logging.error("Webhook queue full — event dropped")
+            except Exception:
+                logging.exception("Webhook handling error")
+
         else:
             self.send_error(404, "Not Found")
 
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.end_headers()
 
     def serve_file(self, path, content_type):
@@ -91,9 +228,9 @@ class GuardianHandler(BaseHTTPRequestHandler):
         except FileNotFoundError:
             self.send_error(404, f"File not found: {path}")
 
-    def json_response(self, data):
+    def json_response(self, data, status=200):
         content = json.dumps(data).encode()
-        self.send_response(200)
+        self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", len(content))
         self.send_header("Access-Control-Allow-Origin", "*")
