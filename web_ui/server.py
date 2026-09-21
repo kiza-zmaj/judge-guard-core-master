@@ -146,8 +146,10 @@ class GuardianHandler(BaseHTTPRequestHandler):
 
                 # Auto-initialize Stream Manager
                 client = KickClient(
-                    client_id=os.environ["KICK_CLIENT_ID"],
                     access_token=tokens["access_token"],
+                    refresh_token=tokens.get("refresh_token"),
+                    expires_at=time.time() + tokens.get("expires_in", 3600),
+                    client_id=os.environ.get("KICK_CLIENT_ID", ""),
                 )
                 stream_mgr = KickStreamManager(client)
                 title = "🧠 Kaggle S6 Challenge | JudgeGuard AI Live Coding Session"

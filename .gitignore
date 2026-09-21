@@ -42,3 +42,8 @@ actions-runner/
 .agent/
 .venv/
 node_modules
+
+# Stream runtime & tokens
+.kick_token.json
+stream_status.json
+stream_incidents.jsonl

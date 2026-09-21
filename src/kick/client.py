@@ -27,10 +27,11 @@ class KickClient:
         user = client.get_user()
     """
 
-    def __init__(self, access_token: str, refresh_token: Optional[str] = None, expires_at: float = 0.0):
+    def __init__(self, access_token: str = "", refresh_token: Optional[str] = None, expires_at: float = 0.0, client_id: Optional[str] = None, **kwargs):
         self._access_token  = access_token
         self._refresh_token = refresh_token
         self._expires_at    = expires_at
+        self._client_id     = client_id
         self._lock          = threading.Lock()
 
     def _maybe_refresh(self):
@@ -56,10 +57,16 @@ class KickClient:
         resp.raise_for_status()
         return resp.json()
 
+    def get(self, path: str, **kwargs) -> dict:
+        return self._get(path, **kwargs)
+
     def _patch(self, path: str, json: dict) -> dict:
         resp = httpx.patch(f"{KICK_API_BASE}{path}", json=json, headers=self._headers(), timeout=10)
         resp.raise_for_status()
         return resp.json() if resp.content else {}
+
+    def patch(self, path: str, json: dict) -> dict:
+        return self._patch(path, json)
 
     # ─── User ───────────────────────────────────────────────────────────────
 

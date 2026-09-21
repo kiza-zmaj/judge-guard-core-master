@@ -9,9 +9,16 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
 
-from .client import KickClient
+# Ensure project root is in sys.path regardless of where script is invoked from
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+try:
+    from src.kick.client import KickClient
+except ImportError:
+    from client import KickClient
 
 
 class KickStreamManager:
@@ -125,10 +132,7 @@ def main() -> None:
         except Exception:
             pass
 
-    client = KickClient(
-        client_id=os.environ["KICK_CLIENT_ID"],
-        access_token=token,
-    )
+    client = KickClient(access_token=token)
     mgr = KickStreamManager(client)
 
     # 1) Update channel info

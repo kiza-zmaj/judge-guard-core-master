@@ -18,13 +18,21 @@ from urllib.parse import urlencode
 from typing import Optional
 import httpx
 
+from dotenv import load_dotenv
+from pathlib import Path
+
+# Load .env from project root if not already loaded
+_env_path = Path(__file__).resolve().parent.parent.parent / ".env"
+if _env_path.exists():
+    load_dotenv(dotenv_path=_env_path)
+
 KICK_AUTHORIZE_URL = "https://id.kick.com/oauth/authorize"
 KICK_TOKEN_URL     = "https://id.kick.com/oauth/token"
 KICK_REVOKE_URL    = "https://id.kick.com/oauth/revoke"
 
-CLIENT_ID     = os.environ["KICK_CLIENT_ID"]
-CLIENT_SECRET = os.environ["KICK_CLIENT_SECRET"]
-REDIRECT_URI  = os.environ["KICK_REDIRECT_URI"]
+CLIENT_ID     = os.environ.get("KICK_CLIENT_ID", "")
+CLIENT_SECRET = os.environ.get("KICK_CLIENT_SECRET", "")
+REDIRECT_URI  = os.environ.get("KICK_REDIRECT_URI", "http://localhost:9876/callback")
 SCOPES        = os.environ.get("KICK_SCOPES", "user:read channel:read events:subscribe")
 
 # In-memory PKCE + state store  (replace with Redis/signed-cookie in prod)
