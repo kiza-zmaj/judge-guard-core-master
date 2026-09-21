@@ -42,8 +42,13 @@ graph LR
 | **11** | `submission_11_lgbm_refined_10fold.csv` | Refined 10-Fold LightGBM + Clean Integer Digits | 0.94606 | **0.94609** | `56404536` | +0.00003 |
 | **12** | `submission_12_xgb_lossguide_10fold.csv` | Refined 10-Fold Lossguide XGBoost (depth 9) | 0.94604 | **0.94609** | `56404540` | +0.00005 |
 | **13** | `submission_13_dual_engine_rank_blend.csv` | Elite Dual-Engine Rank Blend (LGBM 0.64 + XGB 0.36) | 0.94607 | **0.94609** | `56404544` | +0.00002 |
-| **14** | `submission_14_multiseed_tri_engine.csv` | Multi-Seed Tri-Engine (Seeds 42 & 101, 10-Fold) | 0.94608 | **0.94610** 🛡️ | `56404548` | **+0.00002** |
-| **15** | `submission_15_top10_master_assault.csv` | Master Assault: Boundary Shifts + Zero-Tie Lexsort | 0.94608 | **0.94610** | `56404556` | **+0.00002** |
+| **16** | `sub16_kernel_v2_ultimate.csv` | Kernel V2 Ultimate (Original Data + Quad TE) | 0.94598 | **0.94568** | `56408114` | -0.00030 |
+| **17** | `sub17_raw_blend.csv` | Kernel V2 Raw Blend | 0.94598 | **0.94566** | `56408117` | -0.00032 |
+| **18** | `sub18_xgb_recipe_public_calibrated.csv` | XGBoost Recipe Margin (Sub 7) + Physics + GM Band Swaps | 0.94622 | **0.94635** 🚀 | `56418585` | +0.00013 |
+| **19** | `sub19_master_blend_public_calibrated.csv` | Master Blend (Sub 10) + Physics + GM Band Swaps | 0.94628 | **0.94637** 🚀 | `56418598` | +0.00009 |
+| **20** | `sub20_pure_multi_round_elite_blend.csv` | Pure Multi-Round Blend (Sub 7+8+14+6) Physics Shifts (No Bands) | 0.94625 | **0.94634** 🛡️ | `56418607` | +0.00009 |
+| **21** | `sub21_top10_master_assault_calibrated.csv` | Master Top-10 Assault Tri-Model (40% Sub7+40% Sub8+20% Sub14) + Calibrated | 0.94630 | **0.94641** 🥇 | `56418616` | +0.00011 |
+| **22** | `sub22_harmonic_dual_anchor_calibrated.csv` | Harmonic Dual Anchor (50% Sub10 + 50% Sub14) + Calibrated | 0.94626 | **0.94639** 🥈 | `56418630` | +0.00013 |
 
 ---
 
