@@ -47,3 +47,9 @@ node_modules
 .kick_token.json
 stream_status.json
 stream_incidents.jsonl
+
+# Large data ingestion artifacts
+unified_betting_core/data/mozzart_pdfs/
+unified_betting_core/data/*.log
+unified_betting_core/output/mozzart_parsed/
+

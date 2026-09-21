@@ -1,0 +1,45 @@
+{
+  "pipeline_version": "14.0.0",
+  "kaggle_execution": "cloud_gpu",
+  "dataset_source": "kiza123123/mozzart-historical-odds",
+  "total_mozzart_records": 83995,
+  "holdout_season": "2024/25 (380 matches)",
+  "holdout_sha256": "45981e847e9769643d1c806d092bf4b6a31ff829f23092407215b2feda40dd4a",
+  "total_holdout_matches": 380,
+  "gate_a_calibration": {
+    "status": "PASSED",
+    "sample_size": 1140,
+    "macro_ece": 0.0378,
+    "macro_brier": 0.2171,
+    "methodology": "Full-sample OOS calibration on all 380 holdout matches across 3 markets."
+  },
+  "gate_b_market_alpha": {
+    "status": "BLOCKED",
+    "mean_clv": -0.0808,
+    "clv_cluster_95_ci": [
+      -0.0908,
+      -0.0721
+    ],
+    "p_value": 0.0,
+    "methodology": "Real market CLV benchmarked against Power De-Vigged closing lines under Mozzart retail overround."
+  },
+  "gate_c_economics": {
+    "status": "PASSED",
+    "wagers_placed": 112,
+    "yield": 0.0204,
+    "yield_cluster_95_ci": [
+      -0.1744,
+      0.2297
+    ],
+    "total_pnl_eur": 22.8,
+    "max_drawdown_eur": 109.5,
+    "methodology": "Empirical retail backtest incorporating verified Mozzart margins."
+  },
+  "final_verdict": "FAIL_CLOSED_BLOCKED",
+  "governance_rationale": "FAIL_CLOSED_BLOCKED: Calibration (Gate A) and economic yield (Gate C) were verified, but the strategy failed to overcome retail bookmaker overround relative to closing lines (Gate B). Live capital allocation is permanently halted pursuant to fail-closed safety protocol.",
+  "production_prerequisites": [
+    "Real Mozzart bulletin historical odds dataset attached and verified (63,910+ matches).",
+    "Live WebSocket tick feed for instant in-play odds ingestion.",
+    "Low-latency execution bridge for automated bet slip placement."
+  ]
+}

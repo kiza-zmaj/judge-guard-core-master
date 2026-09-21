@@ -1,6 +1,8 @@
 {
-  "pipeline_version": "13.1.0",
+  "pipeline_version": "14.0.0",
   "kaggle_execution": "cloud_gpu",
+  "dataset_source": "kiza123123/mozzart-historical-odds",
+  "total_mozzart_records": 83995,
   "holdout_season": "2024/25 (380 matches)",
   "holdout_sha256": "45981e847e9769643d1c806d092bf4b6a31ff829f23092407215b2feda40dd4a",
   "total_holdout_matches": 380,
@@ -13,32 +15,31 @@
   },
   "gate_b_market_alpha": {
     "status": "BLOCKED",
-    "mean_proxy_clv": -0.0673,
+    "mean_clv": -0.0808,
     "clv_cluster_95_ci": [
-      -0.0752,
-      -0.0592
+      -0.0908,
+      -0.0721
     ],
     "p_value": 0.0,
-    "methodology": "Proxy CLV benchmarked against Power De-Vigged Pinnacle closing total line."
+    "methodology": "Real market CLV benchmarked against Power De-Vigged closing lines under Mozzart retail overround."
   },
   "gate_c_economics": {
     "status": "PASSED",
-    "wagers_placed": 129,
-    "yield": 0.0679,
+    "wagers_placed": 112,
+    "yield": 0.0204,
     "yield_cluster_95_ci": [
-      -0.112,
-      0.268
+      -0.1744,
+      0.2297
     ],
-    "total_pnl_eur": 87.6,
-    "max_drawdown_eur": 101.0,
-    "methodology": "Hypothetical retail backtest using opening consensus pricing with 6.5% overround."
+    "total_pnl_eur": 22.8,
+    "max_drawdown_eur": 109.5,
+    "methodology": "Empirical retail backtest incorporating verified Mozzart margins."
   },
   "final_verdict": "FAIL_CLOSED_BLOCKED",
-  "governance_rationale": "FAIL_CLOSED_BLOCKED: Calibration (Gate A) and economic yield (Gate C) were verified, but the strategy failed to overcome retail bookmaker overround relative to Pinnacle closing lines (Gate B). Live capital allocation is permanently halted pursuant to fail-closed safety protocol.",
+  "governance_rationale": "FAIL_CLOSED_BLOCKED: Calibration (Gate A) and economic yield (Gate C) were verified, but the strategy failed to overcome retail bookmaker overround relative to closing lines (Gate B). Live capital allocation is permanently halted pursuant to fail-closed safety protocol.",
   "production_prerequisites": [
-    "Live tick-by-tick odds feed directly from Mozzart Bet API.",
-    "Exact timestamp recording for execution latency and price degradation.",
-    "Direct halftime closing market data rather than total-goals proxy mapping.",
-    "Replication across additional independent seasons and domestic leagues."
+    "Real Mozzart bulletin historical odds dataset attached and verified (63,910+ matches).",
+    "Live WebSocket tick feed for instant in-play odds ingestion.",
+    "Low-latency execution bridge for automated bet slip placement."
   ]
 }

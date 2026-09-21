@@ -7,7 +7,9 @@
   "is_private": "true",
   "enable_gpu": "true",
   "enable_internet": "true",
-  "dataset_sources": [],
+  "dataset_sources": [
+    "kiza123123/mozzart-historical-odds"
+  ],
   "competition_sources": [],
   "kernel_sources": []
 }

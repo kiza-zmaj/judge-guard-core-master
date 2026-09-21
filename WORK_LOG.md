@@ -335,3 +335,10 @@
 ✅ Completed Refactor SharpBet v13 Real MLE & Rigorous Governance
 🟡 Starting Apply Peer-Review Upgrades to SharpBet v13.1
 ✅ Completed Apply Peer-Review Upgrades to SharpBet v13.1
+🟡 Starting Polish Statistical Rigor & Cluster-Robust p-value
+🟡 Starting Mozzart PDF Archive Download & Analysis
+✅ Completed Mozzart PDF Archive Download & Analysis
+🟡 Starting Mozzart PDF Full Scraper & Parser Build
+🟡 Starting Full Mozzart Archive Download and Ingestion
+🟡 Starting Deploy SharpBet v14 Direct Mozzart Kaggle Ingestion and Audit
+✅ Completed Deploy SharpBet v14 Direct Mozzart Kaggle Ingestion and Audit
