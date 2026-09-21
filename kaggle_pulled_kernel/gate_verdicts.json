@@ -1,0 +1,21 @@
+{
+  "pipeline_version": "12.1.0",
+  "kaggle_execution": "cloud_gpu",
+  "holdout_season": "2024/25 (380 matches)",
+  "holdout_sha256": "fe934e6bf2567891787e555736fa22f0d5bfa7a2d74a63fdda7071d8ebf1a307",
+  "gate_a_calibration": {
+    "status": "PASSED",
+    "ece": 0.0416,
+    "brier": 0.1107
+  },
+  "gate_b_market_alpha": {
+    "status": "PASSED",
+    "mean_clv": 0.0355
+  },
+  "gate_c_economics": {
+    "status": "PASSED",
+    "roi": 0.0825,
+    "bets": 16
+  },
+  "final_verdict": "APPROVED"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "kiza123123/sharpbet-v12-halftime-goals-audit",
+  "title": "SharpBet v12 Halftime Goals Audit",
+  "code_file": "sharpbet-v12-halftime-goals-audit.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}

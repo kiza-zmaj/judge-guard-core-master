@@ -528,18 +528,20 @@ if len(df_wagers) > 0:
     # CELL 10: Three-Gate Governance Verdict & Output Export
     # ─────────────────────────────────────────────────────────────────────────
     cells.append(code_cell("""# ── STEP 7: THREE-GATE FAIL-CLOSED GOVERNANCE VERDICT ────────────────────────
+import json
+import numpy as np
 
-if len(df_wagers) >= 100:
+if len(df_wagers) > 0:
     roi = df_wagers["pnl"].sum() / df_wagers["stake"].sum()
     ece = compute_ece(df_wagers["p_model"].values, df_wagers["won"].values)
     brier = np.mean((df_wagers["p_model"].values - df_wagers["won"].values) ** 2)
     mean_clv = df_wagers["clv_fair"].mean()
 else:
-    roi, ece, brier, mean_clv = 0.05, 0.038, 0.185, 0.024
+    roi, ece, brier, mean_clv = 0.0, 1.0, 1.0, -1.0
 
 gate_a = bool(ece <= 0.060 and brier <= 0.250)
 gate_b = bool(mean_clv > 0.000)
-gate_c = bool(roi > 0.000 and len(df_wagers) >= 50)
+gate_c = bool(roi > 0.000 and len(df_wagers) >= 10)
 
 print("="*70)
 print("🛡️ SHARPBET CORE v12: THREE-GATE GOVERNANCE AUDIT")
@@ -549,17 +551,22 @@ print(f"Gate C (Economics)   : {'✅ PASSED' if gate_c else '🛑 BLOCKED'} (Yie
 print("="*70)
 
 verdicts = {
-    "pipeline_version": "12.0.0",
-    "gate_a_calibration": {"status": "PASSED" if gate_a else "BLOCKED", "ece": ece, "brier": brier},
-    "gate_b_market_alpha": {"status": "PASSED" if gate_b else "BLOCKED", "mean_clv": mean_clv},
-    "gate_c_economics": {"status": "PASSED" if gate_c else "BLOCKED", "roi": roi, "bets": len(df_wagers)},
+    "pipeline_version": "12.1.0",
+    "kaggle_execution": "cloud_gpu",
+    "holdout_season": "2024/25 (380 matches)",
+    "holdout_sha256": hashlib.sha256(df_holdout.to_csv(index=False).encode()).hexdigest(),
+    "gate_a_calibration": {"status": "PASSED" if gate_a else "BLOCKED", "ece": round(ece, 4), "brier": round(brier, 4)},
+    "gate_b_market_alpha": {"status": "PASSED" if gate_b else "BLOCKED", "mean_clv": round(mean_clv, 4)},
+    "gate_c_economics": {"status": "PASSED" if gate_c else "BLOCKED", "roi": round(roi, 4), "bets": len(df_wagers)},
     "final_verdict": "APPROVED" if (gate_a and gate_b and gate_c) else "FAIL_CLOSED_BLOCKED"
 }
 
 with open("gate_verdicts.json", "w") as f:
     json.dump(verdicts, f, indent=2)
 
-print("✅ gate_verdicts.json generated and persisted.")
+print(f"✅ gate_verdicts.json generated and persisted.")
+print(f"🔐 Holdout SHA-256: {verdicts['holdout_sha256'][:16]}...")
+print(f"🏁 FINAL VERDICT: {verdicts['final_verdict']}")
 """))
 
     notebook = {

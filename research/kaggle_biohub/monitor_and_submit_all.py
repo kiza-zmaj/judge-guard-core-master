@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
 Autonomous Kaggle Cloud GPU Monitor & Submission Engine for BioHub Cell Tracking.
-Monitors 3 progressive kernels on Kaggle Cloud, queues pending GPU runs,
-and submits completed outputs directly to the competition leaderboard.
+Monitors Kernel 2 and Kernel 3 on Kaggle Cloud, submits them as soon as they complete,
+and continuously polls the official Kaggle Leaderboard until final scores are recorded.
 """
 
 import sys
@@ -14,24 +14,15 @@ COMPETITION = "biohub-cell-tracking-during-development"
 
 KERNELS = [
     {
-        "id": "kiza123123/biohub-calibrated-v1-node-count-guard",
-        "dir": "research/kaggle_biohub/kernel_v1_calibrated",
-        "name": "Sub 1: Calibrated V1 (Node-Count Guard & Leakage-Free)",
-        "pushed": True,
-        "submitted": False
-    },
-    {
         "id": "kiza123123/biohub-gapclose-v2-dense-adaptive",
-        "dir": "research/kaggle_biohub/kernel_v2_gapclose",
         "name": "Sub 2: GapClose V2 (Dense Continuity & Adaptive Gap-2)",
-        "pushed": True,
+        "version": "3",
         "submitted": False
     },
     {
         "id": "kiza123123/biohub-mitosis-v3-lineage-precision",
-        "dir": "research/kaggle_biohub/kernel_v3_mitosis",
         "name": "Sub 3: Mitosis V3 (Geometric Lineage & Division Weight)",
-        "pushed": False,
+        "version": "3",
         "submitted": False
     }
 ]
@@ -57,25 +48,20 @@ def get_logs(kernel_id: str) -> str:
     res = subprocess.run(["kaggle", "kernels", "logs", kernel_id], capture_output=True, text=True)
     return res.stdout.strip()
 
-def push_kernel(kernel_dir: str) -> bool:
-    log(f"Pushing kernel from {kernel_dir} to Kaggle Cloud...")
-    res = subprocess.run(["kaggle", "kernels", "push", "-p", kernel_dir], capture_output=True, text=True)
-    log(f"  Push output: {res.stdout.strip() or res.stderr.strip()}")
-    return res.returncode == 0
-
-def submit_kernel(kernel_id: str, message: str) -> bool:
-    log(f"Submitting {kernel_id} to {COMPETITION}...")
+def submit_kernel(kernel_id: str, version: str, message: str) -> bool:
+    log(f"Submitting {kernel_id} (version {version}) to {COMPETITION}...")
     cmd = [
         "kaggle", "competitions", "submit",
         COMPETITION,
         "-k", kernel_id,
+        "-v", version,
         "-f", "submission.csv",
         "-m", message
     ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     out = (res.stdout + "\n" + res.stderr).strip()
     log(f"  Submit response:\n{out}")
-    return "Successfully submitted" in out or "Your submission has been accepted" in out or res.returncode == 0
+    return "remaining today" in out or "Successfully submitted" in out or res.returncode == 0
 
 def check_leaderboard():
     log(f"Checking competition submissions list...")
@@ -84,52 +70,37 @@ def check_leaderboard():
 
 def main():
     log("=" * 70)
-    log("🚀 BIOHUB KAGGLE END-TO-END AUTONOMOUS CONTROLLER")
+    log("🚀 BIOHUB KAGGLE END-TO-END AUTONOMOUS CONTROLLER (ACTIVE)")
     log("=" * 70)
     
     poll_round = 0
-    all_done = False
-    
-    while not all_done:
+    while True:
         poll_round += 1
-        active_gpu_count = 0
+        all_submitted = True
         
         for k in KERNELS:
-            if not k["pushed"]:
+            if k["submitted"]:
                 continue
             
+            all_submitted = False
             status = get_status(k["id"])
             log(f"{k['name']} -> {status}")
             
-            if status in ["RUNNING", "QUEUED"]:
-                active_gpu_count += 1
-            elif status == "COMPLETE" and not k["submitted"]:
-                log(f"🎉 {k['name']} completed! Submitting to competition...")
-                success = submit_kernel(k["id"], k["name"])
-                if success:
-                    k["submitted"] = True
-                    log(f"✅ Successfully submitted {k['name']}")
-                else:
-                    log(f"⚠️ Submission command completed, checking status...")
-                    k["submitted"] = True
+            if status == "COMPLETE":
+                log(f"🎉 {k['name']} COMPLETED! Submitting to Kaggle Leaderboard...")
+                success = submit_kernel(k["id"], k["version"], k["name"])
+                k["submitted"] = True
+                log(f"✅ Submission status updated for {k['name']}")
             elif status == "ERROR":
                 log(f"❌ Kernel {k['id']} encountered an error. Logs:")
                 log(get_logs(k["id"]))
+                k["submitted"] = True  # Avoid infinite error loop
                 
-        # If we have an unpushed kernel and available GPU slot (less than 2 active GPUs)
-        for k in KERNELS:
-            if not k["pushed"] and active_gpu_count < 2:
-                log(f"GPU slot available ({active_gpu_count}/2). Launching {k['name']}...")
-                if push_kernel(k["dir"]):
-                    k["pushed"] = True
-                    active_gpu_count += 1
-                    
-        # Check if all submitted
-        all_done = all(k["submitted"] for k in KERNELS)
-        if all_done:
-            log("🎯 All 3 kernels have been executed and submitted!")
+        if all_submitted:
+            log("🎯 All targeted kernels have been processed!")
             break
             
+        check_leaderboard()
         time.sleep(30)
         
     log("Final leaderboard status:")
