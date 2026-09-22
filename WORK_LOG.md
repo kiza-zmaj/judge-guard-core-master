@@ -379,3 +379,5 @@
 ✅ Completed CM Sprint Bus: Ship Phase — Deploy Paper Trading Engine & Pipeline
 🟡 Starting CM Sprint Bus: Monitor Phase — Telemetry & Paper Trading Verification
 ✅ Completed CM Sprint Bus: Monitor Phase — Telemetry & Paper Trading Verification
+🟡 Starting CM Sprint Bus: Retro Phase — Operational Learnings & Sprint Wrap-up
+✅ Completed CM Sprint Bus: Retro Phase — Operational Learnings & Sprint Wrap-up

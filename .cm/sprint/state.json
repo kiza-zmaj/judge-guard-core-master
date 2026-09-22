@@ -13,7 +13,7 @@
     "monitor",
     "retro"
   ],
-  "current_index": 10,
+  "current_index": 11,
   "completed": [
     "brainstorm",
     "plan",
@@ -24,10 +24,11 @@
     "qa",
     "security",
     "ship",
-    "monitor"
+    "monitor",
+    "retro"
   ],
   "skipped": [],
   "started_at": "2026-09-22T11:06:47.787Z",
-  "updated_at": "2026-09-22T11:29:13.839Z",
+  "updated_at": "2026-09-22T11:30:00.001Z",
   "artifacts_dir": "/home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master/.cm/sprint/artifacts"
 }
