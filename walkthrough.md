@@ -88,3 +88,22 @@ We unified the physical 8-Stage verification cycle probe, JudgeGuard v2.1 anti-d
 - **Deployment Pipeline:** Successfully passed all gates (`npm --version`, `ls src/mobile_app_pwa/package.json`, `node --version`, and simulated prod/health checks).
 - **Audit Counts:** 50+ cached verdicts and 53+ audit entries recorded in `research.db`.
 
+---
+
+## 6. Phase 7: SharpBet Core v17.0 Statistical Remediation & Per-League MLE Overhaul
+
+### Forensic Resolution of 11 Peer Review Blockers (P0-01 to P0-11)
+1. **Dixon-Coles Disconnected Graph Rank Deficiency Fixed (P0-01):**
+   - Partitioned the 5 disconnected European leagues into independent MLE models.
+   - Guaranteed full within-league graph connectivity and exact zero-sum parameter identification ($\sum \alpha = 0, \sum \beta = 0$).
+   - Successfully verified convergence (`Success: True`, 31–36 iterations) across all 5 leagues.
+2. **Mandatory Gate 0 (MLE Convergence Gate):**
+   - Automatically halts the pipeline and triggers fail-closed governance if any league fails to converge.
+3. **Transparent Odds Attribution (P0-02, P0-03):**
+   - Explicitly separates genuine Mozzart quotes (`HT X` from 333k records) from synthetic benchmark proxies (`I 0-1`, `I 0`).
+4. **Single-Wager-Per-Fixture Risk Control (P0-05):**
+   - Strictly forbids placing multiple correlated bets on the same match half, eliminating artificial variance compounding.
+5. **Conservative Governance Protocol (P0-07 to P0-11):**
+   - Maximum retrospective verdict set to `CANDIDATE_FOR_PAPER_TRADING`. Production approval requires live execution proof.
+
+

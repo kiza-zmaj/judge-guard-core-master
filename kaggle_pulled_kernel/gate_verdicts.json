@@ -1,41 +1,87 @@
 {
-  "pipeline_version": "16.0.0",
+  "pipeline_version": "17.0.0",
+  "governance_protocol": "JudgeGuard Institutional 4-Gate Framework",
   "kaggle_execution": "cloud_gpu",
   "dataset_source": "kiza123123/mozzart-historical-odds",
   "total_mozzart_records": 344005,
-  "holdout_season": "2024/25 Top-5 European Leagues (1,752 matches)",
+  "holdout_season": "2024/25 Top-5 European Leagues",
   "holdout_sha256": "d94a29d437b1f7afc5caf86db860d0d6e5eb61aa48a9bc525b0c591105c36931",
   "total_holdout_matches": 1751,
+  "gate_0_mle_convergence": {
+    "status": "PASSED",
+    "leagues_fitted": 5,
+    "all_converged": true,
+    "details": {
+      "E0": {
+        "success": true,
+        "nit": 35,
+        "mu": -0.586,
+        "gamma": 0.227,
+        "rho": -0.0212
+      },
+      "SP1": {
+        "success": true,
+        "nit": 38,
+        "mu": -0.801,
+        "gamma": 0.307,
+        "rho": -0.0781
+      },
+      "I1": {
+        "success": true,
+        "nit": 36,
+        "mu": -0.769,
+        "gamma": 0.227,
+        "rho": -0.0371
+      },
+      "D1": {
+        "success": true,
+        "nit": 36,
+        "mu": -0.545,
+        "gamma": 0.303,
+        "rho": -0.0666
+      },
+      "F1": {
+        "success": true,
+        "nit": 32,
+        "mu": -0.647,
+        "gamma": 0.166,
+        "rho": -0.0548
+      }
+    }
+  },
   "gate_a_calibration": {
     "status": "PASSED",
     "sample_size": 1751,
-    "macro_ece": 0.0365,
-    "macro_brier": 0.2239,
-    "methodology": "Full-sample OOS calibration on 1,752 Top-5 European holdout matches across 4 markets."
+    "macro_ece": 0.0379,
+    "macro_brier": 0.2235,
+    "methodology": "Full-sample OOS calibration on Top-5 European holdout matches across 4 markets."
   },
   "forward_tactic_baseline": {
     "status": "BLOCKED",
-    "mean_clv": -0.105,
-    "yield": -0.0911,
-    "failure_reason": "Public action bias in retail odds causes negative CLV penalty on first-half overs (I1+, I2+)."
+    "wagers_placed": 457,
+    "mean_clv": -0.107,
+    "yield": -0.0476,
+    "failure_reason": "Public action bias in retail odds causes negative CLV penalty on first-half overs."
   },
   "reverse_tactic_alpha": {
     "status": "PASSED",
-    "wagers_placed": 1176,
-    "mean_clv": 0.0419,
+    "wagers_placed": 874,
+    "mean_clv": 0.0474,
     "clv_cluster_95_ci": [
-      0.0385,
-      0.0454
+      0.0433,
+      0.0517
     ],
-    "yield": 0.5321,
+    "yield": 0.7198,
     "yield_cluster_95_ci": [
-      0.404,
-      0.6602
+      0.5642,
+      0.8688
     ],
-    "total_pnl_eur": 6257.5,
-    "max_drawdown_eur": 311.1,
-    "methodology": "Multi-League Reverse Tactic fading retail overs, backing Under 1.5 HT (I 0-1), 0-0 HT (I 0), and Draw HT (HT X) with genuine Mozzart quotes."
+    "total_pnl_eur": 6291.4,
+    "max_drawdown_eur": 198.5,
+    "direct_mozzart_odds_used": 0,
+    "synthetic_proxy_odds_used": 874,
+    "risk_management": "Single highest-EV bet per fixture; multi-bet correlated stacking strictly forbidden."
   },
-  "final_verdict": "APPROVED_PRODUCTION",
-  "governance_rationale": "APPROVED_PRODUCTION: The Reverse Tactic successfully cleared all three institutional validation gates. Calibration (Gate A), Market Alpha / Positive CLV (Gate B), and Economic Yield (Gate C) were verified out-of-sample on the untouched 2024/25 Top-5 European holdout."
+  "final_verdict": "CANDIDATE_FOR_PAPER_TRADING",
+  "governance_rationale": "CANDIDATE_FOR_PAPER_TRADING: The Reverse Tactic successfully cleared all four institutional validation gates (Gate 0 Convergence, Gate A Calibration, Gate B CLV Alpha, Gate C Economic Yield). Retrospective backtest qualifies strategy for forward paper trading. Live production allocation remains locked pending real-time feed verification."
 }

@@ -1,76 +1,96 @@
-[{"stream_name":"stderr","time":6.621662963,"data":"/usr/local/lib/python3.12/dist-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.\n"}
-,{"stream_name":"stderr","time":6.621711898,"data":"  validate(nb)\n"}
-,{"stream_name":"stderr","time":7.517625976,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
-,{"stream_name":"stderr","time":7.5176758,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
-,{"stream_name":"stderr","time":7.517681043,"data":"0.00s - to python to disable frozen modules.\n"}
-,{"stream_name":"stderr","time":7.517684653,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
-,{"stream_name":"stderr","time":8.134491605,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
-,{"stream_name":"stderr","time":8.134522868,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
-,{"stream_name":"stderr","time":8.134528202,"data":"0.00s - to python to disable frozen modules.\n"}
-,{"stream_name":"stderr","time":8.134532069,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
-,{"stream_name":"stdout","time":11.632617592999999,"data":"✅ SharpBet Core v16.0 Environment Initialized.\n"}
-,{"stream_name":"stdout","time":11.632673982,"data":"NumPy: 2.0.2 | Pandas: 2.3.3 | Python: 3.12.13\n"}
-,{"stream_name":"stdout","time":11.834274245,"data":"📁 Found Mozzart Historical Odds Dataset: /kaggle/input/mozzart-historical-odds/mozzart_historical_odds.csv\n"}
-,{"stream_name":"stdout","time":13.378366108,"data":"📊 Total Mozzart Matches Loaded: 344,005\n"}
-,{"stream_name":"stdout","time":13.388421969,"data":"🎯 Sanitized Matches with True Halftime 1X2 Odds: 231,457 (67.3%)\n"}
-,{"stream_name":"stdout","time":13.388447475,"data":"🏆 Number of Distinct Leagues: 1,364\n"}
-,{"stream_name":"stdout","time":13.579706648,"data":"🌐 Streaming Top-5 European Leagues from football-data.co.uk:\n"}
-,{"stream_name":"stdout","time":21.968237081,"data":"   Season 2223: Loaded 1826 verified matches.\n"}
-,{"stream_name":"stdout","time":30.035052988,"data":"   Season 2324: Loaded 1752 verified matches.\n"}
-,{"stream_name":"stdout","time":37.969374131,"data":"   Season 2425: Loaded 1751 verified matches.\n"}
-,{"stream_name":"stdout","time":37.969431401,"data":"\n"}
-,{"stream_name":"stdout","time":37.969439556,"data":"📊 Total Verified Top-5 Ground Truth Matches: 5,329\n"}
-,{"stream_name":"stdout","time":37.96944701,"data":"   Training Set  : 3,578 matches (2022/23 \u0026 2023/24)\n"}
-,{"stream_name":"stdout","time":37.969453174,"data":"   Sacred Holdout: 1,751 matches (2024/25)\n"}
-,{"stream_name":"stdout","time":37.969460416,"data":"🔒 Sacred Holdout Fingerprint (SHA-256): d94a29d437b1f7afc5caf86db860d0d6e5eb61aa48a9bc525b0c591105c36931\n"}
-,{"stream_name":"stdout","time":38.369755853,"data":"Fitting Multi-League Dixon-Coles 1H MLE on 3,578 matches across 111 teams...\n"}
-,{"stream_name":"stdout","time":56.765211291,"data":"✅ Identified MLE Success: False (Iterations: 60)\n"}
-,{"stream_name":"stdout","time":56.765272327,"data":"   Sum of Alphas: 0.000000 | Sum of Betas: 0.000000\n"}
-,{"stream_name":"stdout","time":56.765280797,"data":"   Baseline mu: -0.674 | Home gamma: 0.247 | rho: -0.0498\n"}
-,{"stream_name":"stdout","time":56.783972108,"data":"✅ Mozzart Halftime Probability Engine compiled.\n"}
-,{"stream_name":"stdout","time":56.808483745,"data":"📊 Empirical Mozzart Halftime 1X2 Market Margin (N=55,497):\n"}
-,{"stream_name":"stdout","time":56.808520894,"data":"   Mean Overround  : 19.63%\n"}
-,{"stream_name":"stdout","time":56.808526512,"data":"   Median Overround: 19.22%\n"}
-,{"stream_name":"stdout","time":56.808530179,"data":"✅ Exact Power De-Vigging \u0026 Mozzart Margin Solver compiled.\n"}
-,{"stream_name":"stdout","time":68.556001412,"data":"===========================================================================\n"}
-,{"stream_name":"stdout","time":68.556095181,"data":"🛡️ GATE A AUDIT: FULL-SAMPLE OOS CALIBRATION (1,751 MATCHES)\n"}
-,{"stream_name":"stdout","time":68.556105244,"data":"  Market I1+   : ECE = 4.96% | Brier = 0.2001\n"}
-,{"stream_name":"stdout","time":68.556112061,"data":"  Market I2+   : ECE = 3.33% | Brier = 0.2293\n"}
-,{"stream_name":"stdout","time":68.556119109,"data":"  Market I 0-1 : ECE = 3.33% | Brier = 0.2293\n"}
-,{"stream_name":"stdout","time":68.556126376,"data":"  Market HT X  : ECE = 2.97% | Brier = 0.2368\n"}
-,{"stream_name":"stdout","time":68.55613351,"data":"  MACRO ECE    : 3.65% (Threshold: \u003c= 6.00%)\n"}
-,{"stream_name":"stdout","time":68.556140538,"data":"  MACRO BRIER  : 0.2239 (Threshold: \u003c= 0.2300)\n"}
-,{"stream_name":"stdout","time":68.556160117,"data":"GATE A STATUS  : ✅ PASSED\n"}
-,{"stream_name":"stdout","time":68.556167534,"data":"===========================================================================\n"}
-,{"stream_name":"stdout","time":99.455430231,"data":"🎯 Direct Mozzart Match Quotations Identified: 200 matches\n"}
-,{"stream_name":"stdout","time":99.455468834,"data":"📊 Forward Strategy Wagers: 566 bets (Overs: I1+, I2+)\n"}
-,{"stream_name":"stdout","time":99.455475916,"data":"🛡️ Reverse Strategy Wagers: 1,176 bets (Contra: I 0-1, I 0, HT X)\n"}
-,{"stream_name":"stdout","time":168.448536551,"data":"===========================================================================\n"}
-,{"stream_name":"stdout","time":168.448590284,"data":"🛡️ DUAL-STRATEGY INSTITUTIONAL AUDIT: FORWARD VS REVERSE TACTIC\n"}
-,{"stream_name":"stdout","time":168.449779044,"data":"===========================================================================\n"}
-,{"stream_name":"stdout","time":168.449815182,"data":"Metric                    | Forward Tactic (Overs) | Reverse Tactic (Contra)\n"}
-,{"stream_name":"stdout","time":168.449823208,"data":"---------------------------------------------------------------------------\n"}
-,{"stream_name":"stdout","time":168.449828534,"data":"Total Wagers Placed       | 566                    | 1176                  \n"}
-,{"stream_name":"stdout","time":168.44983385,"data":"Win Rate                  | 40.46%                  | 41.24%\n"}
-,{"stream_name":"stdout","time":168.449846665,"data":"Mean Real CLV             | -10.50% (-46.59 t-stat)        | 4.19% (24.68 t-stat)\n"}
-,{"stream_name":"stdout","time":168.449851979,"data":"CLV 95% Cluster CI        | [-11.00%, -9.97%]     | [3.85%, 4.54%]\n"}
-,{"stream_name":"stdout","time":168.449857127,"data":"Total PnL (EUR)           | €-515.40               | €6257.50              \n"}
-,{"stream_name":"stdout","time":168.449862803,"data":"Sample Yield (ROI)        | -9.11%                  | 53.21%\n"}
-,{"stream_name":"stdout","time":168.449867918,"data":"ROI 95% Cluster CI        | [-19.13%, 1.33%]     | [40.40%, 66.02%]\n"}
-,{"stream_name":"stdout","time":168.449876719,"data":"Maximum Drawdown          | €574.20                | €311.10               \n"}
-,{"stream_name":"stdout","time":168.449881984,"data":"GATE B STATUS (CLV \u003e 0)   | 🛑 BLOCKED              | ✅ PASSED              \n"}
-,{"stream_name":"stdout","time":168.449898234,"data":"GATE C STATUS (Yield)     | 🛑 BLOCKED              | ✅ PASSED              \n"}
-,{"stream_name":"stdout","time":168.449902662,"data":"===========================================================================\n"}
-,{"stream_name":"stdout","time":168.468507884,"data":"===========================================================================\n"}
-,{"stream_name":"stdout","time":168.468535625,"data":"🏛️ INSTITUTIONAL GOVERNANCE FINAL VERDICT: APPROVED_PRODUCTION\n"}
-,{"stream_name":"stdout","time":168.468540522,"data":"Audit report successfully exported to 'gate_verdicts.json'.\n"}
-,{"stream_name":"stdout","time":168.468544246,"data":"===========================================================================\n"}
-,{"stream_name":"stderr","time":172.041757303,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
-,{"stream_name":"stderr","time":172.041846899,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
-,{"stream_name":"stderr","time":172.200936065,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
-,{"stream_name":"stderr","time":172.200995264,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
-,{"stream_name":"stderr","time":172.810618005,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
-,{"stream_name":"stderr","time":173.121710133,"data":"[NbConvertApp] Writing 51721 bytes to __notebook__.ipynb\n"}
-,{"stream_name":"stderr","time":175.467338441,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
-,{"stream_name":"stderr","time":176.413983332,"data":"[NbConvertApp] Writing 458887 bytes to __results__.html\n"}
+[{"stream_name":"stderr","time":9.629029392,"data":"/usr/local/lib/python3.12/dist-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.\n"}
+,{"stream_name":"stderr","time":9.629101931,"data":"  validate(nb)\n"}
+,{"stream_name":"stderr","time":10.939031357,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":10.939058031,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":10.939062677999999,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":10.939066573,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":11.710861211,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":11.71090937,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":11.71091503,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":11.710919486,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":16.755734828,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":16.755800265,"data":"🛡️ SharpBet Core v17.0 Statistical Remediation \u0026 Governance Pipeline\n"}
+,{"stream_name":"stdout","time":16.755806175,"data":"NumPy: 2.0.2 | Pandas: 2.3.3 | Python: 3.12.13\n"}
+,{"stream_name":"stdout","time":16.755809504,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":16.957611996,"data":"📁 Found Mozzart Historical Odds Dataset: /kaggle/input/mozzart-historical-odds/mozzart_historical_odds.csv\n"}
+,{"stream_name":"stdout","time":19.060692428,"data":"📊 Total Mozzart Matches Loaded: 344,005\n"}
+,{"stream_name":"stdout","time":19.117969483,"data":"🎯 Sanitized Matches with Genuine Halftime 1X2 Odds: 231,457 (67.3%)\n"}
+,{"stream_name":"stdout","time":19.118027354,"data":"🏆 Number of Distinct Leagues: 1,364\n"}
+,{"stream_name":"stdout","time":19.30313103,"data":"🌐 Streaming Top-5 European Leagues from football-data.co.uk:\n"}
+,{"stream_name":"stdout","time":25.777318571,"data":"   Season 2223: Loaded 1826 verified matches.\n"}
+,{"stream_name":"stdout","time":32.094257673,"data":"   Season 2324: Loaded 1752 verified matches.\n"}
+,{"stream_name":"stdout","time":38.380402009,"data":"   Season 2425: Loaded 1751 verified matches.\n"}
+,{"stream_name":"stdout","time":38.380442226,"data":"\n"}
+,{"stream_name":"stdout","time":38.380447077,"data":"📊 Total Verified Top-5 Ground Truth Matches: 5,329\n"}
+,{"stream_name":"stdout","time":38.380451443,"data":"   Training Set  : 3,578 matches (2022/23 \u0026 2023/24)\n"}
+,{"stream_name":"stdout","time":38.380455053,"data":"   Sacred Holdout: 1,751 matches (2024/25)\n"}
+,{"stream_name":"stdout","time":38.380458292,"data":"🔒 Sacred Holdout Fingerprint (SHA-256): d94a29d437b1f7afc5caf86db860d0d6e5eb61aa48a9bc525b0c591105c36931\n"}
+,{"stream_name":"stdout","time":38.558269182,"data":"Fitting Independent Identified Dixon-Coles 1H MLE per League:\n"}
+,{"stream_name":"stdout","time":39.835931311,"data":"  ✅ [E0] Premier League (England)  : Success=True (Nit=35) | mu=-0.586 | gamma=0.227 | rho=-0.0212\n"}
+,{"stream_name":"stdout","time":39.835995029,"data":"       Teams: 23 | Matches: 760 | Sum Alphas: 0.000000 | Sum Betas: 0.000000\n"}
+,{"stream_name":"stdout","time":41.245217809,"data":"  ✅ [SP1] La Liga (Spain)           : Success=True (Nit=38) | mu=-0.801 | gamma=0.307 | rho=-0.0781\n"}
+,{"stream_name":"stdout","time":41.245249359,"data":"       Teams: 23 | Matches: 760 | Sum Alphas: 0.000000 | Sum Betas: 0.000000\n"}
+,{"stream_name":"stdout","time":42.616393054,"data":"  ✅ [I1] Serie A (Italy)           : Success=True (Nit=36) | mu=-0.769 | gamma=0.227 | rho=-0.0371\n"}
+,{"stream_name":"stdout","time":42.616443651,"data":"       Teams: 23 | Matches: 760 | Sum Alphas: 0.000000 | Sum Betas: 0.000000\n"}
+,{"stream_name":"stdout","time":43.667066725,"data":"  ✅ [D1] Bundesliga (Germany)      : Success=True (Nit=36) | mu=-0.545 | gamma=0.303 | rho=-0.0666\n"}
+,{"stream_name":"stdout","time":43.667108728,"data":"       Teams: 20 | Matches: 612 | Sum Alphas: 0.000000 | Sum Betas: 0.000000\n"}
+,{"stream_name":"stdout","time":44.552599508,"data":"  ✅ [F1] Ligue 1 (France)          : Success=True (Nit=32) | mu=-0.647 | gamma=0.166 | rho=-0.0548\n"}
+,{"stream_name":"stdout","time":44.55267754,"data":"       Teams: 22 | Matches: 686 | Sum Alphas: 0.000000 | Sum Betas: 0.000000\n"}
+,{"stream_name":"stdout","time":44.552685775,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":44.55269116,"data":"🛡️ GATE 0 AUDIT: MLE OPTIMIZATION CONVERGENCE\n"}
+,{"stream_name":"stdout","time":44.552696277,"data":"  Total Leagues Evaluated: 5\n"}
+,{"stream_name":"stdout","time":44.552700996,"data":"  Converged Leagues      : 5/5\n"}
+,{"stream_name":"stdout","time":44.552706157,"data":"GATE 0 STATUS            : ✅ PASSED\n"}
+,{"stream_name":"stdout","time":44.552711106,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":44.585778699,"data":"✅ Multi-League Halftime Probability Engine compiled.\n"}
+,{"stream_name":"stdout","time":44.622258767,"data":"📊 Empirical Mozzart Halftime 1X2 Market Margin (N=55,497):\n"}
+,{"stream_name":"stdout","time":44.62232774,"data":"   Mean Overround  : 19.63%\n"}
+,{"stream_name":"stdout","time":44.622338276,"data":"   Median Overround: 19.22%\n"}
+,{"stream_name":"stdout","time":44.622344394,"data":"✅ Exact Power De-Vigging \u0026 Mozzart Margin Solver compiled.\n"}
+,{"stream_name":"stdout","time":56.3466074,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":56.346655503,"data":"🛡️ GATE A AUDIT: FULL-SAMPLE OOS CALIBRATION (1,751 MATCHES)\n"}
+,{"stream_name":"stdout","time":56.346663673,"data":"  Market I1+   : ECE = 5.21% | Brier = 0.1997\n"}
+,{"stream_name":"stdout","time":56.346669398,"data":"  Market I2+   : ECE = 3.34% | Brier = 0.2290\n"}
+,{"stream_name":"stdout","time":56.346673918,"data":"  Market I 0-1 : ECE = 3.34% | Brier = 0.2290\n"}
+,{"stream_name":"stdout","time":56.34668344,"data":"  Market HT X  : ECE = 3.27% | Brier = 0.2364\n"}
+,{"stream_name":"stdout","time":56.346687115,"data":"  MACRO ECE    : 3.79% (Threshold: \u003c= 6.00%)\n"}
+,{"stream_name":"stdout","time":56.3466908,"data":"  MACRO BRIER  : 0.2235 (Threshold: \u003c= 0.2300)\n"}
+,{"stream_name":"stdout","time":56.346694213,"data":"GATE A STATUS  : ✅ PASSED\n"}
+,{"stream_name":"stdout","time":56.346697737,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":86.848394464,"data":"🎯 Matches with Direct Mozzart Quotes Identified: 200\n"}
+,{"stream_name":"stdout","time":86.848438952,"data":"📊 Forward Strategy Wagers (1-per-match): 457 bets\n"}
+,{"stream_name":"stdout","time":86.848444147,"data":"🛡️ Reverse Strategy Wagers (1-per-match): 874 bets\n"}
+,{"stream_name":"stdout","time":86.848454247,"data":"   Direct Mozzart Quotes Used : 0 (0.0%)\n"}
+,{"stream_name":"stdout","time":86.848457125,"data":"   Synthetic Proxy Quotes Used: 874 (100.0%)\n"}
+,{"stream_name":"stdout","time":86.848459554,"data":"   Market Breakdown:\n"}
+,{"stream_name":"stdout","time":86.848461853,"data":"     - HT X  : 815 bets (Win Rate: 41.1%, Mean CLV: +4.93%)\n"}
+,{"stream_name":"stdout","time":86.848464525,"data":"     - I 0   : 59 bets (Win Rate: 37.3%, Mean CLV: +2.19%)\n"}
+,{"stream_name":"stdout","time":190.012258455,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":190.01234071,"data":"🛡️ DUAL-STRATEGY INSTITUTIONAL AUDIT: FORWARD VS REVERSE TACTIC\n"}
+,{"stream_name":"stdout","time":190.012350829,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":190.012356888,"data":"Metric                    | Forward Tactic (Overs) | Reverse Tactic (Contra)\n"}
+,{"stream_name":"stdout","time":190.012363041,"data":"---------------------------------------------------------------------------\n"}
+,{"stream_name":"stdout","time":190.012368663,"data":"Total Wagers Placed       | 457                    | 874                   \n"}
+,{"stream_name":"stdout","time":190.012374383,"data":"Win Rate                  | 36.76%                  | 40.85%\n"}
+,{"stream_name":"stdout","time":190.012380662,"data":"Mean Real CLV             | -10.70% (-39.45 t-stat)       | +4.74% (21.79 t-stat)\n"}
+,{"stream_name":"stdout","time":190.01238629,"data":"CLV 95% Cluster CI        | [-11.22%, -10.20%]    | [+4.33%, +5.17%]\n"}
+,{"stream_name":"stdout","time":190.01239143,"data":"Total PnL (EUR)           | €-217.50               | €6291.40              \n"}
+,{"stream_name":"stdout","time":190.012396973,"data":"Sample Yield (ROI)        | -4.76%                  | +71.98%\n"}
+,{"stream_name":"stdout","time":190.012402281,"data":"ROI 95% Cluster CI        | [-16.43%, +7.58%]    | [+56.42%, +86.88%]\n"}
+,{"stream_name":"stdout","time":190.012407715,"data":"Maximum Drawdown          | €320.10                | €198.50               \n"}
+,{"stream_name":"stdout","time":190.012413104,"data":"GATE B STATUS (CLV \u003e 0)   | 🛑 BLOCKED              | ✅ PASSED              \n"}
+,{"stream_name":"stdout","time":190.012418995,"data":"GATE C STATUS (Yield)     | 🛑 BLOCKED              | ✅ PASSED              \n"}
+,{"stream_name":"stdout","time":190.012425484,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":190.032701591,"data":"===========================================================================\n"}
+,{"stream_name":"stdout","time":190.032730386,"data":"🏛️ INSTITUTIONAL GOVERNANCE FINAL VERDICT: CANDIDATE_FOR_PAPER_TRADING\n"}
+,{"stream_name":"stdout","time":190.032737787,"data":"Audit report successfully exported to 'gate_verdicts.json'.\n"}
+,{"stream_name":"stdout","time":190.032743004,"data":"===========================================================================\n"}
+,{"stream_name":"stderr","time":193.848450699,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":193.848482287,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":194.036286089,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":194.036329337,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":194.699852383,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":195.006371428,"data":"[NbConvertApp] Writing 58509 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":197.383202702,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":198.374586475,"data":"[NbConvertApp] Writing 481870 bytes to __results__.html\n"}
 ]
