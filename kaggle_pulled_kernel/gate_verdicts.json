@@ -1,88 +1,202 @@
 {
-  "pipeline_version": "18.1.0",
-  "build_tag": "sharpbet-v18.1-halftime-goals-production",
-  "governance_protocol": "JudgeGuard Institutional 4-Gate Framework",
-  "kaggle_execution": "cloud_gpu",
-  "dataset_source": "kiza123123/mozzart-historical-odds",
-  "total_mozzart_records": 344005,
-  "holdout_season": "2024/25 Top-5 European Leagues",
-  "holdout_sha256": "d94a29d437b1f7afc5caf86db860d0d6e5eb61aa48a9bc525b0c591105c36931",
-  "total_holdout_matches": 1751,
-  "gate_0_mle_convergence": {
-    "status": "PASSED",
-    "leagues_fitted": 5,
-    "all_converged": true,
-    "details": {
-      "E0": {
-        "success": true,
-        "nit": 29,
-        "mu": -0.586,
-        "gamma": 0.227,
-        "rho": -0.0212
-      },
-      "SP1": {
-        "success": true,
-        "nit": 30,
-        "mu": -0.801,
-        "gamma": 0.307,
-        "rho": -0.0781
-      },
-      "I1": {
-        "success": true,
-        "nit": 34,
-        "mu": -0.769,
-        "gamma": 0.227,
-        "rho": -0.0372
-      },
-      "D1": {
-        "success": true,
-        "nit": 28,
-        "mu": -0.545,
-        "gamma": 0.303,
-        "rho": -0.0667
-      },
-      "F1": {
-        "success": true,
-        "nit": 29,
-        "mu": -0.647,
-        "gamma": 0.166,
-        "rho": -0.0549
-      }
+  "pipeline_version": "18.3.0",
+  "build_tag": "sharpbet-v18.3-halftime-goals-holdout-enforced",
+  "governance_protocol": "JudgeGuard Institutional 8-Gate Framework (v18.3)",
+  "execution_environment": "Kaggle Cloud GPU MLOps Kernel",
+  "production_status": "BLOCKED",
+  "final_verdict": "FAIL_CLOSED_BLOCKED",
+  "governance_rationale": "FAIL_CLOSED_BLOCKED: Institutional validation failed on Gate C Final Holdout (Holdout Yield -0.79% <= 2.00%), Gate F (Direct Mozzart Bets 3 < 350), Gate E (Direct Coverage 0.66% < 80.00%). Untouched 2025/26 holdout yielded -0.79%, failing to confirm economic viability out-of-sample.",
+  "temporal_provenance": {
+    "training_seasons": [
+      "2223",
+      "2324"
+    ],
+    "development_season": "2425",
+    "final_holdout_season": "2526",
+    "final_holdout_touched": false,
+    "max_allowed_date": "2026-09-22",
+    "margin_source": "pre_holdout_training_period",
+    "margin_cutoff": "2024-08-01",
+    "mean_overround_used": 0.1065
+  },
+  "direct_coverage_audit": {
+    "development_matches_evaluated": 1751,
+    "development_direct_quotes_matched": 6,
+    "development_ambiguous_matches_rejected": 0,
+    "development_total_selected_wagers": 458,
+    "development_direct_mozzart_wagers": 3,
+    "development_synthetic_proxy_wagers": 455,
+    "development_direct_coverage_selected_wagers": 0.0066,
+    "development_direct_coverage_matches": 0.0034,
+    "direct_cohort_status": "DIRECT_COHORT_INSUFFICIENT_SAMPLE",
+    "holdout_matches_evaluated": 1752,
+    "holdout_selected_wagers": 159,
+    "holdout_direct_wagers": 0,
+    "holdout_synthetic_wagers": 159,
+    "holdout_direct_coverage": 0.0
+  },
+  "eight_governance_gates": {
+    "gate_0_mle_convergence": {
+      "status": "PASSED",
+      "converged_leagues": 5
+    },
+    "gate_a_calibration": {
+      "status": "PASSED",
+      "gate_a_dev": "PASSED",
+      "gate_a_holdout": "PASSED",
+      "macro_ece_dev": 0.0379,
+      "macro_brier_dev": 0.2235,
+      "macro_ece_holdout": 0.0409,
+      "macro_brier_holdout": 0.2233
+    },
+    "gate_b_market_alpha": {
+      "status": "PASSED",
+      "gate_b_dev": "PASSED",
+      "gate_b_holdout": "PASSED",
+      "mean_proxy_clv_dev": 0.0202,
+      "mean_proxy_clv_holdout": 0.0173
+    },
+    "gate_c_economic_yield": {
+      "status": "BLOCKED",
+      "gate_c_dev": "PASSED",
+      "gate_c_holdout": "BLOCKED",
+      "sample_yield_dev": 0.0928,
+      "sample_yield_holdout": -0.0079,
+      "holdout_yield_failure_reason": "Holdout yield <= 2.00% blocks production economic viability"
+    },
+    "gate_d_sample_adequacy": {
+      "status": "PASSED",
+      "dev_wagers": 458,
+      "dev_min": 350,
+      "holdout_wagers": 159,
+      "holdout_min": 150
+    },
+    "gate_e_direct_coverage": {
+      "status": "BLOCKED",
+      "coverage": 0.0066,
+      "required_min": 0.8
+    },
+    "gate_f_direct_sample": {
+      "status": "BLOCKED",
+      "direct_wagers": 3,
+      "required_min": 350
+    },
+    "gate_g_temporal_integrity": {
+      "status": "PASSED",
+      "future_rows_removed": 0,
+      "margin_cutoff": "2024-08-01"
+    },
+    "gate_h_data_quality": {
+      "status": "PASSED",
+      "sanitized_ht_rows": 8498,
+      "undated_legacy_rows_isolated": 274290,
+      "provenance_note": "Legacy undated bulletin rows strictly excluded; 100% of modeled records contain verified ISO dates."
     }
   },
-  "gate_a_calibration": {
-    "status": "PASSED",
-    "sample_size": 1751,
-    "macro_ece": 0.0379,
-    "macro_brier": 0.2235,
-    "methodology": "Full-sample OOS calibration on Top-5 European holdout matches across 4 markets."
-  },
-  "forward_tactic_baseline": {
-    "status": "BLOCKED",
-    "wagers_placed": 513,
-    "mean_clv": -0.0859,
-    "yield": -0.024,
-    "failure_reason": "Public action bias in retail odds causes negative CLV penalty on first-half overs."
-  },
-  "reverse_tactic_alpha": {
-    "status": "PASSED",
-    "wagers_placed": 357,
-    "mean_clv": 0.019,
-    "clv_cluster_95_ci": [
-      0.0173,
-      0.0207
-    ],
-    "yield": 0.1663,
-    "yield_cluster_95_ci": [
-      0.0736,
-      0.2664
-    ],
-    "total_pnl_eur": 593.7,
-    "max_drawdown_eur": 98.5,
-    "direct_mozzart_odds_used": 3,
-    "synthetic_proxy_odds_used": 354,
-    "risk_management": "Single highest-EV bet per fixture; multi-bet correlated stacking strictly forbidden."
-  },
-  "final_verdict": "CANDIDATE_FOR_PAPER_TRADING",
-  "governance_rationale": "CANDIDATE_FOR_PAPER_TRADING: The Reverse Tactic cleared all four institutional validation gates (Gate 0 Convergence, Gate A Calibration, Gate B CLV Alpha, Gate C Economic Yield). Direct Mozzart historical quotes verified where available. Paper trading execution approved; real capital remains locked."
+  "cohort_metrics": {
+    "DIRECT_MOZZART": {
+      "n_bets": 3,
+      "n_fixtures": 3,
+      "win_rate": 0.3333333333333333,
+      "mean_clv": 0.07956372144948005,
+      "clv_ci": [
+        0.02978532928449029,
+        0.14652597564342384
+      ],
+      "clv_t_ratio": 2.818657177701246,
+      "pnl": -5.5,
+      "pnl_ci": [
+        -30.0,
+        43.5
+      ],
+      "yield": -0.18333333333333332,
+      "yield_ci": [
+        -1.0,
+        1.45
+      ],
+      "max_drawdown": 10.0,
+      "mdd_ci": [
+        0.0,
+        20.0
+      ]
+    },
+    "SYNTHETIC_PROXY": {
+      "n_bets": 455,
+      "n_fixtures": 455,
+      "win_rate": 0.43736263736263736,
+      "mean_clv": 0.019845032918755893,
+      "clv_ci": [
+        0.01771023029177052,
+        0.0219144417004985
+      ],
+      "clv_t_ratio": 19.091144178709346,
+      "pnl": 430.29999999999995,
+      "pnl_ci": [
+        -73.12,
+        948.975
+      ],
+      "yield": 0.09457142857142856,
+      "yield_ci": [
+        -0.01607032967032967,
+        0.20856593406593407
+      ],
+      "max_drawdown": 136.70000000000005,
+      "mdd_ci": [
+        101.875,
+        364.4674999999998
+      ]
+    },
+    "ALL_COMBINED_DEV": {
+      "n_bets": 458,
+      "n_fixtures": 458,
+      "win_rate": 0.4366812227074236,
+      "mean_clv": 0.020236203367647098,
+      "clv_ci": [
+        0.01829632991526132,
+        0.0224851180335276
+      ],
+      "clv_t_ratio": 18.671810244547775,
+      "pnl": 424.79999999999995,
+      "pnl_ci": [
+        -82.47499999999992,
+        989.7549999999999
+      ],
+      "yield": 0.09275109170305676,
+      "yield_ci": [
+        -0.018007641921397362,
+        0.21610371179039298
+      ],
+      "max_drawdown": 136.70000000000005,
+      "mdd_ci": [
+        99.49000000000011,
+        401.225
+      ]
+    },
+    "FINAL_HOLDOUT_ONLY": {
+      "n_bets": 159,
+      "n_fixtures": 159,
+      "win_rate": 0.3836477987421384,
+      "mean_clv": 0.017273281383664255,
+      "clv_ci": [
+        0.014280554670771687,
+        0.02040914667627918
+      ],
+      "clv_t_ratio": 10.901924627742254,
+      "pnl": -12.600000000000023,
+      "pnl_ci": [
+        -321.93,
+        322.765
+      ],
+      "yield": -0.007924528301886807,
+      "yield_ci": [
+        -0.20247169811320756,
+        0.20299685534591191
+      ],
+      "max_drawdown": 239.8,
+      "mdd_ci": [
+        87.3725,
+        394.95999999999987
+      ]
+    }
+  }
 }
