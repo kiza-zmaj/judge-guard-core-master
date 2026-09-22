@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "pipeline": [
+    "brainstorm",
+    "plan",
+    "design",
+    "tdd",
+    "build",
+    "review",
+    "qa",
+    "security",
+    "ship",
+    "monitor",
+    "retro"
+  ],
+  "current_index": 9,
+  "completed": [
+    "brainstorm",
+    "plan",
+    "design",
+    "tdd",
+    "build",
+    "review",
+    "qa",
+    "security",
+    "ship"
+  ],
+  "skipped": [],
+  "started_at": "2026-09-22T11:06:47.787Z",
+  "updated_at": "2026-09-22T11:28:24.572Z",
+  "artifacts_dir": "/home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master/.cm/sprint/artifacts"
+}

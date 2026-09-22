@@ -1,0 +1,1 @@
+Architecture and system design completed with mermaid flow and data schemas

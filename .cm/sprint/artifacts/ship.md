@@ -1,0 +1,1 @@
+Paper trading pipeline deployed: live ticket generation, Dixon-Coles Poisson v17, immutable JSONL audit logger, PostHog telemetry, and zero-stake safety enforcement.

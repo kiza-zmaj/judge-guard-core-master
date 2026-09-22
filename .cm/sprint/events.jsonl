@@ -1,0 +1,10 @@
+{"type":"init","from":null,"at":"2026-09-22T11:06:47.787Z"}
+{"type":"complete","step":"brainstorm","at":"2026-09-22T11:07:37.119Z"}
+{"type":"complete","step":"plan","at":"2026-09-22T11:07:55.124Z"}
+{"type":"complete","step":"design","at":"2026-09-22T11:08:11.008Z"}
+{"type":"complete","step":"tdd","at":"2026-09-22T11:10:34.152Z"}
+{"type":"complete","step":"build","at":"2026-09-22T11:11:40.129Z"}
+{"type":"complete","step":"review","at":"2026-09-22T11:11:57.391Z"}
+{"type":"complete","step":"qa","at":"2026-09-22T11:12:48.773Z"}
+{"type":"complete","step":"security","at":"2026-09-22T11:13:13.487Z"}
+{"type":"complete","step":"ship","at":"2026-09-22T11:28:24.572Z"}

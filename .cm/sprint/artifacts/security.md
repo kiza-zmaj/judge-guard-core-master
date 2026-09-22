@@ -1,0 +1,1 @@
+Security audit passed: zero financial exposure, deterministic SHA-256 integrity, credential isolation
