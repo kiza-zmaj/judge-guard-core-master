@@ -1,5 +1,6 @@
 {
-  "pipeline_version": "17.0.0",
+  "pipeline_version": "18.1.0",
+  "build_tag": "sharpbet-v18.1-halftime-goals-production",
   "governance_protocol": "JudgeGuard Institutional 4-Gate Framework",
   "kaggle_execution": "cloud_gpu",
   "dataset_source": "kiza123123/mozzart-historical-odds",
@@ -14,38 +15,38 @@
     "details": {
       "E0": {
         "success": true,
-        "nit": 35,
+        "nit": 29,
         "mu": -0.586,
         "gamma": 0.227,
         "rho": -0.0212
       },
       "SP1": {
         "success": true,
-        "nit": 38,
+        "nit": 30,
         "mu": -0.801,
         "gamma": 0.307,
         "rho": -0.0781
       },
       "I1": {
         "success": true,
-        "nit": 36,
+        "nit": 34,
         "mu": -0.769,
         "gamma": 0.227,
-        "rho": -0.0371
+        "rho": -0.0372
       },
       "D1": {
         "success": true,
-        "nit": 36,
+        "nit": 28,
         "mu": -0.545,
         "gamma": 0.303,
-        "rho": -0.0666
+        "rho": -0.0667
       },
       "F1": {
         "success": true,
-        "nit": 32,
+        "nit": 29,
         "mu": -0.647,
         "gamma": 0.166,
-        "rho": -0.0548
+        "rho": -0.0549
       }
     }
   },
@@ -58,30 +59,30 @@
   },
   "forward_tactic_baseline": {
     "status": "BLOCKED",
-    "wagers_placed": 457,
-    "mean_clv": -0.107,
-    "yield": -0.0476,
+    "wagers_placed": 513,
+    "mean_clv": -0.0859,
+    "yield": -0.024,
     "failure_reason": "Public action bias in retail odds causes negative CLV penalty on first-half overs."
   },
   "reverse_tactic_alpha": {
     "status": "PASSED",
-    "wagers_placed": 874,
-    "mean_clv": 0.0474,
+    "wagers_placed": 357,
+    "mean_clv": 0.019,
     "clv_cluster_95_ci": [
-      0.0433,
-      0.0517
+      0.0173,
+      0.0207
     ],
-    "yield": 0.7198,
+    "yield": 0.1663,
     "yield_cluster_95_ci": [
-      0.5642,
-      0.8688
+      0.0736,
+      0.2664
     ],
-    "total_pnl_eur": 6291.4,
-    "max_drawdown_eur": 198.5,
-    "direct_mozzart_odds_used": 0,
-    "synthetic_proxy_odds_used": 874,
+    "total_pnl_eur": 593.7,
+    "max_drawdown_eur": 98.5,
+    "direct_mozzart_odds_used": 3,
+    "synthetic_proxy_odds_used": 354,
     "risk_management": "Single highest-EV bet per fixture; multi-bet correlated stacking strictly forbidden."
   },
   "final_verdict": "CANDIDATE_FOR_PAPER_TRADING",
-  "governance_rationale": "CANDIDATE_FOR_PAPER_TRADING: The Reverse Tactic successfully cleared all four institutional validation gates (Gate 0 Convergence, Gate A Calibration, Gate B CLV Alpha, Gate C Economic Yield). Retrospective backtest qualifies strategy for forward paper trading. Live production allocation remains locked pending real-time feed verification."
+  "governance_rationale": "CANDIDATE_FOR_PAPER_TRADING: The Reverse Tactic cleared all four institutional validation gates (Gate 0 Convergence, Gate A Calibration, Gate B CLV Alpha, Gate C Economic Yield). Direct Mozzart historical quotes verified where available. Paper trading execution approved; real capital remains locked."
 }
