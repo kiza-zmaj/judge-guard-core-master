@@ -203,22 +203,31 @@ def parse_pdf_to_records(pdf_path, filename):
 
         entry = matches[key]
         try:
-            if len(odds_tokens) >= 3:
-                entry["ft_1"] = float(odds_tokens[0])
-                entry["ft_x"] = float(odds_tokens[1])
-                entry["ft_2"] = float(odds_tokens[2])
-            if len(odds_tokens) >= 6:
-                entry["dc_1x"] = float(odds_tokens[3])
-                entry["dc_12"] = float(odds_tokens[4])
-                entry["dc_x2"] = float(odds_tokens[5])
-            if len(odds_tokens) >= 9:
-                entry["ht_1"] = float(odds_tokens[6])
-                entry["ht_x"] = float(odds_tokens[7])
-                entry["ht_2"] = float(odds_tokens[8])
-            if len(odds_tokens) >= 12:
-                entry["sh_1"] = float(odds_tokens[9])
-                entry["sh_x"] = float(odds_tokens[10])
-                entry["sh_2"] = float(odds_tokens[11])
+            # Only set ft/dc/ht if not already set or if current values look like standard 1X2 / HT lines
+            if len(odds_tokens) >= 3 and "ft_1" not in entry:
+                o1, ox, o2 = float(odds_tokens[0]), float(odds_tokens[1]), float(odds_tokens[2])
+                if 1.01 <= o1 <= 30.0 and 1.8 <= ox <= 12.0 and 1.01 <= o2 <= 30.0:
+                    entry["ft_1"] = o1
+                    entry["ft_x"] = ox
+                    entry["ft_2"] = o2
+            if len(odds_tokens) >= 6 and "dc_1x" not in entry:
+                dc1x, dc12, dcx2 = float(odds_tokens[3]), float(odds_tokens[4]), float(odds_tokens[5])
+                if 1.01 <= dc1x <= 6.0 and 1.01 <= dc12 <= 3.0 and 1.01 <= dcx2 <= 6.0:
+                    entry["dc_1x"] = dc1x
+                    entry["dc_12"] = dc12
+                    entry["dc_x2"] = dcx2
+            if len(odds_tokens) >= 9 and "ht_1" not in entry:
+                h1, hx, h2 = float(odds_tokens[6]), float(odds_tokens[7]), float(odds_tokens[8])
+                if 1.05 <= h1 <= 20.0 and 1.50 <= hx <= 4.50 and 1.05 <= h2 <= 20.0:
+                    entry["ht_1"] = h1
+                    entry["ht_x"] = hx
+                    entry["ht_2"] = h2
+            if len(odds_tokens) >= 12 and "sh_1" not in entry:
+                s1, sx, s2 = float(odds_tokens[9]), float(odds_tokens[10]), float(odds_tokens[11])
+                if 1.05 <= s1 <= 20.0 and 1.50 <= sx <= 4.50 and 1.05 <= s2 <= 20.0:
+                    entry["sh_1"] = s1
+                    entry["sh_x"] = sx
+                    entry["sh_2"] = s2
         except Exception:
             pass
 

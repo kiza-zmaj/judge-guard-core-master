@@ -360,3 +360,6 @@
 ✅ Completed Execute SharpBet v16.0 Multi-League Direct Mozzart Odds Halftime Reverse Tactic
 🟡 Starting Verify SharpBet v16.0 APPROVED_PRODUCTION Gate Verdicts
 ✅ Completed Verify SharpBet v16.0 APPROVED_PRODUCTION Gate Verdicts
+🛑 BLOCKED: SharpBet v16.0 APPROVED_PRODUCTION verdict REVOKED — MLE Success: False, peer review identified 11 critical issues
+🟡 Starting SharpBet Core v17.0 Statistical Remediation & Per-League MLE Convergence Implementation
+✅ Completed SharpBet Core v17.0 Statistical Remediation & Per-League MLE Convergence Implementation
