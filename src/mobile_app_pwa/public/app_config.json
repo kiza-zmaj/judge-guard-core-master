@@ -4,7 +4,7 @@
   "content": "Welcome to the Agent-Controlled PWA!",
   "components": [],
   "last_verdict": {
-    "action": "Verify CM Sprint Bus: Ship Phase Complete",
+    "action": "Verify CM Sprint Bus: Monitor Phase Complete",
     "status": "PASSED",
     "reason": "Approved (Unified Verification)",
     "timestamp": "Now"

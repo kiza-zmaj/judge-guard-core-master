@@ -1,0 +1,1 @@
+PostHog telemetry verified, paper trading log integrity confirmed with SHA-256 hashes, zero financial exposure (€0.00 stake), and calibrated ECE tracking active.
