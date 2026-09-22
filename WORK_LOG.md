@@ -383,3 +383,8 @@
 ✅ Completed CM Sprint Bus: Retro Phase — Operational Learnings & Sprint Wrap-up
 🟡 Starting Settlement of Paper Wagers (21.09.2026) in paper_trading_log.jsonl
 ✅ Completed Settlement of Paper Wagers (21.09.2026) in paper_trading_log.jsonl
+🟡 Starting S3 PDF-to-CSV Parser Implementation (mozzart_pdf_parser.py)
+🟡 Starting Push SharpBet Core v18.0 Kernel to Kaggle
+🟡 Starting BLOCKER FIX: Direct Mozzart Odds Integration + Parser Provenance
+🟡 Starting Upgrade Mozzart PDF Parser to v2.0 with Metadata Date Resolution and Halftime 1X2 Extraction
+✅ Completed Upgrade Mozzart PDF Parser to v2.0 with Metadata Date Resolution and Halftime 1X2 Extraction
