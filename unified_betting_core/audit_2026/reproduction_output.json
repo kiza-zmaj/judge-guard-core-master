@@ -1,0 +1,21 @@
+{
+  "status": "SUCCESS",
+  "returncode": 0,
+  "stdout_summary": [
+    "  Projekat       : /home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master",
+    "  Git commit     : eaf4b061d96c82337e7b3b962d6a645dcf4ca5b1 2026-09-22 17:51:45 +0200 checkpoint: SharpBet Core v18.3 Implementation & Kaggle Verification",
+    "  Input JSON     : /home/kizamladjanijebac/Downloads/mozzart_next_5_days_2026-09-23_to_2026-09-27.json",
+    "  Utakmica u inputu : 75",
+    "  Utakmica u inputu     : 75",
+    "  Evaluiranih outcomes  : 224",
+    "EXECUTABLE_EV SELEKCIJA      : 0",
+    "FINALNI REZULTAT: PRAZAN TIKET",
+    "  status == 'EXECUTABLE_EV'        \u2192  0 selekcija",
+    "  historical_proof : False  \u2192 FAIL-CLOSED"
+  ],
+  "evaluated_outcomes": 224,
+  "executable_ev": 0,
+  "ticket_status": "EMPTY_FAIL_CLOSED",
+  "data_quality_state": "STALE",
+  "historical_proof": false
+}

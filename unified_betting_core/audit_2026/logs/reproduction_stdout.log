@@ -1,0 +1,60 @@
+========================================================================
+LOCAL_COMPONENT_VERIFICATION — SharpBet Core
+========================================================================
+  Projekat       : /home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master
+  Git commit     : eaf4b061d96c82337e7b3b962d6a645dcf4ca5b1 2026-09-22 17:51:45 +0200 checkpoint: SharpBet Core v18.3 Implementation & Kaggle Verification
+  Input JSON     : /home/kizamladjanijebac/Downloads/mozzart_next_5_days_2026-09-23_to_2026-09-27.json
+  Tip verifikacije: Direktni poziv komponenti (ne run_pipeline)
+
+  ⚠  DataQualityState: STALE (snimljeni JSON, nije live feed)
+  ⚠  Kaggle v18.3 Dixon-Coles model: NIJE reprodukovan
+     Lokalni fallback: h_xg=1.4 / a_xg=1.1 za mečeve bez xg polja
+
+  Utakmica u inputu : 75
+  Izvor             : Mozzart browser listing
+  Preuzeto          : 2026-09-22
+  Datumi            : ['2026-09-23', '2026-09-24', '2026-09-25', '2026-09-26', '2026-09-27']
+
+  DEFAULT_BANKROLL  : €1000.00
+  MIN_EDGE          : 0.05
+  DATA_QUALITY      : STALE  (snimljeni JSON, 22.09.2026)
+  historical_proof  : False
+
+========================================================================
+AUDIT PRESKOČENIH OUTCOMES
+========================================================================
+  Utakmica u inputu     : 75
+  Očekivano outcomes    : 225  (75 × 3)
+  Preskočeno outcomes   : 1
+  Evaluiranih outcomes  : 224
+  Razlika               : 0
+
+  ID         Meč                                 Out    Kvota   Razlog
+  --------------------------------------------------------------------
+  1069401    Servette Geneve W vs Lion W         away   1.01    kvota 1.01 <= 1.01 (nevažeća)
+
+========================================================================
+UKUPNO EVALUIRANIH SELEKCIJA : 224
+EXECUTABLE_EV SELEKCIJA      : 0
+Runtime asercije             : PROŠLE ✅
+========================================================================
+
+Status breakdown:
+  NO_EDGE                                   127
+  FAKE_EV                                    77
+  MARGINAL_EV                                16
+  CALIBRATION_FAILED                          4
+  UKUPNO                                    224
+
+========================================================================
+FINALNI REZULTAT: PRAZAN TIKET
+
+  gate_eval.is_executable == True  →  0 selekcija
+  status == 'EXECUTABLE_EV'        →  0 selekcija
+
+  Tip verifikacije : LOCAL_COMPONENT_VERIFICATION
+  DATA_QUALITY     : STALE  (snimljeni JSON, nije live)
+  historical_proof : False  → FAIL-CLOSED
+  Primer gate note : ['No edge: raw EV -13.06%']
+
+  Nema opklada za ručni unos. Bankrol €1000.00 je zaštićen.

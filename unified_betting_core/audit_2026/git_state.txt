@@ -1,0 +1,85 @@
+On branch master
+Your branch is ahead of 'origin/master' by 47 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+  (commit or discard the untracked or modified content in submodules)
+	modified:   ../WORK_LOG.md
+	modified:   ../my-worker (modified content)
+	modified:   data/prediction_audit_trail.jsonl
+	modified:   output/mozzart_tickets.json
+	modified:   ../walkthrough.md
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../scratch/pseudo_labeling_experiment.py
+	../scratch/run_json_pipeline.py
+	audit_2026/
+	business-case-sharpbet-2026-09-22.md
+	market-opportunity-analysis-2026-09-22.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+=== REMOTES ===
+origin	https://github.com/kizabgd123/judge-guard-core-master.git (fetch)
+origin	https://github.com/kizabgd123/judge-guard-core-master.git (push)
+=== BRANCHES ===
+* master
++ optimize_pyodide_small_model
+  remotes/origin/master
+  remotes/origin/optimize_pyodide_small_model
+=== LAST 50 COMMITS ===
+eaf4b06 - 2026-09-22 17:51:45 +0200 - checkpoint: SharpBet Core v18.3 Implementation & Kaggle Verification (JudgeGuard)
+9c9e9df - 2026-09-22 17:18:47 +0200 - checkpoint: Verified Kaggle Remote Execution Version 15 (CANDIDATE_FOR_PAPER_TRADING) (JudgeGuard)
+ed9dc88 - 2026-09-22 17:15:25 +0200 - checkpoint: Push Product-Ready SharpBet v18.1 Halftime Goals Kernel to Kaggle (Version 15) (JudgeGuard)
+6559f30 - 2026-09-22 17:14:53 +0200 - checkpoint: Product-Ready SharpBet v18.1 Halftime Goals Kernel Compilation (JudgeGuard)
+e3649fb - 2026-09-22 15:52:15 +0200 - checkpoint: Upgrade Mozzart PDF Parser to v2.0 Complete (JudgeGuard)
+82ab815 - 2026-09-22 13:39:53 +0200 - checkpoint: Settlement of Paper Wagers (21.09.2026) Complete — Win Rate 78.9%, CLV +3.06% (JudgeGuard)
+55a42a6 - 2026-09-22 13:30:15 +0200 - checkpoint: CM Sprint Bus: Retro Phase Complete (Sprint Cycle Finished) (JudgeGuard)
+108f037 - 2026-09-22 13:29:32 +0200 - checkpoint: CM Sprint Bus: Monitor Phase Complete (JudgeGuard)
+ae8fc3e - 2026-09-22 13:28:38 +0200 - checkpoint: CM Sprint Bus: Ship Phase Complete (JudgeGuard)
+49c101f - 2026-09-22 13:18:27 +0200 - checkpoint: paper trading cycle complete — 6 tickets 22 wagers JSONL+PostHog (JudgeGuard)
+c99203d - 2026-09-22 06:49:22 +0200 - checkpoint: Kaggle Execution & Forensic Verification of SharpBet Core v17.0 (CANDIDATE_FOR_PAPER_TRADING) (JudgeGuard)
+8c465ba - 2026-09-22 06:33:11 +0200 - checkpoint: Push Remediated SharpBet Core v17.0 Kernel to Kaggle (Version 13) (JudgeGuard)
+55f845b - 2026-09-22 06:32:27 +0200 - checkpoint: SharpBet Core v17.0 Statistical Remediation & Per-League MLE Convergence Implementation (JudgeGuard)
+282face - 2026-09-22 05:29:40 +0200 - checkpoint: SharpBet v16.0 APPROVED_PRODUCTION - N=1177 wagers, CLV +4.18%, ROI +53.39%, PnL +€6284 (JudgeGuard)
+d5ea75e - 2026-09-22 05:18:31 +0200 - checkpoint: implementation plan for v16.0 (JudgeGuard)
+c626dab - 2026-09-21 23:36:07 +0200 - checkpoint: Push notebook Version 11 to Kaggle (JudgeGuard)
+16ec66b - 2026-09-21 23:23:14 +0200 - checkpoint: Deploy SharpBet v15 Halftime Reverse Tactic to Kaggle (JudgeGuard)
+a9e1789 - 2026-09-21 15:44:11 +0200 - checkpoint: Rewrite SharpBet v8 Audit Rigorous Foundation - zero assumptions, verified arXiv and NotebookLM, formal JTBD (JudgeGuard)
+61c8956 - 2026-09-21 15:28:26 +0200 - checkpoint: sharpbet-v8 audit documentation - JTBD, literature matrix, CLV decomposition, power analysis, decision (JudgeGuard)
+eab0022 - 2026-09-21 15:07:52 +0200 - checkpoint: SharpBet v14 Kernel v8 - 344k Mozzart matches - FAIL_CLOSED_BLOCKED confirmed (JudgeGuard)
+e89ae24 - 2026-09-21 14:52:22 +0200 - checkpoint: Deploy SharpBet v14 Direct Mozzart Kaggle Ingestion and Audit (JudgeGuard)
+89fdfa6 - 2026-09-21 12:29:51 +0200 - checkpoint: SharpBet v13.1 - Exact MLE Identification, True Power De-Vig, Cluster Bootstrap & Complete Peer-Review Compliance (JudgeGuard)
+a6d964d - 2026-09-21 12:22:04 +0200 - checkpoint: SharpBet v13.0 - Real MLE, Full OOS Calibration & Honest Fail-Closed Governance (JudgeGuard)
+4eb9fac - 2026-09-21 12:10:01 +0200 - checkpoint: SharpBet v12.1 Halftime Goals Pipeline - All Gates APPROVED (JudgeGuard)
+fafd571 - 2026-09-21 11:58:18 +0200 - checkpoint: Build SharpBet v12 Kaggle GPU Notebook Generator (JudgeGuard)
+cf3d9d9 - 2026-09-21 11:57:08 +0200 - checkpoint: Execute SharpBet v12 Ingestion & Settlement Engine (JudgeGuard)
+c218814 - 2026-09-21 11:54:56 +0200 - checkpoint: Implementation Plan SharpBet v12 Multi-Bet Halftime Goals Kaggle GPU Pipeline (JudgeGuard)
+2da5220 - 2026-09-21 10:15:29 +0200 - checkpoint: Kaggle BioHub End-to-End Analysis and 3 Submissions Launch (JudgeGuard)
+377517c - 2026-09-21 09:16:20 +0200 - checkpoint: s6e9 kernel version 5 complete with empirical oof verification (JudgeGuard)
+167980b - 2026-09-21 09:06:02 +0200 - checkpoint: complete reproducible s6e9 notebook and audit verification (JudgeGuard)
+74dcb41 - 2026-09-21 08:37:28 +0200 - checkpoint: Final Engineering Report and Kaggle Push Complete (JudgeGuard)
+e6cf4b6 - 2026-09-21 08:30:12 +0200 - checkpoint: S6E9 Frankenstein Top-5 Assault complete (Sub 27 LB 0.94658) (JudgeGuard)
+7db5cb5 - 2026-09-21 08:11:57 +0200 - checkpoint: S6E9 Round 2 five submissions executed (highest LB 0.94641) (JudgeGuard)
+e5e2da1 - 2026-09-21 08:01:27 +0200 - checkpoint: ArXiv literature review S6E9 Round 2 - 27 papers, 5 clusters, priority reading list (JudgeGuard)
+f04d136 - 2026-09-21 07:21:28 +0200 - checkpoint: Fix OBS Wayland PipeWire screen capture - replace xshm_input_v2 with pipewire-desktop-capture-source + fix start_stream.py launch env (JudgeGuard)
+c45b77d - 2026-09-21 07:18:14 +0200 - checkpoint: update start_stream with xcb platform environment (JudgeGuard)
+1be76ef - 2026-09-21 07:09:49 +0200 - checkpoint: Configure 2026 Best Practice OBS Streaming Profile and Live Pipeline (JudgeGuard)
+5741322 - 2026-09-21 03:51:59 +0200 - checkpoint: Kick Live Stream and Kaggle Challenge Setup (JudgeGuard)
+29f44ac - 2026-09-21 03:39:05 +0200 - feat: Kick API OAuth 2.1 + Webhook integration (P0 complete) (JudgeGuard)
+8691eda - 2026-09-21 00:50:53 +0200 - checkpoint: Archive Mozzart Placed Tickets and Build Training Dataset (JudgeGuard)
+c3d9435 - 2026-09-21 00:32:48 +0200 - checkpoint: Integrate Mozzart Ingestion into Unified Betting Core Main Pipeline (JudgeGuard)
+26351b0 - 2026-09-21 00:11:05 +0200 - checkpoint: Generate Betting Tickets from Current Matches via Unified Betting Core (JudgeGuard)
+38a0329 - 2026-09-20 21:38:28 +0200 - checkpoint: Kaggle S6E9 Master Audit Report and Tasks Completion (JudgeGuard)
+aa06905 - 2026-09-20 21:28:54 +0200 - checkpoint: Kaggle S6E9 Top-10 Assault Pipeline Execution (Submissions 11-15) + Audit (JudgeGuard)
+c9124ff - 2026-09-20 19:38:52 +0200 - checkpoint: Kaggle S6E9 Top-10 Assault Implementation Plan (JudgeGuard)
+97486bd - 2026-09-20 05:20:22 +0200 - checkpoint: End-to-End SharpBet v11 Pipeline & Kaggle Push (JudgeGuard)
+a75cdae - 2026-09-20 04:36:09 +0200 - checkpoint: SharpBet v10 End-to-End: Nested Walk-Forward + Base-Margin + CLV Audit + Paper Trading Ledger + Kaggle v10 Generator (JudgeGuard)
+e6a821f - 2026-09-19 23:13:01 +0200 - checkpoint: Round 2 complete - 5/5 submissions scored, best LB=0.94632 (Sub7+Sub10) (JudgeGuard)
+81aff43 - 2026-09-19 22:29:59 +0200 - checkpoint: Run Cloud Kernel Monitor and Automated 5-Submission Pipeline (JudgeGuard)
+6c91d5b - 2026-09-19 22:04:07 +0200 - checkpoint: Deploy S6E9 Generator Forensics Pipeline to Kaggle Cloud GPU Kernel (JudgeGuard)=== SUBMODULES NOTE ===
+fatal: no submodule mapping found in .gitmodules for path 'my-worker'
+Submodule error: my-worker has no .gitmodules entry
+=== STASH ===

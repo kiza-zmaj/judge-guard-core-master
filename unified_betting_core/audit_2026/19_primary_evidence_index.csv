@@ -1,0 +1,15 @@
+metric_or_fact,source_file,line_or_cell,raw_string,checksum_or_id,audit_status,implication
+Macro ECE 3.78%,sharpbet-v12-halftime-goals-audit.log,Line 42,"MACRO ECE    : 3.78% (Threshold: <= 6.00%)",217a675ac5ccba5e...,VERIFIED,Model probabilities are well-calibrated on holdout
+Macro Brier Score 0.2171,sharpbet-v12-halftime-goals-audit.log,Line 43,"MACRO BRIER  : 0.2171 (Threshold: <= 0.2200)",217a675ac5ccba5e...,VERIFIED,Brier score outperforms naive 0.25 baseline on holdout
+Odds Floor 1.25,unified_betting_core/generate_kaggle_v12.py,Line 489,"market_odds_i1 = round(max((1.0 / p_i1) * 0.935, 1.25), 2)",9bffa01022ac3656...,VERIFIED,Creates artificial positive EV for any probability > 80%
+Synthetic CLV definition,unified_betting_core/generate_kaggle_v12.py,Line 513,"""clv_fair"": round(ev_i1 * 0.85, 4)",9bffa01022ac3656...,VERIFIED,Proves CLV was not measured against market closing line
+Real Mozzart Margin N=77043,sharpbet-v12-halftime-goals-audit.log,Line 33,"Empirical Mozzart Halftime 1X2 Market Margin (N=77,043): Mean Overround: 18.79%",217a675ac5ccba5e...,VERIFIED,Proves retail bookmaker has 18.79% margin hurdle on 1H
+Real Mozzart CLV -9.82%,sharpbet-v12-halftime-goals-audit.log,Line 52,"Mean CLV : -9.82% (t = -18.90, p-value = 0.0000)",217a675ac5ccba5e...,VERIFIED,Proves strategy suffers -9.82% negative edge against real odds
+T-statistic -18.90,sharpbet-v12-halftime-goals-audit.log,Line 52,"(t = -18.90, p-value = 0.0000)",217a675ac5ccba5e...,VERIFIED,Statistically confirms underperformance relative to closing line
+Claimed ROI +53.39% N=1177,git commit log,commit 282face,"checkpoint: SharpBet v16.0 APPROVED_PRODUCTION - N=1177 wagers, CLV +4.18%, ROI +53.39%",282face43b4d6824...,INVALID_ARTIFACT,Result achieved by re-introducing proxy odds without market fills
+Claimed Yield +16.76% (v18.1),gate_verdicts.json,Line 75,"""yield"": 0.1676",2c8bb75a625f69ba...,INVALID_ARTIFACT,Yield derived almost entirely from synthetic proxy odds
+Synthetic proxy bets 351 of 354,gate_verdicts.json,Lines 82-83,"""direct_mozzart_odds_used"": 3, ""synthetic_proxy_odds_used"": 351",2c8bb75a625f69ba...,VERIFIED,99.15% of bets in v18.1 were synthetic; only 3 used real quotes
+v18.3 Holdout Yield -0.79%,unified_betting_core/generate_kaggle_v18.py,Line 10,"Because 2025/26 holdout yield is -0.79%, Gate C Final Holdout is strictly BLOCKED",46bc92cb82719cbe...,VERIFIED,Proves untouched holdout season experienced negative economic yield
+Business Case €100k MRR mismatch,business-case-sharpbet-2026-09-22.md,Line 272,"Month 10-12: Full Break-Even Milestone (~1,100 Paying Users | €100K MRR)",980de9e1608c18f6...,CONTRADICTED,1100 * €57.12 = €62832; shortfall of €37168 per month
+Local Pipeline Outcome Count 224,audit_2026/logs/reproduction_stdout.log,Line 29,"Evaluiranih outcomes  : 224",audit log dynamic,VERIFIED,Matches exactly 75 matches * 3 minus 1 skipped outcome (1.01)
+Local Pipeline Executable EV Count 0,audit_2026/logs/reproduction_stdout.log,Line 38,"EXECUTABLE_EV SELEKCIJA      : 0",audit log dynamic,VERIFIED,Confirms fail-closed protection on stale data snapshot

@@ -1,0 +1,22 @@
+{
+  "run_timestamp": "2026-09-22T19:40:00Z",
+  "exit_code": 0,
+  "input_rows": 75,
+  "expected_outcomes": 225,
+  "skipped_outcomes": 1,
+  "evaluated_outcomes": 224,
+  "status_breakdown": {
+    "NO_EDGE": 127,
+    "FAKE_EV": 77,
+    "MARGINAL_EV": 16,
+    "CALIBRATION_FAILED": 4
+  },
+  "executable_count": 0,
+  "data_quality": "STALE",
+  "historical_proof": false,
+  "ticket_status": "EMPTY_TICKET",
+  "assertions_passed": true,
+  "assertion_errors": [],
+  "stdout_log": "/home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master/unified_betting_core/audit_2026/logs/reproduction_stdout.log",
+  "stderr_log": "/home/kizamladjanijebac/Documents/jude guard/judge-guard-core-master/unified_betting_core/audit_2026/logs/reproduction_stderr.log"
+}
