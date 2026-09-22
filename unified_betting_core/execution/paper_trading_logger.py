@@ -10,9 +10,15 @@ import hashlib
 import json
 import os
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Dict, List, Optional
 
 from unified_betting_core.config import DATA_DIR
+
+try:
+    from unified_betting_core.execution.telemetry import track_paper_bet_logged, track_match_settlement
+except ImportError:
+    track_paper_bet_logged = lambda entry: None
+    track_match_settlement = lambda *args, **kwargs: None
 
 PAPER_LOG_FILE = os.path.join(DATA_DIR, "paper_trading_log.jsonl")
 
@@ -95,7 +101,64 @@ class PaperTradingLogger:
         with open(self.log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry) + "\n")
 
+        # Emit telemetry event to PostHog
+        try:
+            track_paper_bet_logged(entry)
+        except Exception:
+            pass
+
         return entry
+
+    def settle_bet(
+        self,
+        event_id: str,
+        actual_result: str,
+        won: bool,
+        realized_pnl: float,
+        closing_odds: Optional[float] = None,
+        realized_clv: Optional[float] = None,
+    ) -> bool:
+        """
+        Settles a pending paper bet and records the result in the audit log & PostHog telemetry.
+        """
+        logs = self.read_all_logs()
+        updated = False
+        target_entry = None
+        for record in logs:
+            if record.get("event_id") == event_id and not record.get("settled"):
+                record["settled"] = True
+                record["actual_result"] = actual_result
+                record["won"] = won
+                record["realized_pnl"] = round(realized_pnl, 4)
+                record["closing_odds"] = round(closing_odds, 3) if closing_odds else None
+                record["realized_clv"] = round(realized_clv, 4) if realized_clv is not None else None
+                record["settled_at"] = datetime.now(timezone.utc).isoformat()
+                updated = True
+                target_entry = record
+                break
+
+        if updated:
+            with open(self.log_path, "w", encoding="utf-8") as f:
+                for record in logs:
+                    f.write(json.dumps(record) + "\n")
+
+            if target_entry:
+                try:
+                    track_match_settlement(
+                        event_id=event_id,
+                        match=target_entry.get("match", "Unknown"),
+                        outcome=target_entry.get("outcome", "Unknown"),
+                        odds=target_entry.get("odds", 1.0),
+                        actual_result=actual_result,
+                        won=won,
+                        realized_pnl=realized_pnl,
+                        closing_odds=closing_odds,
+                        realized_clv=realized_clv,
+                    )
+                except Exception:
+                    pass
+
+        return updated
 
     def read_all_logs(self) -> list[dict[str, Any]]:
         """Reads all historical paper trading entries."""
