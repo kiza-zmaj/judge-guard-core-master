@@ -23,6 +23,18 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# Telemetry and Token Cleaner integration (P1-8)
+try:
+    from .telemetry import telemetry
+    from .token_cleaner import token_cleaner
+except ImportError:
+    try:
+        from src.antigravity_core.telemetry import telemetry
+        from src.antigravity_core.token_cleaner import token_cleaner
+    except ImportError:
+        telemetry = None
+        token_cleaner = None
+
 # Default active rotation keys (100% production)
 DEFAULT_API_KEYS = [
     "REDACTED_ENV_GEMINI_API_KEY_1",
@@ -196,7 +208,32 @@ class GeminiClient:
                 # as required by some SDK versions to reliably override thresholds.
                 kwargs = {"generation_config": generation_config}
 
+                t_start = time.time()
                 response = self.model.generate_content(prompt, **kwargs)
+                latency_ms = (time.time() - t_start) * 1000.0
+
+                # 📊 Telemetry extraction (P1-8)
+                if telemetry:
+                    try:
+                        p_tok, c_tok, t_tok, cd_tok = 0, 0, 0, 0
+                        usage = getattr(response, "usage_metadata", None)
+                        if usage:
+                            p_tok = getattr(usage, "prompt_token_count", 0) or 0
+                            c_tok = getattr(usage, "candidates_token_count", 0) or 0
+                            t_tok = getattr(usage, "total_token_count", 0) or 0
+                            cd_tok = getattr(usage, "cached_content_token_count", 0) or 0
+                        telemetry.record_call(
+                            agent="gemini_client",
+                            action="generate_content",
+                            model=self.model_name,
+                            prompt_tokens=p_tok,
+                            completion_tokens=c_tok,
+                            total_tokens=t_tok,
+                            cached_tokens=cd_tok,
+                            latency_ms=latency_ms
+                        )
+                    except Exception as tel_e:
+                        logger.debug(f"Telemetry log error: {tel_e}")
 
                 # Safe candidate extraction: check finish_reason before accessing .text
                 extracted_text = ""

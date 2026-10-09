@@ -1,0 +1,36 @@
+{
+  "name": "JudgeGuard Core Master",
+  "version": "2.0.0",
+  "environment": "production",
+  "git": {
+    "enforce_checkpoints": true,
+    "commit_prefix": "checkpoint:",
+    "audit_staged_files": true,
+    "gate_script": "git_bolt_jules_gate.py"
+  },
+  "token_cleaner": {
+    "enabled": true,
+    "max_hunk_lines": 50,
+    "ignore_paths": [
+      "local_py/**",
+      "*.json",
+      ".venv/**",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".git/**",
+      "*.so",
+      "*.pyc",
+      "exports/**"
+    ]
+  },
+  "telemetry": {
+    "enabled": true,
+    "provider": "sqlite",
+    "db_path": "research.db",
+    "track_latency": true,
+    "track_tokens": true,
+    "track_cost": true,
+    "badge_output": true
+  }
+}

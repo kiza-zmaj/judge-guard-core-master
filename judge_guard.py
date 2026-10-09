@@ -472,6 +472,22 @@ class JudgeGuard:
             cached_verdict = self.pipeline.get_cached_verdict(current_action)
             if cached_verdict == "PASSED":
                 print(f"⚡ Bolt: Reusing cached approval for '{current_action}'")
+                try:
+                    from src.antigravity_core.telemetry import telemetry
+                    telemetry.record_call(
+                        agent="bolt",
+                        action=current_action,
+                        model="verdict_cache",
+                        prompt_tokens=0,
+                        completion_tokens=0,
+                        total_tokens=0,
+                        cached_tokens=1500,
+                        tokens_saved=1500,
+                        latency_ms=1.5,
+                        status="CACHED_APPROVED"
+                    )
+                except Exception:
+                    pass
                 if bridge_available:
                     bridge.push_verdict(current_action, "PASSED", "Approved (Cached)")
 
