@@ -15,8 +15,10 @@ from typing import Tuple, Optional, Dict
 # Ensure local packages are on sys.path
 _repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 _local_dist = os.path.join(_repo_root, "local_py", "local", "lib", "python3.14", "dist-packages")
-if os.path.exists(_local_dist) and _local_dist not in sys.path:
+if sys.version_info >= (3, 14) and os.path.exists(_local_dist) and _local_dist not in sys.path:
     sys.path.insert(0, _local_dist)
+elif os.path.exists(_local_dist) and _local_dist not in sys.path:
+    sys.path.append(_local_dist)
 if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 

@@ -42,3 +42,6 @@ actions-runner/
 .agent/
 .venv/
 node_modules
+
+.gemini/
+gha-creds-*.json

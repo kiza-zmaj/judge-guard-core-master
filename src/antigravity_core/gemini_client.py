@@ -9,8 +9,10 @@ import sys
 # Ensure local dependencies are discovered in all environments
 _repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 _local_dist = os.path.join(_repo_root, "local_py", "local", "lib", "python3.14", "dist-packages")
-if os.path.exists(_local_dist) and _local_dist not in sys.path:
+if sys.version_info >= (3, 14) and os.path.exists(_local_dist) and _local_dist not in sys.path:
     sys.path.insert(0, _local_dist)
+elif os.path.exists(_local_dist) and _local_dist not in sys.path:
+    sys.path.append(_local_dist)
 
 # Load environment variables so standalone invocations have API keys
 try:
@@ -139,13 +141,16 @@ class GeminiClient:
         )
 
     def _rotate_key(self) -> bool:
-        """Rotates to the next available API key."""
+        """Rotates to the next available API key. Returns False when all keys have been cycled on current model."""
         if len(self.api_keys) <= 1:
             return False
 
         self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
         logger.warning(f"🔄 Rotating API Key. Switching to Key #{self.current_key_index + 1}")
         self._configure_client()
+        if self.current_key_index == 0:
+            # Full cycle completed across all keys for this model
+            return False
         return True
 
     def _rotate_model(self) -> bool:
@@ -194,19 +199,34 @@ class GeminiClient:
                 response = self.model.generate_content(prompt, **kwargs)
 
                 # Safe candidate extraction: check finish_reason before accessing .text
+                extracted_text = ""
                 if response.candidates:
                     try:
                         candidate = response.candidates[0]
                         fr = getattr(candidate, "finish_reason", None)
-                        # Check if fr is an actual integer/enum and not a mock/MagicMock
                         if isinstance(fr, int):
-                            # FinishReason: 3 = SAFETY, 7 = BLOCKLIST, 8 = PROHIBITED_CONTENT, 9 = SPII, 11 = IMAGE_SAFETY
                             if fr in (3, 7, 8, 9, 11):
                                 raise ValueError(f"SAFETY_BLOCKED: finish_reason={fr}. Gemini safety filter triggered.")
-                    except (IndexError, TypeError):
+                        
+                        content = getattr(candidate, "content", None)
+                        parts = getattr(content, "parts", []) if content else []
+                        text_chunks = [p.text for p in parts if getattr(p, "text", None)]
+                        if text_chunks:
+                            extracted_text = "".join(text_chunks)
+                    except Exception:
                         pass
 
-                return response.text
+                if not extracted_text:
+                    try:
+                        extracted_text = response.text
+                    except Exception as text_err:
+                        if "finish_reason" in str(text_err):
+                            logger.warning(f"⚠️ Candidate has no text parts ({text_err}). Rotating...")
+                            if self._rotate_key() or self._rotate_model():
+                                continue
+                        raise
+
+                return extracted_text
             except Exception as e:
                 error_str = str(e)
                 # Check for quota or rate limit errors
@@ -263,8 +283,8 @@ class GeminiClient:
         """
 
         try:
-            # ⚡ Bolt: Use max_output_tokens=100 for classification to avoid premature MAX_TOKENS cutoff
-            raw_result = self.generate_content(prompt, generation_config={"max_output_tokens": 100})
+            # Use max_output_tokens=2048 to allow reasoning/thinking models to produce thoughts and the final verdict
+            raw_result = self.generate_content(prompt, generation_config={"max_output_tokens": 2048})
             if not raw_result:
                 raise ValueError("Empty response from Gemini")
 

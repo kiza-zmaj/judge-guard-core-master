@@ -22,7 +22,7 @@ if [ ! -f "$VENV_PYTHON" ]; then
     VENV_PYTHON="python3"
 fi
 
-export PYTHONPATH="$SCRIPT_DIR:$SCRIPT_DIR/local_py/local/lib/python3.14/dist-packages:$PYTHONPATH"
+export PYTHONPATH="$SCRIPT_DIR:$PYTHONPATH"
 
 # 1. Ensure TICKET.md is synchronized with current action
 echo "🎫 Synchronizing TICKET.md for: QWEN: $ACTION"

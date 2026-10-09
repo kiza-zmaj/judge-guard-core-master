@@ -1,0 +1,15 @@
+{
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/.venv",
+    "**/__pycache__"
+  ],
+  "extraPaths": [
+    "./local_py/local/lib/python3.14/dist-packages",
+    "."
+  ],
+  "pythonVersion": "3.12"
+}

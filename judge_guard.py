@@ -19,18 +19,20 @@ import threading
 import json
 import logging
 from typing import Dict, Any, List, Optional
+# Inject local python packages and repo root
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+_local_dist = os.path.join(_script_dir, "local_py", "local", "lib", "python3.14", "dist-packages")
+if sys.version_info >= (3, 14) and os.path.exists(_local_dist) and _local_dist not in sys.path:
+    sys.path.insert(0, _local_dist)
+elif os.path.exists(_local_dist) and _local_dist not in sys.path:
+    sys.path.append(_local_dist)
+if _script_dir not in sys.path:
+    sys.path.insert(0, _script_dir)
+
 from dotenv import load_dotenv
 
 # Load .env automatically
 load_dotenv()
-
-# Inject local python packages and repo root
-_script_dir = os.path.dirname(os.path.abspath(__file__))
-_local_dist = os.path.join(_script_dir, "local_py", "local", "lib", "python3.14", "dist-packages")
-if os.path.exists(_local_dist) and _local_dist not in sys.path:
-    sys.path.insert(0, _local_dist)
-if _script_dir not in sys.path:
-    sys.path.insert(0, _script_dir)
 
 from concurrent.futures import ThreadPoolExecutor
 
