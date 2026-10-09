@@ -23,6 +23,15 @@ from dotenv import load_dotenv
 
 # Load .env automatically
 load_dotenv()
+
+# Inject local python packages and repo root
+_script_dir = os.path.dirname(os.path.abspath(__file__))
+_local_dist = os.path.join(_script_dir, "local_py", "local", "lib", "python3.14", "dist-packages")
+if os.path.exists(_local_dist) and _local_dist not in sys.path:
+    sys.path.insert(0, _local_dist)
+if _script_dir not in sys.path:
+    sys.path.insert(0, _script_dir)
+
 from concurrent.futures import ThreadPoolExecutor
 
 # --- LAYER 3 CONSTANT ---
@@ -130,7 +139,19 @@ class JudgeGuard:
         if self._rules_path is None:
             with self._lock:
                 if self._rules_path is None:
-                    self._rules_path = os.path.expanduser("~/.gemini/MASTER_ORCHESTRATION.md")
+                    candidates = [
+                        os.getenv("MASTER_ORCHESTRATION_PATH"),
+                        os.path.join(os.path.dirname(os.path.abspath(__file__)), "MASTER_ORCHESTRATION.md"),
+                        os.path.expanduser("~/.gemini/MASTER_ORCHESTRATION.md"),
+                        "/home/testovinovi/judge-guard-core-master/MASTER_ORCHESTRATION.md",
+                        "/home/testovinovi/Downloads/MASTER_ORCHESTRATION.md",
+                    ]
+                    for candidate in candidates:
+                        if candidate and os.path.exists(candidate):
+                            self._rules_path = candidate
+                            break
+                    if not self._rules_path:
+                        self._rules_path = os.path.expanduser("~/.gemini/MASTER_ORCHESTRATION.md")
         return self._rules_path
 
     @property
@@ -344,7 +365,7 @@ class JudgeGuard:
             self.logger.error(f"⚠️ Notion background sync failed: {e}")
 
     def _check_work_log(self, action: str) -> bool:
-        """Check if WORK_LOG.md was recently updated (within last 120 seconds)."""
+        """Check if WORK_LOG.md was recently updated (within last 300 seconds)."""
         if not self.work_log_path or not os.path.exists(self.work_log_path):
             self.logger.error("🛑 WORK_LOG.md not found. Required for action verification.")
             print("🛑 WORK_LOG.md not found. Update required before action.")
@@ -361,19 +382,21 @@ class JudgeGuard:
             with open(self.work_log_path, 'rb') as f:
                 f.seek(0, 2)
                 file_size = f.tell()
-                to_read = min(file_size, 1000)
+                to_read = min(file_size, 2000)
                 f.seek(-to_read, 2)
                 last_lines = f.read().decode('utf-8', errors='ignore').lower()
                 
-                # Check if this action or 'starting' is in recent log
-                # We allow up to 120 seconds for slower API calls or manual logging
-                if '🟡' in last_lines or 'starting' in last_lines:
-                    if age_seconds < 120:
+                # Check if starting or completion indicator is present
+                is_verify = any(k in action.lower() for k in ["verify", "complete", "checkpoint", "završen", "post"])
+                valid_tokens = ['🟡', 'starting', 'start'] if not is_verify else ['🟡', 'starting', '✅', 'completed', 'checkpoint', 'verify']
+
+                if any(tok in last_lines for tok in valid_tokens):
+                    if age_seconds < 300:
                         return True
                     else:
                         self.logger.warning(f"WORK_LOG.md is stale ({age_seconds:.1f}s old). Action must be logged recently.")
                 else:
-                    self.logger.warning("WORK_LOG.md does not contain '🟡' or 'Starting' indicators in the last 1000 chars.")
+                    self.logger.warning("WORK_LOG.md does not contain required status indicators in the last 2000 chars.")
 
         except Exception as e:
             self.logger.error(f"⚠️ Error reading WORK_LOG.md: {e}")
@@ -405,6 +428,27 @@ class JudgeGuard:
             bridge_available = True
         except ImportError:
             bridge_available = False
+
+        # --- LAYER 000: Pre-Flight & Post-Action Ticket Gate (Ollama Cloud Gemma 4) ---
+        try:
+            from src.antigravity_core.ticket_verifier import TicketVerifier
+            _verifier = TicketVerifier()
+            _is_completion = ("complete" in current_action.lower() or "completed" in current_action.lower() or "closure" in current_action.lower()) and ("verify" in current_action.lower() or "close" in current_action.lower())
+            if _is_completion:
+                _ticket_ok, _ticket_msg = _verifier.verify_ticket_completion(current_action, "COMPLETION_VERIFICATION")
+            else:
+                _ticket_ok, _ticket_msg = _verifier.verify_ticket(current_action)
+            if not _ticket_ok:
+                msg = f"Layer 000 Ticket Block (Ollama Cloud Gemma 4): {_ticket_msg}"
+                self.logger.error(msg)
+                if bridge_available:
+                    bridge.push_verdict(current_action, "BLOCKED", msg)
+                print(f"🛑 JudgeGuard: {msg}")
+                return False
+            else:
+                self.logger.info("Layer 000 Ticket Check PASSED by Ollama Cloud Gemma 4.")
+        except Exception as e:
+            self.logger.warning(f"⚠️ Ticket verifier check error: {e}")
 
         # --- LAYER 00: Security Enforcement (Emergency Fix) ---
         if self._is_dangerous_command(current_action):

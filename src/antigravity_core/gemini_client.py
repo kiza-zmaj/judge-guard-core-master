@@ -4,6 +4,14 @@ import time
 from typing import Optional, Dict, Tuple
 import logging
 
+import sys
+
+# Ensure local dependencies are discovered in all environments
+_repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+_local_dist = os.path.join(_repo_root, "local_py", "local", "lib", "python3.14", "dist-packages")
+if os.path.exists(_local_dist) and _local_dist not in sys.path:
+    sys.path.insert(0, _local_dist)
+
 # Load environment variables so standalone invocations have API keys
 try:
     from dotenv import load_dotenv
@@ -13,6 +21,22 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+# Default active rotation keys (100% production)
+DEFAULT_API_KEYS = [
+    "REDACTED_ENV_GEMINI_API_KEY_1",
+    "REDACTED_ENV_GEMINI_API_KEY_2",
+]
+
+# Default active model rotation: Gemini 3.8 Flash & Gemini 3.7 Flash with 2.5 Flash fallback
+DEFAULT_MODELS = [
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-2.5-flash",
+]
+
+# Security passcode required to modify or override model
+MODEL_LOCK_PASSCODE = "0012"
+
 # ⚡ Bolt: Lazy import holder
 genai = None
 
@@ -20,57 +44,82 @@ class GeminiClient:
     """
     Client for interacting with Google's Gemini models.
 
-    Provides multi-key rotation, retry with backoff, and a `judge_content`
-    method that returns a *authoritative* verdict (never blindly passes when
-    safety filters block the response).
+    Provides dual-axis rotation (multi-key rotation + model rotation across
+    Gemini 3.8 Flash, Gemini 3.7 Flash, and fallback), retry with backoff,
+    and a `judge_content` method that returns an authoritative verdict.
+    Mocks and simulations are strictly forbidden.
+    Model changes are protected by security passcode '0012'.
     """
 
-    def __init__(self, model_name: Optional[str] = None, api_keys: Optional[str] = None):
+    def __init__(self, model_name: Optional[str] = None, api_keys: Optional[str] = None, passcode: Optional[str] = None):
         """
-        Initialize a GeminiClient, loading API keys, configuring mock mode when no keys are found, and preparing the client.
-
-        Parameters:
-            model_name (str): The Gemini model identifier to use (default: "models/gemini-flash-latest").
-            api_keys (Optional[str]): Comma-separated API keys string; if omitted, the environment variables
-                `GEMINI_API_KEYS` or `GEMINI_API_KEY` will be used. When no keys are available, the client
-                enters mock mode and uses a placeholder key.
-
-        Notes:
-            - Sets `self.api_keys` to a list of keys, `self.current_key_index` to 0, `self.model_name`
-              to the provided model_name, and `self.mock_mode` to True when falling back to mock mode.
-            - Calls `_configure_client()` to finalize client setup.
+        Initialize a GeminiClient with real rotating API keys and models.
+        Model change requires passcode '0012'.
         """
         keys_env = api_keys or os.getenv("GEMINI_API_KEYS")
         if not keys_env:
-            # Fallback for backward compatibility
             single_key = os.getenv("GEMINI_API_KEY")
-            if not single_key:
-                logger.error("GEMINI_API_KEYS not found in environment. 100% PRODUCT MODE ACTIVE. Halting.")
-                raise ValueError("GEMINI_API_KEY is required in 100% Product Mode. Mocks are STRICTLY FORBIDDEN.")
-            else:
+            if single_key:
                 self.api_keys = [single_key]
+            else:
+                self.api_keys = list(DEFAULT_API_KEYS)
         else:
             self.api_keys = [k.strip() for k in keys_env.split(",") if k.strip()]
 
+        # Enforce passcode '0012' if requesting a model other than default gemini-3.8-flash
+        desired_model = model_name or os.getenv("GEMINI_MODEL")
+        provided_code = passcode or os.getenv("MODEL_CHANGE_PASSCODE")
+
+        if desired_model and desired_model != DEFAULT_MODELS[0]:
+            if provided_code != MODEL_LOCK_PASSCODE:
+                logger.warning(
+                    f"🔒 Model change to '{desired_model}' rejected: Passcode '0012' required. "
+                    f"Falling back to locked standard model '{DEFAULT_MODELS[0]}'."
+                )
+                desired_model = DEFAULT_MODELS[0]
+
+        models_env = os.getenv("GEMINI_MODELS")
+        if models_env:
+            self.models = [m.strip() for m in models_env.split(",") if m.strip()]
+        else:
+            if desired_model:
+                self.models = [desired_model] + [m for m in DEFAULT_MODELS if m != desired_model]
+            else:
+                self.models = list(DEFAULT_MODELS)
+
         self.current_key_index = 0
-        self.model_name = os.getenv("GEMINI_MODEL", model_name or "gemini-2.5-flash")
+        self.current_model_index = 0
+        self.model_name = self.models[self.current_model_index]
         self._configure_client()
+
+    def change_model(self, new_model: str, passcode: str) -> bool:
+        """
+        Change active model. Requires security passcode '0012'.
+        """
+        if passcode != MODEL_LOCK_PASSCODE:
+            logger.error("🚨 Security Violation: Unauthorized model change attempt! Passcode '0012' required.")
+            raise PermissionError("Access Denied: Passcode '0012' is required to modify Antigravity model.")
+
+        self.model_name = new_model
+        if new_model not in self.models:
+            self.models.insert(0, new_model)
+        self.current_model_index = self.models.index(new_model)
+        self._configure_client()
+        logger.info(f"🔒 Model successfully changed to '{new_model}' with authorized passcode.")
+        return True
 
     def _configure_client(self):
         """
-        Configure the Gemini client to use the currently selected API key.
-        Stores safety_settings on self so they can be passed in every generate_content call.
+        Configure the Gemini client to use the currently selected API key and model.
         """
-        # ⚡ Bolt: Lazy import google-generativeai to reduce startup latency
         global genai
         if genai is None:
             import google.generativeai as genai
 
         current_key = self.api_keys[self.current_key_index]
+        self.model_name = self.models[self.current_model_index]
         genai.configure(api_key=current_key)
 
-        # Build and store safety settings — passed on every generate_content call, not just the model constructor.
-        # This is required because some SDK versions only respect safety_settings when passed per-request.
         try:
             from google.generativeai.types import HarmCategory, HarmBlockThreshold
             self.safety_settings = {
@@ -83,18 +132,30 @@ class GeminiClient:
             self.safety_settings = None
 
         self.model = genai.GenerativeModel(self.model_name, safety_settings=self.safety_settings)
-        # Obscure key for logging
         masked_key = current_key[:4] + "..." + current_key[-4:] if len(current_key) > 8 else "****"
-        logger.info(f"configured Gemini with key: {masked_key} (Key {self.current_key_index + 1}/{len(self.api_keys)})")
+        logger.info(
+            f"Configured Gemini with key: {masked_key} (Key {self.current_key_index + 1}/{len(self.api_keys)}) "
+            f"on model: {self.model_name} (Model {self.current_model_index + 1}/{len(self.models)})"
+        )
 
-    def _rotate_key(self):
+    def _rotate_key(self) -> bool:
         """Rotates to the next available API key."""
         if len(self.api_keys) <= 1:
-            logger.warning("Only one API key available. Cannot rotate.")
             return False
 
         self.current_key_index = (self.current_key_index + 1) % len(self.api_keys)
         logger.warning(f"🔄 Rotating API Key. Switching to Key #{self.current_key_index + 1}")
+        self._configure_client()
+        return True
+
+    def _rotate_model(self) -> bool:
+        """Rotates to the next model in the model hierarchy (e.g. Flash 8 -> Flash 7 -> 2.5)."""
+        if len(self.models) <= 1:
+            return False
+
+        self.current_model_index = (self.current_model_index + 1) % len(self.models)
+        self.model_name = self.models[self.current_model_index]
+        logger.warning(f"🔄 Rotating Model. Switching to Model #{self.current_model_index + 1}: {self.model_name}")
         self._configure_client()
         return True
 
@@ -157,8 +218,12 @@ class GeminiClient:
                         logger.info("Retrying immediately with NEW key...")
                         continue
 
-                    # If rotation failed (only 1 key) or we cycled through all?
-                    # For now basic logic: if rotate returns False, we respect backoff
+                    # If all keys were rotated on current model, try rotating model
+                    if self._rotate_model():
+                        logger.info("Retrying immediately with NEXT MODEL in hierarchy...")
+                        continue
+
+                    # If rotation failed or cycled through all
                     sleep_time = 2 ** (attempt % 3) # Simple backoff
                     logger.warning(f"Sleeping {sleep_time}s before retry...")
                     time.sleep(sleep_time)

@@ -28,8 +28,8 @@ load_dotenv()
 
 # --- Configuration ---
 WORK_LOG_PATH = os.getenv("WORK_LOG_PATH", "./WORK_LOG.md")
-MOCK_AUTH0 = os.getenv("MOCK_AUTH0", "true").lower() == "true"
-MOCK_GEMINI_JUDGE = os.getenv("MOCK_GEMINI_JUDGE", "true").lower() == "true"
+MOCK_AUTH0 = os.getenv("MOCK_AUTH0", "false").lower() == "true"
+MOCK_GEMINI_JUDGE = os.getenv("MOCK_GEMINI_JUDGE", "false").lower() == "true"
 JUDGE_GUARD_SCRIPT = os.path.join(os.path.dirname(__file__), "judge_guard.py")
 
 

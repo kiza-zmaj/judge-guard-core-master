@@ -1,46 +1,100 @@
 #!/bin/bash
-# Gemini CLI Wrapper for Antigravity
-# Usage: ./gemini_cli.sh '<action description>'
+# Gemini CLI Wrapper for Antigravity — 100% PRODUCTION MODE
+# Usage: ./gemini_cli.sh '<action description>' [optional command to execute]
 
 ACTION=$1
+COMMAND_TO_RUN=$2
+
 if [ -z "$ACTION" ]; then
     echo ""
-    echo "  Usage: gemini_cli.sh '<action description>'"
+    echo "  Usage: gemini_cli.sh '<action description>' [optional command]"
     echo ""
     echo "  Examples:"
-    echo "    ./gemini_cli.sh 'Start Phase 2 Execution'"
-    echo "    ./gemini_cli.sh 'Deploy to production'"
-    echo ""
-    echo "  This wrapper:"
-    echo "    1. Logs 🟡 Starting [ACTION] to WORK_LOG.md"
-    echo "    2. Runs JudgeGuard verification (judge_guard.py)"
-    echo "    3. Logs ✅ or 🛑 result to WORK_LOG.md"
+    echo "    ./gemini_cli.sh 'Update model configuration'"
+    echo "    ./gemini_cli.sh 'Run test suite' 'pytest tests/'"
     echo ""
     exit 1
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_PYTHON="$SCRIPT_DIR/.venv/bin/python3"
-
-# Fall back to system python3 if venv not available
 if [ ! -f "$VENV_PYTHON" ]; then
-    echo "⚠️  .venv not found. Using system python3. Run: python3 -m venv .venv && .venv/bin/pip install -r requirements.txt"
     VENV_PYTHON="python3"
 fi
 
-# 1. Update WORK_LOG.md (Mandatory Rule)
+export PYTHONPATH="$SCRIPT_DIR:$SCRIPT_DIR/local_py/local/lib/python3.14/dist-packages:$PYTHONPATH"
+
+# 1. Ensure TICKET.md is synchronized with current action
+echo "🎫 Synchronizing TICKET.md for: $ACTION"
+"$VENV_PYTHON" "$SCRIPT_DIR/src/antigravity_core/ticket_verifier.py" "$ACTION" create > /dev/null 2>&1
+
+# 2. Record action start in WORK_LOG.md (Mandatory Rule)
 echo "" >> "$SCRIPT_DIR/WORK_LOG.md"
 echo "🟡 Starting $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
 
-# 2. Run JudgeGuard via venv Python
-cd "$SCRIPT_DIR" && PYTHONPATH="$SCRIPT_DIR" "$VENV_PYTHON" judge_guard.py "$ACTION"
-RESULT=$?
+# 3. Pre-Action JudgeGuard Check (Runs Layer 000 Ollama Cloud Gemma 4 Gate + Layers 00, 0, 1, 2, 3)
+echo "🛡️ Running Pre-Action JudgeGuard Verification..."
+cd "$SCRIPT_DIR" && "$VENV_PYTHON" judge_guard.py "$ACTION"
+PRE_RESULT=$?
 
-if [ $RESULT -eq 0 ]; then
-    echo "✅ Action Approved by JudgeGuard"
-    echo "✅ Completed $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
-else
-    echo "🛑 Action BLOCKED by JudgeGuard"
-    echo "🛑 Failed: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
+if [ $PRE_RESULT -ne 0 ]; then
+    echo "🛑 Action BLOCKED by JudgeGuard."
+    echo "🛑 Blocked: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
     exit 1
 fi
+
+echo "✅ Pre-Action Approved by JudgeGuard."
+
+# 4. Execute the command if provided
+if [ -n "$COMMAND_TO_RUN" ]; then
+    echo "🚀 Executing command: $COMMAND_TO_RUN"
+    eval "$COMMAND_TO_RUN"
+    CMD_EXIT=$?
+    if [ $CMD_EXIT -ne 0 ]; then
+        echo "❌ Execution failed with exit code $CMD_EXIT"
+        echo "🛑 Failed during execution: $ACTION (exit code $CMD_EXIT)" >> "$SCRIPT_DIR/WORK_LOG.md"
+        exit $CMD_EXIT
+    fi
+fi
+
+# 5. Post-Action Ticket Closure Verification (Approval from Gemma 4 + Agents)
+echo "🎫 Requesting Post-Action Ticket Closure Approval from Agents..."
+"$VENV_PYTHON" "$SCRIPT_DIR/src/antigravity_core/ticket_verifier.py" "$ACTION" verify_complete
+POST_TICKET_RESULT=$?
+
+if [ $POST_TICKET_RESULT -ne 0 ]; then
+    echo "🛑 Post-action ticket closure REJECTED by agent gate."
+    echo "🛑 Rejected at closure: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
+    exit 1
+fi
+
+echo "✅ Agent closure approval granted for ticket."
+echo "✅ Completed $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
+
+# 6. Automatic Git Checkpoint & Verification
+CHANGES_COUNT=$(git -C "$SCRIPT_DIR" status --porcelain | wc -l)
+if [ "$CHANGES_COUNT" -gt 0 ]; then
+    echo "📦 Staging changes and committing checkpoint..."
+    git -C "$SCRIPT_DIR" add .
+    git -C "$SCRIPT_DIR" commit -m "checkpoint: $ACTION"
+    COMMIT_EXIT=$?
+    if [ $COMMIT_EXIT -ne 0 ]; then
+        echo "❌ Git checkpoint commit failed!"
+        echo "🛑 Checkpoint commit failed for: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
+        exit 1
+    fi
+    COMMIT_SHA=$(git -C "$SCRIPT_DIR" rev-parse --short HEAD)
+    echo "📌 Git checkpoint SHA: $COMMIT_SHA" >> "$SCRIPT_DIR/WORK_LOG.md"
+    echo "✅ Git checkpoint created: $COMMIT_SHA"
+else
+    echo "ℹ️ No file changes detected; recording NO_CHANGES."
+    echo "📌 Checkpoint: NO_CHANGES" >> "$SCRIPT_DIR/WORK_LOG.md"
+fi
+
+# 7. Codex Log Monitoring & Cleanup
+if [ -f "$SCRIPT_DIR/scripts/codex_log_cleaner.py" ]; then
+    "$VENV_PYTHON" "$SCRIPT_DIR/scripts/codex_log_cleaner.py" > /dev/null 2>&1
+fi
+
+echo "🎉 Action '$ACTION' successfully verified, executed, and checkpointed."
+exit 0
