@@ -8,6 +8,7 @@
     "**/__pycache__"
   ],
   "extraPaths": [
+    "./.venv/lib/python3.12/site-packages",
     "./local_py/local/lib/python3.14/dist-packages",
     "."
   ],

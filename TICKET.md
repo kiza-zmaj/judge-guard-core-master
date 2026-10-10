@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Configure Bolt and Jules Git Integration with Token Cleaner and Telemetry
-**Objective:** Execute action: Configure Bolt and Jules Git Integration with Token Cleaner and Telemetry
+**Action:** Update Pyright configuration and finalize Bolt and Jules telemetry integration
+**Objective:** Execute action: Update Pyright configuration and finalize Bolt and Jules telemetry integration
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
