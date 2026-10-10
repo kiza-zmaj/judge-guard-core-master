@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Remediate audit findings - require real env keys, scrub secrets, fix cached token accounting
-**Objective:** Execute action: Remediate audit findings - require real env keys, scrub secrets, fix cached token accounting
+**Action:** Fix cached token test data and purge obsolete remote branch with exposed secrets
+**Objective:** Execute action: Fix cached token test data and purge obsolete remote branch with exposed secrets
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
