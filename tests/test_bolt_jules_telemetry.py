@@ -29,7 +29,7 @@ class TestBoltJulesTelemetry(unittest.TestCase):
             completion_tokens=200,
             thinking_tokens=0,
             total_tokens=700,
-            cached_tokens=1000,
+            cached_tokens=200,
             tokens_saved=3500,
             latency_ms=210.5
         )
@@ -47,7 +47,7 @@ class TestBoltJulesTelemetry(unittest.TestCase):
             completion_tokens=400,
             thinking_tokens=0,
             total_tokens=1200,
-            cached_tokens=2000,
+            cached_tokens=300,
             tokens_saved=5000,
             latency_ms=380.0
         )
