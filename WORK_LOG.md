@@ -376,3 +376,10 @@
 ✅ Tests: 104/104 passed, 0 Pyright errors
 🔑 Remote SHA confirmed: bc4b355 (GitHub master synchronized)
 ℹ️ Auth Instructions: Run 'notebooklm login' in terminal or export NOTEBOOKLM_AUTH_JSON to authorize access to the active notebook
+
+🟡 Starting Integrate notebook titles and aliases for FK Sava 45 and Fine-Tuning 2026 into NLM orchestrator
+✅ Completed Integrate notebook titles and aliases for FK Sava 45 and Fine-Tuning 2026 into NLM orchestrator
+📌 Git checkpoint SHA: a6c1026
+📚 NLM Catalog: NOTEBOOK_CATALOG v2 refactored with typed Dict lookups and get_notebook_title() / get_active_notebook_id() helpers
+✅ Aliases verified: fk-sava-45 → FK Sava 45, fine-tuning → Fine-Tuning & OpenWebUI 2026, active/research/current → ead6db95
+🧪 Tests: 109/109 passed (5 new tests in test_nlm_orchestrator.py), 0 Pyright errors on nlm_orchestrator.py
