@@ -75,10 +75,11 @@ class TelemetryTracker:
     latency, and agent operation telemetry.
 
     Token Accounting:
-      total_tokens = prompt_tokens + completion_tokens + thinking_tokens + cached_tokens
-      - prompt_tokens: tokens in the input prompt
+      total_tokens = prompt_tokens + completion_tokens + thinking_tokens
+      - prompt_tokens: tokens in the input prompt (includes cached_tokens)
       - completion_tokens: tokens in the candidate output response
       - thinking_tokens: internal reasoning / thinking tokens (e.g. Gemini 3.8/3.7 Flash thinking)
+      - cached_tokens: cached content tokens (subset of prompt_tokens)
       - tokens_saved: estimated tokens saved via TokenCleaner context pruning heuristics
     """
 
@@ -127,11 +128,12 @@ class TelemetryTracker:
         latency_ms = float(latency_ms) if isinstance(latency_ms, (int, float)) else 0.0
 
         # Automatic thinking token resolution for reasoning models (e.g. Gemini 3.8 Flash)
-        if thinking_tokens == 0 and total_tokens > (prompt_tokens + completion_tokens + cached_tokens):
-            thinking_tokens = max(0, total_tokens - (prompt_tokens + completion_tokens + cached_tokens))
+        # Note: prompt_tokens already includes cached_tokens (cached_tokens is a subset of prompt_tokens).
+        if thinking_tokens == 0 and total_tokens > (prompt_tokens + completion_tokens):
+            thinking_tokens = max(0, total_tokens - (prompt_tokens + completion_tokens))
 
         if total_tokens == 0:
-            total_tokens = prompt_tokens + completion_tokens + thinking_tokens + cached_tokens
+            total_tokens = prompt_tokens + completion_tokens + thinking_tokens
 
         cost = calculate_cost(model, prompt_tokens, completion_tokens)
 

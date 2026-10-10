@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Reconcile telemetry token savings and Pyright type safety
-**Objective:** Execute action: Reconcile telemetry token savings and Pyright type safety
+**Action:** Remediate audit findings - require real env keys, scrub secrets, fix cached token accounting
+**Objective:** Execute action: Remediate audit findings - require real env keys, scrub secrets, fix cached token accounting
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN

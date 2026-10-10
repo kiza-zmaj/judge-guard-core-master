@@ -36,10 +36,7 @@ except ImportError:
         token_cleaner = None
 
 # Default active rotation keys (100% production)
-DEFAULT_API_KEYS = [
-    "REDACTED_ENV_GEMINI_API_KEY_1",
-    "REDACTED_ENV_GEMINI_API_KEY_2",
-]
+DEFAULT_API_KEYS: list[str] = []
 
 # Default active model rotation: Gemini 3.8 Flash & Gemini 3.7 Flash with 2.5 Flash fallback
 DEFAULT_MODELS = [
@@ -71,14 +68,25 @@ class GeminiClient:
         Model change requires passcode '0012'.
         """
         keys_env = api_keys or os.getenv("GEMINI_API_KEYS")
-        if not keys_env:
-            single_key = os.getenv("GEMINI_API_KEY")
-            if single_key:
-                self.api_keys = [single_key]
-            else:
-                self.api_keys = list(DEFAULT_API_KEYS)
+        candidate_keys: list[str] = []
+        if keys_env:
+            candidate_keys = [k.strip() for k in keys_env.split(",") if k.strip()]
         else:
-            self.api_keys = [k.strip() for k in keys_env.split(",") if k.strip()]
+            single_key = os.getenv("GEMINI_API_KEY")
+            if single_key and single_key.strip():
+                candidate_keys = [single_key.strip()]
+
+        # Filter out empty or placeholder/redacted values
+        self.api_keys = [
+            k for k in candidate_keys
+            if k and not k.startswith("REDACTED_") and "your-gemini-api-key" not in k.lower()
+        ]
+
+        if not self.api_keys:
+            raise ValueError(
+                "GEMINI_API_KEY or GEMINI_API_KEYS environment variable is required. "
+                "No valid API keys configured."
+            )
 
         # Enforce passcode '0012' if requesting a model other than default gemini-3.8-flash
         desired_model = model_name or os.getenv("GEMINI_MODEL")
@@ -232,8 +240,8 @@ class GeminiClient:
                             t_tok = int(tt) if isinstance(tt, (int, float)) else 0
                             cd_tok = int(cdt) if isinstance(cdt, (int, float)) else 0
                             th_tok = int(tht) if isinstance(tht, (int, float)) else 0
-                            if th_tok == 0 and t_tok > (p_tok + c_tok + cd_tok):
-                                th_tok = max(0, t_tok - (p_tok + c_tok + cd_tok))
+                            if th_tok == 0 and t_tok > (p_tok + c_tok):
+                                th_tok = max(0, t_tok - (p_tok + c_tok))
                         telemetry.record_call(
                             agent="gemini_client",
                             action="generate_content",

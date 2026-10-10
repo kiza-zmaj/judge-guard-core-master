@@ -14,17 +14,15 @@ MODELS_STORE_DIR = BASE_DIR / "models_store"
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral:7b")
 ANYTHING_LLM_URL = os.getenv("ANYTHING_LLM_URL", "http://localhost:39321/api/v1/openai")
-ANYTHING_LLM_KEY = os.getenv("ANYTHING_LLM_KEY", "[REDACTED_ANYTHING_LLM_KEY]")
+ANYTHING_LLM_KEY = os.getenv("ANYTHING_LLM_KEY", "")
 
 # Bookmaker & Odds Data
-ODDS_API_KEY = os.getenv("ODDS_API_KEY", "[REDACTED_ODDS_API_KEY]")
+ODDS_API_KEY = os.getenv("ODDS_API_KEY", "")
 ODDS_API_URL = f"https://api.the-odds-api.com/v4/sports/soccer_epl/odds?regions=eu&markets=h2h&apiKey={ODDS_API_KEY}"
 
 # Telegram Alerts
-TELEGRAM_BOT_TOKEN = os.getenv(
-    "TELEGRAM_BOT_TOKEN", "[REDACTED_TELEGRAM_TOKEN]"
-)
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "512345678")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
 # Risk & Decision Thresholds
 MIN_EDGE = float(os.getenv("MIN_EDGE", "0.05"))  # 5% minimum expected value

@@ -173,7 +173,7 @@ class JudgeGuard:
                     try:
                         from src.antigravity_core.gemini_client import GeminiClient
                         self._gemini = GeminiClient()
-                    except ImportError as e:
+                    except (ImportError, ValueError) as e:
                         self.logger.warning(f"⚠️ GeminiClient not available: {e}")
         return self._gemini
 
@@ -431,6 +431,15 @@ class JudgeGuard:
         except ImportError:
             bridge_available = False
 
+        # --- LAYER 00: Security Enforcement (Emergency Fix) ---
+        if self._is_dangerous_command(current_action):
+            msg = "Security Violation: Action contains forbidden dangerous commands (sudo/root deletion)."
+            self.logger.error(f"Layer 00 Block: {msg}")
+            if bridge_available:
+                bridge.push_verdict(current_action, "BLOCKED", msg)
+            print(f"🛑 JudgeGuard: {msg}")
+            return False
+
         # --- LAYER 000: Pre-Flight & Post-Action Ticket Gate (Ollama Cloud Gemma 4) ---
         try:
             from src.antigravity_core.ticket_verifier import TicketVerifier
@@ -451,15 +460,6 @@ class JudgeGuard:
                 self.logger.info("Layer 000 Ticket Check PASSED by Ollama Cloud Gemma 4.")
         except Exception as e:
             self.logger.warning(f"⚠️ Ticket verifier check error: {e}")
-
-        # --- LAYER 00: Security Enforcement (Emergency Fix) ---
-        if self._is_dangerous_command(current_action):
-            msg = "Security Violation: Action contains forbidden dangerous commands (sudo/root deletion)."
-            self.logger.error(f"Layer 00 Block: {msg}")
-            if bridge_available:
-                bridge.push_verdict(current_action, "BLOCKED", msg)
-            print(f"🛑 JudgeGuard: {msg}")
-            return False
 
         # --- LAYER 0: Work Log Enforcement (NEW) ---
         # ⚡ Bolt: Fast-fail before expensive context loading/LLM calls

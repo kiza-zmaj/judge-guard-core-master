@@ -10,6 +10,18 @@ def mock_genai():
         mock_model = mock_genai_mod.GenerativeModel
         yield mock_config, mock_model
 
+def test_gemini_client_init_no_keys_raises(mock_genai, monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEYS", raising=False)
+    with pytest.raises(ValueError, match="GEMINI_API_KEY or GEMINI_API_KEYS"):
+        GeminiClient()
+
+def test_gemini_client_init_placeholder_keys_raises(mock_genai, monkeypatch):
+    monkeypatch.setenv("GEMINI_API_KEY", "REDACTED_ENV_GEMINI_API_KEY_1")
+    monkeypatch.delenv("GEMINI_API_KEYS", raising=False)
+    with pytest.raises(ValueError, match="No valid API keys configured"):
+        GeminiClient()
+
 def test_gemini_client_init_single_key(mock_genai, monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "test_key")
     monkeypatch.delenv("GEMINI_API_KEYS", raising=False)

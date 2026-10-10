@@ -89,6 +89,65 @@ class TestBoltJulesTelemetry(unittest.TestCase):
         # tokens_saved is an estimate from character heuristics (len/3.8)
         self.assertIsInstance(rec["tokens_saved"], int)
 
+    def test_thinking_tokens_with_cached_tokens(self):
+        """
+        Verifies that non-zero cached_tokens does NOT decrease thinking_tokens,
+        because prompt_tokens already includes cached_tokens (cached is a subset).
+          prompt=2546 (of which 500 are cached), completion=2, total=3039
+          thinking_tokens = 3039 - (2546 + 2) = 491
+        """
+        rec = self.tracker.record_call(
+            agent="gemini_client",
+            action="generate_content",
+            model="gemini-3.8-flash",
+            prompt_tokens=2546,
+            completion_tokens=2,
+            total_tokens=3039,
+            cached_tokens=500,
+            tokens_saved=22,
+            latency_ms=4200.0,
+        )
+        self.assertEqual(rec["thinking_tokens"], 491)
+        self.assertEqual(rec["cached_tokens"], 500)
+        self.assertEqual(
+            rec["prompt_tokens"] + rec["completion_tokens"] + rec["thinking_tokens"],
+            rec["total_tokens"]
+        )
+
+    def test_thinking_tokens_auto_resolution_total_zero(self):
+        """
+        Verifies that when total_tokens == 0, it is computed as prompt + completion + thinking,
+        without double-counting cached_tokens.
+        """
+        rec = self.tracker.record_call(
+            agent="gemini_client",
+            action="generate_content",
+            model="gemini-3.8-flash",
+            prompt_tokens=1000,
+            completion_tokens=100,
+            thinking_tokens=200,
+            total_tokens=0,
+            cached_tokens=400,
+        )
+        self.assertEqual(rec["total_tokens"], 1300)
+
+    def test_thinking_tokens_explicit_provided(self):
+        """
+        When thinking_tokens is explicitly provided from thoughts_token_count in API metadata,
+        it is preserved as-is.
+        """
+        rec = self.tracker.record_call(
+            agent="gemini_client",
+            action="generate_content",
+            model="gemini-3.8-flash",
+            prompt_tokens=2546,
+            completion_tokens=2,
+            thinking_tokens=491,
+            total_tokens=3039,
+            cached_tokens=500,
+        )
+        self.assertEqual(rec["thinking_tokens"], 491)
+
     def test_token_cleaner_filtering(self):
         files = [
             "src/antigravity_core/gemini_client.py",

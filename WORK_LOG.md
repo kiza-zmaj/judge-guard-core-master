@@ -328,3 +328,5 @@
 🔐 Secret scrub: git-filter-repo removed GCP API keys from all commits
 🔑 Remote SHA confirmed: 31af344bd01eca9e47199929b19bc136c4b8d422
 ✅ STATUS: FULLY_VERIFIED — remote master matches local HEAD
+
+🟡 Starting Remediate audit findings - require real env keys, scrub secrets, fix cached token accounting
