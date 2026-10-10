@@ -47,6 +47,8 @@ NOTEBOOK_ALIASES = {
     "business":       "baa27d6f-25f4-4b66-afcc-ded160bf146d",
     "openwebui":      "2e9ea5b4-e16e-4374-a2e1-22919f82e7da",
     "ai-coaching":    "f0e758cb-0897-46ea-9c84-330ad01597ee",
+    "research":       "ead6db95-9afb-49d1-ad7f-5cd42c87bb94",
+    "active":         "ead6db95-9afb-49d1-ad7f-5cd42c87bb94",
 }
 
 # Artifact types the nlm CLI can download (normalized for hyphen and underscore)

@@ -367,3 +367,9 @@
 📊 Telemetry Verified: research.db shows successful NLM_QUERY record (id=234, 7.67ms, 27 tokens)
 ✅ Tests: 104/104 passed (7 new test_bootstrap_workspace.py tests added), 0 Pyright errors
 🎼 Conductor Track research_nlm_bootstrap_20261010: ALL Phase 2 & Phase 3 tasks marked complete; tracks.md updated
+
+🟡 Starting Register Active NotebookLM UUID ead6db95 and Link NLM CLI Suite
+✅ Completed Register Active NotebookLM UUID ead6db95 and Link NLM CLI Suite
+📚 Active Notebook: Set to ead6db95-9afb-49d1-ad7f-5cd42c87bb94 in .cm/notebook_id and nlm_orchestrator.py (aliases 'research' and 'active')
+🔧 NLM CLI Suite: Installed notebooklm-py 0.8.4, symlinked nlm in .venv/bin/nlm and ~/.local/bin/nlm, initialized default profile directory
+ℹ️ Auth Instructions: Run 'notebooklm login' in terminal or export NOTEBOOKLM_AUTH_JSON to authorize access to the active notebook
