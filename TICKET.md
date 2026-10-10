@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Update Pyright configuration and finalize Bolt and Jules telemetry integration
-**Objective:** Execute action: Update Pyright configuration and finalize Bolt and Jules telemetry integration
+**Action:** Reconcile telemetry token savings and Pyright type safety
+**Objective:** Execute action: Reconcile telemetry token savings and Pyright type safety
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN

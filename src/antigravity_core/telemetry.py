@@ -97,6 +97,13 @@ class TelemetryTracker:
         """
         Records an LLM call or agent task execution telemetry record.
         """
+        prompt_tokens = int(prompt_tokens) if isinstance(prompt_tokens, (int, float)) else 0
+        completion_tokens = int(completion_tokens) if isinstance(completion_tokens, (int, float)) else 0
+        total_tokens = int(total_tokens) if isinstance(total_tokens, (int, float)) else 0
+        cached_tokens = int(cached_tokens) if isinstance(cached_tokens, (int, float)) else 0
+        tokens_saved = int(tokens_saved) if isinstance(tokens_saved, (int, float)) else 0
+        latency_ms = float(latency_ms) if isinstance(latency_ms, (int, float)) else 0.0
+
         if total_tokens == 0:
             total_tokens = prompt_tokens + completion_tokens
 

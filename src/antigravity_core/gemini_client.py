@@ -1,7 +1,7 @@
 import os
 import re
 import time
-from typing import Optional, Dict, Tuple
+from typing import Optional, Dict, Tuple, Any
 import logging
 
 import sys
@@ -176,7 +176,7 @@ class GeminiClient:
         self._configure_client()
         return True
 
-    def generate_content(self, prompt: str, generation_config: Optional[Dict] = None) -> str:
+    def generate_content(self, prompt: str, generation_config: Any = None) -> str:
         """
         Produce model-generated text for the given prompt, using API-key rotation and retry/backoff on quota or rate-limit errors.
 
@@ -206,10 +206,14 @@ class GeminiClient:
                 # ⚡ Bolt: Pass custom generation config (e.g. max_output_tokens)
                 # SECURITY FIX: Also pass safety_settings per-request (not just on model constructor),
                 # as required by some SDK versions to reliably override thresholds.
-                kwargs = {"generation_config": generation_config}
-
                 t_start = time.time()
-                response = self.model.generate_content(prompt, **kwargs)
+                # 🧹 Token Cleaner: Clean/prune context and calculate saved tokens
+                saved_tokens = 0
+                active_prompt = prompt
+                if token_cleaner:
+                    active_prompt, saved_tokens = token_cleaner.clean_prompt_context(prompt)
+
+                response = self.model.generate_content(active_prompt, generation_config=generation_config)
                 latency_ms = (time.time() - t_start) * 1000.0
 
                 # 📊 Telemetry extraction (P1-8)
@@ -218,10 +222,14 @@ class GeminiClient:
                         p_tok, c_tok, t_tok, cd_tok = 0, 0, 0, 0
                         usage = getattr(response, "usage_metadata", None)
                         if usage:
-                            p_tok = getattr(usage, "prompt_token_count", 0) or 0
-                            c_tok = getattr(usage, "candidates_token_count", 0) or 0
-                            t_tok = getattr(usage, "total_token_count", 0) or 0
-                            cd_tok = getattr(usage, "cached_content_token_count", 0) or 0
+                            pt = getattr(usage, "prompt_token_count", 0)
+                            ct = getattr(usage, "candidates_token_count", 0)
+                            tt = getattr(usage, "total_token_count", 0)
+                            cdt = getattr(usage, "cached_content_token_count", 0)
+                            p_tok = int(pt) if isinstance(pt, (int, float)) else 0
+                            c_tok = int(ct) if isinstance(ct, (int, float)) else 0
+                            t_tok = int(tt) if isinstance(tt, (int, float)) else 0
+                            cd_tok = int(cdt) if isinstance(cdt, (int, float)) else 0
                         telemetry.record_call(
                             agent="gemini_client",
                             action="generate_content",
@@ -230,6 +238,7 @@ class GeminiClient:
                             completion_tokens=c_tok,
                             total_tokens=t_tok,
                             cached_tokens=cd_tok,
+                            tokens_saved=saved_tokens,
                             latency_ms=latency_ms
                         )
                     except Exception as tel_e:
