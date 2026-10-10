@@ -26,7 +26,7 @@ COST_PER_MILLION = {
 
 
 def _init_telemetry_table(conn: sqlite3.Connection):
-    """Ensures telemetry schema exists in SQLite."""
+    """Ensures telemetry schema exists in SQLite with thinking_tokens support."""
     conn.execute("""
         CREATE TABLE IF NOT EXISTS telemetry (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,6 +36,7 @@ def _init_telemetry_table(conn: sqlite3.Connection):
             model TEXT NOT NULL,
             prompt_tokens INTEGER DEFAULT 0,
             completion_tokens INTEGER DEFAULT 0,
+            thinking_tokens INTEGER DEFAULT 0,
             total_tokens INTEGER DEFAULT 0,
             cached_tokens INTEGER DEFAULT 0,
             tokens_saved INTEGER DEFAULT 0,
@@ -46,6 +47,17 @@ def _init_telemetry_table(conn: sqlite3.Connection):
             details TEXT DEFAULT ''
         )
     """)
+    # Migration: check if thinking_tokens column exists in case table was created earlier
+    cursor = conn.cursor()
+    columns = [col[1] for col in cursor.execute("PRAGMA table_info(telemetry)").fetchall()]
+    if "thinking_tokens" not in columns:
+        cursor.execute("ALTER TABLE telemetry ADD COLUMN thinking_tokens INTEGER DEFAULT 0")
+        # Backfill existing rows: thinking_tokens = total - (prompt + completion + cached)
+        cursor.execute("""
+            UPDATE telemetry 
+            SET thinking_tokens = MAX(0, total_tokens - (prompt_tokens + completion_tokens + cached_tokens))
+            WHERE thinking_tokens = 0 AND total_tokens > (prompt_tokens + completion_tokens + cached_tokens)
+        """)
     conn.commit()
 
 
@@ -61,6 +73,13 @@ class TelemetryTracker:
     """
     Singleton-style telemetry manager for tracking LLM token metrics,
     latency, and agent operation telemetry.
+
+    Token Accounting:
+      total_tokens = prompt_tokens + completion_tokens + thinking_tokens + cached_tokens
+      - prompt_tokens: tokens in the input prompt
+      - completion_tokens: tokens in the candidate output response
+      - thinking_tokens: internal reasoning / thinking tokens (e.g. Gemini 3.8/3.7 Flash thinking)
+      - tokens_saved: estimated tokens saved via TokenCleaner context pruning heuristics
     """
 
     def __init__(self, db_path: Optional[str] = None):
@@ -86,6 +105,7 @@ class TelemetryTracker:
         model: str,
         prompt_tokens: int = 0,
         completion_tokens: int = 0,
+        thinking_tokens: int = 0,
         total_tokens: int = 0,
         cached_tokens: int = 0,
         tokens_saved: int = 0,
@@ -96,16 +116,22 @@ class TelemetryTracker:
     ) -> Dict[str, Any]:
         """
         Records an LLM call or agent task execution telemetry record.
+        Automatically resolves internal thinking/reasoning tokens if total_tokens exceeds prompt+completion.
         """
         prompt_tokens = int(prompt_tokens) if isinstance(prompt_tokens, (int, float)) else 0
         completion_tokens = int(completion_tokens) if isinstance(completion_tokens, (int, float)) else 0
+        thinking_tokens = int(thinking_tokens) if isinstance(thinking_tokens, (int, float)) else 0
         total_tokens = int(total_tokens) if isinstance(total_tokens, (int, float)) else 0
         cached_tokens = int(cached_tokens) if isinstance(cached_tokens, (int, float)) else 0
         tokens_saved = int(tokens_saved) if isinstance(tokens_saved, (int, float)) else 0
         latency_ms = float(latency_ms) if isinstance(latency_ms, (int, float)) else 0.0
 
+        # Automatic thinking token resolution for reasoning models (e.g. Gemini 3.8 Flash)
+        if thinking_tokens == 0 and total_tokens > (prompt_tokens + completion_tokens + cached_tokens):
+            thinking_tokens = max(0, total_tokens - (prompt_tokens + completion_tokens + cached_tokens))
+
         if total_tokens == 0:
-            total_tokens = prompt_tokens + completion_tokens
+            total_tokens = prompt_tokens + completion_tokens + thinking_tokens + cached_tokens
 
         cost = calculate_cost(model, prompt_tokens, completion_tokens)
 
@@ -115,13 +141,13 @@ class TelemetryTracker:
                 conn.execute("""
                     INSERT INTO telemetry (
                         agent, action, model, prompt_tokens, completion_tokens,
-                        total_tokens, cached_tokens, tokens_saved, latency_ms,
-                        cost_estimate_usd, status, git_sha, details
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        thinking_tokens, total_tokens, cached_tokens, tokens_saved,
+                        latency_ms, cost_estimate_usd, status, git_sha, details
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     agent, action, model, prompt_tokens, completion_tokens,
-                    total_tokens, cached_tokens, tokens_saved, latency_ms,
-                    cost, status, git_sha, details
+                    thinking_tokens, total_tokens, cached_tokens, tokens_saved,
+                    latency_ms, cost, status, git_sha, details
                 ))
                 conn.commit()
         except Exception as e:
@@ -133,6 +159,7 @@ class TelemetryTracker:
             "model": model,
             "prompt_tokens": prompt_tokens,
             "completion_tokens": completion_tokens,
+            "thinking_tokens": thinking_tokens,
             "total_tokens": total_tokens,
             "cached_tokens": cached_tokens,
             "tokens_saved": tokens_saved,
@@ -142,7 +169,8 @@ class TelemetryTracker:
             "git_sha": git_sha,
         }
         logger.info(
-            f"📊 [TELEMETRY] agent={agent} model={model} tokens={total_tokens} (saved={tokens_saved}) "
+            f"📊 [TELEMETRY] agent={agent} model={model} tokens={total_tokens} "
+            f"(prompt={prompt_tokens}, completion={completion_tokens}, thinking={thinking_tokens}, saved_est={tokens_saved}) "
             f"latency={latency_ms:.1f}ms cost=${cost:.5f}"
         )
         return record
@@ -159,6 +187,9 @@ class TelemetryTracker:
                     SELECT 
                         COUNT(*) as total_calls,
                         SUM(total_tokens) as sum_tokens,
+                        SUM(prompt_tokens) as sum_prompt,
+                        SUM(completion_tokens) as sum_completion,
+                        SUM(thinking_tokens) as sum_thinking,
                         SUM(tokens_saved) as sum_saved,
                         SUM(cached_tokens) as sum_cached,
                         AVG(latency_ms) as avg_latency,
@@ -168,18 +199,33 @@ class TelemetryTracker:
 
                 # Per agent breakdown
                 by_agent = cursor.execute("""
-                    SELECT agent, COUNT(*) as calls, SUM(total_tokens) as tokens, SUM(tokens_saved) as saved
+                    SELECT agent, COUNT(*) as calls, SUM(total_tokens) as tokens,
+                           SUM(prompt_tokens) as prompt, SUM(completion_tokens) as completion,
+                           SUM(thinking_tokens) as thinking, SUM(tokens_saved) as saved
                     FROM telemetry GROUP BY agent
                 """).fetchall()
 
                 return {
                     "total_calls": row["total_calls"] or 0,
                     "total_tokens": row["sum_tokens"] or 0,
+                    "total_prompt_tokens": row["sum_prompt"] or 0,
+                    "total_completion_tokens": row["sum_completion"] or 0,
+                    "total_thinking_tokens": row["sum_thinking"] or 0,
                     "total_tokens_saved": row["sum_saved"] or 0,
                     "total_cached_tokens": row["sum_cached"] or 0,
                     "average_latency_ms": round(row["avg_latency"] or 0.0, 2),
                     "total_cost_usd": round(row["total_cost"] or 0.0, 5),
-                    "by_agent": {r["agent"]: {"calls": r["calls"], "tokens": r["tokens"], "saved": r["saved"]} for r in by_agent}
+                    "by_agent": {
+                        r["agent"]: {
+                            "calls": r["calls"],
+                            "tokens": r["tokens"],
+                            "prompt": r["prompt"] or 0,
+                            "completion": r["completion"] or 0,
+                            "thinking": r["thinking"] or 0,
+                            "saved": r["saved"] or 0,
+                        }
+                        for r in by_agent
+                    }
                 }
         except Exception as e:
             logger.error(f"Failed to fetch telemetry summary: {e}")
@@ -189,7 +235,7 @@ class TelemetryTracker:
         """Formats a markdown telemetry badge suitable for commits and PRs."""
         return (
             f"📊 **Telemetry ({agent.upper()})**: {total_tokens:,} tokens used | "
-            f"⚡ {tokens_saved:,} tokens saved | ⏱️ {latency_ms:.1f}ms | 🤖 `{model}`"
+            f"⚡ ~{tokens_saved:,} tokens saved (est) | ⏱️ {latency_ms:.1f}ms | 🤖 `{model}`"
         )
 
 

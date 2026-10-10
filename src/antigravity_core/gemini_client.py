@@ -219,23 +219,28 @@ class GeminiClient:
                 # 📊 Telemetry extraction (P1-8)
                 if telemetry:
                     try:
-                        p_tok, c_tok, t_tok, cd_tok = 0, 0, 0, 0
+                        p_tok, c_tok, th_tok, t_tok, cd_tok = 0, 0, 0, 0, 0
                         usage = getattr(response, "usage_metadata", None)
                         if usage:
                             pt = getattr(usage, "prompt_token_count", 0)
                             ct = getattr(usage, "candidates_token_count", 0)
                             tt = getattr(usage, "total_token_count", 0)
                             cdt = getattr(usage, "cached_content_token_count", 0)
+                            tht = getattr(usage, "thoughts_token_count", getattr(usage, "thinking_token_count", 0))
                             p_tok = int(pt) if isinstance(pt, (int, float)) else 0
                             c_tok = int(ct) if isinstance(ct, (int, float)) else 0
                             t_tok = int(tt) if isinstance(tt, (int, float)) else 0
                             cd_tok = int(cdt) if isinstance(cdt, (int, float)) else 0
+                            th_tok = int(tht) if isinstance(tht, (int, float)) else 0
+                            if th_tok == 0 and t_tok > (p_tok + c_tok + cd_tok):
+                                th_tok = max(0, t_tok - (p_tok + c_tok + cd_tok))
                         telemetry.record_call(
                             agent="gemini_client",
                             action="generate_content",
                             model=self.model_name,
                             prompt_tokens=p_tok,
                             completion_tokens=c_tok,
+                            thinking_tokens=th_tok,
                             total_tokens=t_tok,
                             cached_tokens=cd_tok,
                             tokens_saved=saved_tokens,

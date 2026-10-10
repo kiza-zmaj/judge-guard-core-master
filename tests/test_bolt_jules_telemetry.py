@@ -20,13 +20,14 @@ class TestBoltJulesTelemetry(unittest.TestCase):
         self.tracker = TelemetryTracker(db_path=self.db_path)
 
     def test_record_and_summary_telemetry(self):
-        # Record Bolt call
+        # Record Bolt call — no thinking tokens (classic model)
         rec_bolt = self.tracker.record_call(
             agent="bolt",
             action="Git Staged Context Pruning",
             model="gemini-3.7-flash",
             prompt_tokens=500,
             completion_tokens=200,
+            thinking_tokens=0,
             total_tokens=700,
             cached_tokens=1000,
             tokens_saved=3500,
@@ -35,14 +36,16 @@ class TestBoltJulesTelemetry(unittest.TestCase):
         self.assertEqual(rec_bolt["agent"], "bolt")
         self.assertEqual(rec_bolt["tokens_saved"], 3500)
         self.assertGreater(rec_bolt["cost_estimate_usd"], 0)
+        self.assertEqual(rec_bolt["thinking_tokens"], 0)
 
-        # Record Jules call
+        # Record Jules call — no thinking tokens
         rec_jules = self.tracker.record_call(
             agent="jules",
             action="PR Maintenance Triage",
             model="gemini-3.7-flash",
             prompt_tokens=800,
             completion_tokens=400,
+            thinking_tokens=0,
             total_tokens=1200,
             cached_tokens=2000,
             tokens_saved=5000,
@@ -57,6 +60,34 @@ class TestBoltJulesTelemetry(unittest.TestCase):
         self.assertEqual(summary["total_tokens_saved"], 8500)
         self.assertIn("bolt", summary["by_agent"])
         self.assertIn("jules", summary["by_agent"])
+
+    def test_thinking_tokens_auto_resolution(self):
+        """
+        Verifies the exact 491-token arithmetic from the auditor's review:
+          prompt=2546, completion=2, total=3039 → thinking_tokens = 3039 - (2546+2) = 491
+        This is the Gemini Flash Thinking/reasoning budget.
+        """
+        rec = self.tracker.record_call(
+            agent="gemini_client",
+            action="generate_content",
+            model="gemini-3.8-flash",
+            prompt_tokens=2546,
+            completion_tokens=2,
+            # thinking_tokens NOT passed — auto-resolved from total
+            total_tokens=3039,
+            cached_tokens=0,
+            tokens_saved=22,
+            latency_ms=5555.2,
+        )
+        # Auto-resolved thinking = 3039 - (2546 + 2 + 0) = 491
+        self.assertEqual(rec["thinking_tokens"], 491)
+        # Arithmetic is clean
+        self.assertEqual(
+            rec["prompt_tokens"] + rec["completion_tokens"] + rec["thinking_tokens"],
+            rec["total_tokens"]
+        )
+        # tokens_saved is an estimate from character heuristics (len/3.8)
+        self.assertIsInstance(rec["tokens_saved"], int)
 
     def test_token_cleaner_filtering(self):
         files = [
@@ -99,7 +130,8 @@ class TestBoltJulesTelemetry(unittest.TestCase):
         )
         self.assertIn("Telemetry (BOLT)", badge)
         self.assertIn("1,500 tokens used", badge)
-        self.assertIn("4,200 tokens saved", badge)
+        # Badge labels savings as estimated (heuristic, not tokenizer-verified)
+        self.assertIn("4,200 tokens saved (est)", badge)
 
 
 if __name__ == "__main__":
