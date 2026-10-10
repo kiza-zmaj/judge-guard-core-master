@@ -23,33 +23,107 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from typing import Any, Dict, List, Optional
+
 # ---------------------------------------------------------------------------
-# Constants
+# Constants & Notebook Catalog
 # ---------------------------------------------------------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent
 WORK_LOG = PROJECT_ROOT / "WORK_LOG.md"
 DEFAULT_EXPORT_DIR = PROJECT_ROOT / "exports" / "general"
 NLM_BIN = "nlm"  # Assumes nlm is on PATH
 
-# Known notebook aliases for convenience
-NOTEBOOK_ALIASES = {
-    "pitch":         "7c85c185-28bb-4585-b77f-987d3f3dabfb",
-    "nexus-rag":     "83fc213b-0684-4251-8980-42e0610a6742",
-    "pitch-nexus":   "83fc213b-0684-4251-8980-42e0610a6742",
-    "linkedin":      "4f6b5323-3465-4071-851d-e153416be6d3",
-    "nexus":         "4f6b5323-3465-4071-851d-e153416be6d3",
-    "elegant-franklin": "4f6b5323-3465-4071-851d-e153416be6d3",
-    "fk-sava-45":    "3d33925e-5929-445b-8870-25f3dc23bf2b",
-    "fine-tuning":   "eeb2676d-bd7f-4e73-a29b-38c43b9359d1",
-    "web-ui":         "04ca32da-7d57-4722-889c-e85a89053051",
-    "orchestration": "accc0826-6eed-456a-8b3f-5aab8d1496b8",
-    "e2e-web":        "56a8e99f-ab95-4d7e-b076-66ba11595101",
-    "business":       "baa27d6f-25f4-4b66-afcc-ded160bf146d",
-    "openwebui":      "2e9ea5b4-e16e-4374-a2e1-22919f82e7da",
-    "ai-coaching":    "f0e758cb-0897-46ea-9c84-330ad01597ee",
-    "research":       "ead6db95-9afb-49d1-ad7f-5cd42c87bb94",
-    "active":         "ead6db95-9afb-49d1-ad7f-5cd42c87bb94",
-}
+# Authoritative catalog of registered notebooks with titles and aliases
+NOTEBOOK_CATALOG: List[Dict[str, Any]] = [
+    {
+        "alias": "research",
+        "title": "Active Research Workspace",
+        "id": "ead6db95-9afb-49d1-ad7f-5cd42c87bb94",
+        "alt_aliases": ["active", "current"],
+    },
+    {
+        "alias": "fk-sava-45",
+        "title": "FK Sava 45",
+        "id": "3d33925e-5929-445b-8870-25f3dc23bf2b",
+        "alt_aliases": ["sava-45", "fk-sava"],
+    },
+    {
+        "alias": "fine-tuning",
+        "title": "Fine-Tuning & OpenWebUI 2026",
+        "id": "eeb2676d-bd7f-4e73-a29b-38c43b9359d1",
+        "alt_aliases": ["openwebui-ft", "finetuning"],
+    },
+    {
+        "alias": "pitch",
+        "title": "Vlada Stojanovic & Pocarr Investor Pitch",
+        "id": "7c85c185-28bb-4585-b77f-987d3f3dabfb",
+        "alt_aliases": [],
+    },
+    {
+        "alias": "nexus-rag",
+        "title": "Nexus RAG Knowledge Base",
+        "id": "83fc213b-0684-4251-8980-42e0610a6742",
+        "alt_aliases": ["pitch-nexus"],
+    },
+    {
+        "alias": "linkedin",
+        "title": "LinkedIn Nexus Growth Engine",
+        "id": "4f6b5323-3465-4071-851d-e153416be6d3",
+        "alt_aliases": ["nexus", "elegant-franklin"],
+    },
+    {
+        "alias": "web-ui",
+        "title": "Web UI Best Practices 2026",
+        "id": "04ca32da-7d57-4722-889c-e85a89053051",
+        "alt_aliases": [],
+    },
+    {
+        "alias": "orchestration",
+        "title": "Orchestration & Safety 2026",
+        "id": "accc0826-6eed-456a-8b3f-5aab8d1496b8",
+        "alt_aliases": [],
+    },
+    {
+        "alias": "e2e-web",
+        "title": "E2E Web Systems 2026",
+        "id": "56a8e99f-ab95-4d7e-b076-66ba11595101",
+        "alt_aliases": [],
+    },
+    {
+        "alias": "business",
+        "title": "Strategic Business Automation 2026",
+        "id": "baa27d6f-25f4-4b66-afcc-ded160bf146d",
+        "alt_aliases": [],
+    },
+    {
+        "alias": "openwebui",
+        "title": "OpenWebUI Massive Knowledge System",
+        "id": "2e9ea5b4-e16e-4374-a2e1-22919f82e7da",
+        "alt_aliases": [],
+    },
+    {
+        "alias": "ai-coaching",
+        "title": "AI Coaching 2026",
+        "id": "f0e758cb-0897-46ea-9c84-330ad01597ee",
+        "alt_aliases": [],
+    },
+]
+
+# Populated lookup dictionaries
+NOTEBOOK_ALIASES: Dict[str, str] = {}
+NOTEBOOK_TITLES: Dict[str, str] = {}
+NOTEBOOK_BY_ID: Dict[str, Dict[str, Any]] = {}
+
+for entry in NOTEBOOK_CATALOG:
+    nid = entry["id"]
+    title = entry["title"]
+    alias = entry["alias"]
+    NOTEBOOK_ALIASES[alias.lower()] = nid
+    NOTEBOOK_TITLES[alias.lower()] = title
+    for alt in entry.get("alt_aliases", []):
+        NOTEBOOK_ALIASES[alt.lower()] = nid
+        NOTEBOOK_TITLES[alt.lower()] = title
+    NOTEBOOK_BY_ID[nid] = entry
 
 # Artifact types the nlm CLI can download (normalized for hyphen and underscore)
 DOWNLOADABLE_ARTIFACTS = {
@@ -79,9 +153,45 @@ def log_work(message: str) -> None:
         f.write(f"{message}\n")
 
 
+def get_active_notebook_id() -> str:
+    """Retrieve active notebook ID from .cm/notebook_id or default research notebook."""
+    cm_file = PROJECT_ROOT / ".cm" / "notebook_id"
+    if cm_file.exists():
+        try:
+            active_id = cm_file.read_text(encoding="utf-8").strip()
+            if active_id:
+                return active_id
+        except Exception:
+            pass
+    return "ead6db95-9afb-49d1-ad7f-5cd42c87bb94"
+
+
 def resolve_notebook_id(identifier: str) -> str:
-    """Resolve a notebook alias to its UUID, or return the identifier as-is."""
-    return NOTEBOOK_ALIASES.get(identifier.lower(), identifier)
+    """Resolve a notebook alias, title, or keyword to its UUID, or return identifier as-is."""
+    cleaned = identifier.strip().lower()
+    if cleaned in ("active", "current"):
+        return get_active_notebook_id()
+
+    if cleaned in NOTEBOOK_ALIASES:
+        return NOTEBOOK_ALIASES[cleaned]
+
+    # Check case-insensitive title match
+    for entry in NOTEBOOK_CATALOG:
+        if entry["title"].lower() == cleaned:
+            return entry["id"]
+
+    return identifier
+
+
+def get_notebook_title(identifier: str) -> str:
+    """Return human-readable title for a notebook ID or alias."""
+    resolved_id = resolve_notebook_id(identifier)
+    if resolved_id in NOTEBOOK_BY_ID:
+        return NOTEBOOK_BY_ID[resolved_id]["title"]
+    cleaned = identifier.strip().lower()
+    if cleaned in NOTEBOOK_TITLES:
+        return NOTEBOOK_TITLES[cleaned]
+    return identifier
 
 
 def run_nlm(args: list, timeout: int = 120) -> subprocess.CompletedProcess:
@@ -146,14 +256,23 @@ def cmd_query(notebook_id: str, question: str, json_output: bool = False) -> str
     Query the NotebookLM Brain.
     Protocol A from System Instructions.
     """
-    print_header(f"🧠 Querying Brain: {notebook_id[:12]}...")
+    title = get_notebook_title(notebook_id)
+    print_header(f"🧠 Querying Brain: {title} ({notebook_id[:12]}...)")
     log_work(f"🟡 Starting [NLM Query]: \"{question[:60]}...\"")
 
-    args = ["notebook", "query", notebook_id, question]
+    # In modern notebooklm-py, syntax is: nlm ask -n <id> <question>
+    args = ["ask", "-n", notebook_id, question]
     if json_output:
         args.append("--json")
 
     result = run_nlm(args, timeout=120)
+
+    # Legacy CLI fallback
+    if result.returncode != 0 and "No such command" in result.stderr:
+        legacy_args = ["notebook", "query", notebook_id, question]
+        if json_output:
+            legacy_args.append("--json")
+        result = run_nlm(legacy_args, timeout=120)
 
     if result.returncode != 0:
         error_msg = get_error_message(result)
@@ -172,9 +291,13 @@ def cmd_status(notebook_id: str) -> list:
     Check studio artifact status.
     Protocol B from System Instructions.
     """
-    print_header(f"📊 Studio Status: {notebook_id[:12]}...")
+    title = get_notebook_title(notebook_id)
+    print_header(f"📊 Studio Status: {title} ({notebook_id[:12]}...)")
 
-    result = run_nlm(["studio", "status", notebook_id], timeout=30)
+    # In modern notebooklm-py, syntax is: nlm artifact list -n <id> --json
+    result = run_nlm(["artifact", "list", "-n", notebook_id, "--json"], timeout=30)
+    if result.returncode != 0 and "No such command" in result.stderr:
+        result = run_nlm(["studio", "status", notebook_id], timeout=30)
 
     if result.returncode != 0:
         error_msg = get_error_message(result)
@@ -209,7 +332,8 @@ def cmd_fetch(notebook_id: str, output_dir: str, convert_mp3: bool = True) -> li
     Download all completed artifacts.
     Protocol C from System Instructions.
     """
-    print_header(f"📥 Fetching Artifacts: {notebook_id[:12]}...")
+    title = get_notebook_title(notebook_id)
+    print_header(f"📥 Fetching Artifacts: {title} ({notebook_id[:12]}...)")
     log_work(f"🟡 Starting [NLM Fetch]: notebook={notebook_id[:12]}...")
 
     # Step 1: Check status first (MANDATORY per system instructions)
@@ -245,10 +369,16 @@ def cmd_fetch(notebook_id: str, output_dir: str, convert_mp3: bool = True) -> li
         cmd_name = art_info["cmd"]
 
         print(f"  📦 Downloading {art_type} → {output_file}")
+        # Try modern notebooklm-py download syntax
         result = run_nlm(
-            ["download", cmd_name, notebook_id, "-o", str(output_file)],
+            ["download", cmd_name, str(output_file), "-n", notebook_id],
             timeout=60
         )
+        if result.returncode != 0 and "No such command" in result.stderr:
+            result = run_nlm(
+                ["download", cmd_name, notebook_id, "-o", str(output_file)],
+                timeout=60
+            )
 
         if result.returncode == 0:
             downloaded.append(str(output_file))
@@ -285,20 +415,21 @@ def cmd_fetch(notebook_id: str, output_dir: str, convert_mp3: bool = True) -> li
 
 def cmd_pipeline(
     notebook_id: str,
-    question: str,
-    generate_types: list = None,
+    question: str = "",
+    generate_types: Optional[List[str]] = None,
     do_fetch: bool = True,
-    output_dir: str = None,
+    output_dir: Optional[str] = None,
     convert_mp3: bool = True,
-) -> dict:
+) -> Dict[str, Any]:
     """
     Full pipeline: Query → Generate (optional) → Wait → Fetch.
     Workflow Pattern from System Instructions.
     """
-    print_header("🚀 Full Orchestration Pipeline")
+    title = get_notebook_title(notebook_id)
+    print_header(f"🚀 Full Orchestration Pipeline: {title}")
     log_work(f"🟡 Starting [NLM Pipeline]: notebook={notebook_id[:12]}...")
 
-    results = {
+    results: Dict[str, Any] = {
         "query_answer": None,
         "generated": [],
         "downloaded": [],
@@ -314,10 +445,15 @@ def cmd_pipeline(
         for art_type in generate_types:
             print(f"  🔧 Generating {art_type}...")
             gen_result = run_nlm(
-                [art_type, "create", notebook_id] if art_type in ("audio", "report", "slides", "video")
-                else [art_type, notebook_id],
+                ["generate", art_type, "-n", notebook_id],
                 timeout=30,
             )
+            if gen_result.returncode != 0 and "No such command" in gen_result.stderr:
+                gen_result = run_nlm(
+                    [art_type, "create", notebook_id] if art_type in ("audio", "report", "slides", "video")
+                    else [art_type, notebook_id],
+                    timeout=30,
+                )
             if gen_result.returncode == 0:
                 results["generated"].append(art_type)
                 print(f"  ✅ Generation triggered: {art_type}")
@@ -361,25 +497,28 @@ def cmd_pipeline(
 # ---------------------------------------------------------------------------
 
 def main():
+    epilog_lines = ["Registered Notebook Catalogs & Aliases:"]
+    for item in NOTEBOOK_CATALOG:
+        alias_info = item["alias"]
+        if item.get("alt_aliases"):
+            alias_info += f" ({', '.join(item['alt_aliases'])})"
+        epilog_lines.append(f"  {alias_info:<22} → {item['title']}")
+
+    epilog_text = "\n".join(epilog_lines) + """
+
+Examples:
+  python3 nlm_orchestrator.py query fk-sava-45 "Who are the key players?"
+  python3 nlm_orchestrator.py query fine-tuning "What are the LoRA fine-tuning hyperparameters?"
+  python3 nlm_orchestrator.py query pitch "What is the core value proposition?"
+  python3 nlm_orchestrator.py status fine-tuning
+  python3 nlm_orchestrator.py fetch fk-sava-45 --output exports/sava/
+  python3 nlm_orchestrator.py list
+"""
+
     parser = argparse.ArgumentParser(
         description="NotebookLM Orchestrator Agent — Query, Generate, Fetch from the Brain",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Notebook Aliases:
-  pitch        → Vlada Stojanovic & Pocarr Investor Pitch
-  fk-sava-45   → FK Sava 45
-  fine-tuning  → Fine-Tuning & OpenWebUI 2026
-  web-ui       → Web UI Best Practices 2026
-  business     → Strategic Business Automation 2026
-  openwebui    → OpenWebUI Massive Knowledge System
-  ai-coaching  → AI Coaching 2026
-
-Examples:
-  python3 nlm_orchestrator.py query pitch "What is the core value proposition?"
-  python3 nlm_orchestrator.py status pitch
-  python3 nlm_orchestrator.py fetch pitch --output exports/pitch/
-  python3 nlm_orchestrator.py pipeline pitch "Summarize the pitch" --fetch
-        """,
+        epilog=epilog_text,
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -410,7 +549,7 @@ Examples:
     p_pipe.add_argument("--no-mp3", action="store_true", help="Skip .m4a → .mp3 conversion")
 
     # --- list ---
-    p_list = subparsers.add_parser("list", help="List known notebook aliases")
+    p_list = subparsers.add_parser("list", help="List registered notebooks and aliases")
 
     args = parser.parse_args()
 
@@ -420,9 +559,17 @@ Examples:
 
     # --- list ---
     if args.command == "list":
-        print_header("📚 Known Notebook Aliases")
-        for alias, nid in sorted(NOTEBOOK_ALIASES.items()):
-            print(f"  {alias:<16} → {nid}")
+        active_id = get_active_notebook_id()
+        print_header("📚 Registered Notebook Catalogs & Aliases")
+        print(f"   {'Alias':<22} {'Title':<38} {'Notebook ID'}")
+        print(f"   {'-'*22} {'-'*38} {'-'*36}")
+        for item in NOTEBOOK_CATALOG:
+            alias_str = item["alias"]
+            if item.get("alt_aliases"):
+                alias_str += f" ({', '.join(item['alt_aliases'])})"
+            prefix = "⭐ " if item["id"] == active_id else "   "
+            print(f"{prefix}{alias_str:<22} {item['title']:<38} {item['id']}")
+        print(f"\n  ⭐ = Active workspace notebook ({active_id})")
         sys.exit(0)
 
     # Resolve alias
@@ -459,3 +606,4 @@ Examples:
 
 if __name__ == "__main__":
     main()
+
