@@ -39,7 +39,7 @@ from concurrent.futures import ThreadPoolExecutor
 # --- LAYER 3 CONSTANT ---
 PROJECT_ESSENCE = """
 PROJECT ESSENCE (Golden Snapshot):
-The system has two active approved sub-projects:
+The system has three active approved sub-projects:
 
 SUB-PROJECT 1: Mental Game Platform
 The goal is to build a 100% free informational "Mental Game" platform.
@@ -61,6 +61,17 @@ Core Values:
 4. CLV-First Evaluation: Closing Line Value is the primary long-term edge signal.
 5. Conservative Staking: 1/20th Kelly, 0.75% cap; no real money until paper CLV is confirmed.
 6. Open Science: All results published transparently on Kaggle with honest conclusions.
+
+SUB-PROJECT 3: FK Sava 45 Club Website (fk_sava_45)
+The goal is to build the official website for FK Sava 45 football club using Astro framework.
+Location: /home/testovinovi/Documents/fk_sava_45
+Core Values:
+1. Football Club Focus: Content centered on team rosters, match results, and club news.
+2. Tech Stack: Astro (static site generator) with Tailwind CSS and content collections.
+3. Conductor Methodology: Project managed via Conductor tracks (conductor/ directory).
+4. Production Quality: Zero mocks, real content, verified builds only.
+5. Atomic Development: Work organized in tracks (current: enhance_team_rosters_20261010).
+6. User Sovereignty: All major changes directed and approved by the user.
 """
 # ------------------------
 
@@ -105,8 +116,10 @@ class JudgeGuard:
                     self._setup_done = True
 
     @property
-    def logger(self):
+    def logger(self) -> logging.Logger:
         self._ensure_setup()
+        if self._logger is None:
+            self._logger = logging.getLogger(__name__)
         return self._logger
 
     @property
@@ -425,6 +438,7 @@ class JudgeGuard:
         self._ensure_setup()
 
         # ⚡ Bolt: Lazy import bridge to avoid early 'requests' load
+        bridge = None
         try:
             from src.antigravity_core.mobile_bridge import bridge
             bridge_available = True
@@ -579,7 +593,7 @@ class JudgeGuard:
         if isinstance(eval_result, tuple):
             verdict, is_authoritative = eval_result
         else:
-            verdict = bool(eval_result)
+            verdict = eval_result
             is_authoritative = getattr(getattr(judge, "client", None), "last_is_authoritative", True)
 
         if verdict and is_authoritative:

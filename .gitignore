@@ -45,3 +45,4 @@ node_modules
 
 .gemini/
 gha-creds-*.json
+WORK_LOG.html

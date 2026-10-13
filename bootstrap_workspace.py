@@ -143,7 +143,7 @@ def query_notebooklm(question: str, record_telemetry: bool = True) -> Dict[str, 
 
     elapsed_ms = (time.perf_counter() - start_time) * 1000.0
     prompt_tokens = len(question.split())
-    answer_text = result.get("answer", "")
+    answer_text = str(result.get("answer", ""))
     completion_tokens = len(answer_text.split())
 
     telemetry_record = None

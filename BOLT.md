@@ -8,12 +8,15 @@
 
 ## 🏛️ 1. Git & Master Orchestration Directives
 
-1. **User Sovereignty:** The USER is the ultimate authority.
-2. **Never Bypass JudgeGuard:** Every change must verify against `judge_guard.py` before execution.
-3. **Atomic Task Chunking:** Maximum 5 open tasks in `WORK_LOG.md` at any time.
-4. **Git Checkpoints:** Every completed task must produce a Git commit with prefix `checkpoint: [ACTION]` and log the SHA to `WORK_LOG.md`.
-5. **No Mocks, No Simulations:** 100% production code only.
-6. **Zero Privilege Escalation:** Blocked on `sudo`, `rm -rf /`, `chmod -R 777`.
+1. **User Sovereignty:** The USER is the ultimate authority. No action without user approval.
+2. **JudgeGuard is Mandatory:** Every major action must pass `judge_guard.py` before execution.
+3. **TICKET.md Required:** Work ticket must be created/updated before running verification.
+4. **Layer 000 Ticket Gate:** Ollama Cloud Gemma 4 verifies tickets before launch AND approves completion before ticket closure.
+5. **Git Checkpoint After Success:** Every successful action MUST create a git commit (`checkpoint: [ACTION]`) and log the SHA to `WORK_LOG.md`.
+6. **Atomic Task Chunking:** Maximum 5 open tasks in `WORK_LOG.md` at any time.
+7. **No Mocks, No Simulations:** 100% production mode only.
+8. **Model Lock:** Antigravity model changes require passcode `0012`.
+9. **No Sudo, No Privilege Escalation:** Hard block in Layer 00 on `sudo`, `rm -rf /`, `chmod -R 777`.
 
 ---
 
@@ -60,3 +63,34 @@ Bolt MUST track and log all AI operations to maintain complete observability:
      ```bash
      python3 git_bolt_jules_gate.py telemetry
      ```
+
+---
+
+## 🔄 4. Verification Workflow
+
+```bash
+# 1. Update WORK_LOG.md
+echo "🟡 Starting [ACTION]" >> WORK_LOG.md
+
+# 2. Pre-Action Verification (Layer 000 Ollama Gemma 4 + JudgeGuard)
+./gemini_cli.sh "[ACTION]"
+
+# 3. Post-Action Verification & Checkpoint is automatic:
+# - Ollama Gemma 4 COMPLETION_APPROVED
+# - Token audit via git_bolt_jules_gate.py
+# - git commit -m "checkpoint: [ACTION]"
+# - Telemetry badge & SHA logged to WORK_LOG.md
+```
+
+---
+
+## 📁 5. Key Files
+- `judge_guard.py` — Multi-layer safety engine
+- `gemini_cli.sh` — Automated 7-step execution wrapper
+- `qwen_cli.sh` — Qwen execution wrapper
+- `git_bolt_jules_gate.py` — Token gate, cleaner & telemetry badge generator
+- `TICKET.md` — Current active ticket
+- `WORK_LOG.md` — Mandatory task log
+- `MASTER_ORCHESTRATION.md` — Source of truth
+- `GEMINI.md` — Directives for Antigravity & Gemini agents
+

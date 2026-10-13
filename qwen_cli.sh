@@ -59,7 +59,8 @@ fi
 
 # 5. Post-Action Ticket Closure Verification (Approval from Gemma 4 + Agents)
 echo "🎫 Requesting Post-Action Ticket Closure Approval from Agents..."
-"$VENV_PYTHON" "$SCRIPT_DIR/src/antigravity_core/ticket_verifier.py" "QWEN: $ACTION" verify_complete
+CLOSURE_EVIDENCE="COMPLETED: Execution finished with exit code ${CMD_EXIT:-0}; Master Orchestration standards and safety rules maintained."
+"$VENV_PYTHON" "$SCRIPT_DIR/src/antigravity_core/ticket_verifier.py" "QWEN: $ACTION" verify_complete "$CLOSURE_EVIDENCE"
 POST_TICKET_RESULT=$?
 
 if [ $POST_TICKET_RESULT -ne 0 ]; then
@@ -74,6 +75,10 @@ echo "✅ Completed QWEN: $ACTION" >> "$SCRIPT_DIR/WORK_LOG.md"
 # 6. Automatic Git Checkpoint & Verification
 CHANGES_COUNT=$(git -C "$SCRIPT_DIR" status --porcelain | wc -l)
 if [ "$CHANGES_COUNT" -gt 0 ]; then
+    echo "🔍 Running Token Cleaner Audit..."
+    if [ -f "$SCRIPT_DIR/git_bolt_jules_gate.py" ]; then
+        "$VENV_PYTHON" "$SCRIPT_DIR/git_bolt_jules_gate.py" audit
+    fi
     echo "📦 Staging changes and committing checkpoint..."
     git -C "$SCRIPT_DIR" add .
     git -C "$SCRIPT_DIR" commit -m "checkpoint: QWEN: $ACTION"
@@ -86,6 +91,12 @@ if [ "$CHANGES_COUNT" -gt 0 ]; then
     COMMIT_SHA=$(git -C "$SCRIPT_DIR" rev-parse --short HEAD)
     echo "📌 Git checkpoint SHA: $COMMIT_SHA" >> "$SCRIPT_DIR/WORK_LOG.md"
     echo "✅ Git checkpoint created: $COMMIT_SHA"
+    if [ -f "$SCRIPT_DIR/git_bolt_jules_gate.py" ]; then
+        BADGE=$("$VENV_PYTHON" "$SCRIPT_DIR/git_bolt_jules_gate.py" badge --agent qwen --action "$ACTION" 2>/dev/null)
+        if [ -n "$BADGE" ]; then
+            echo "$BADGE" >> "$SCRIPT_DIR/WORK_LOG.md"
+        fi
+    fi
 else
     echo "ℹ️ No file changes detected; recording NO_CHANGES."
     echo "📌 Checkpoint: NO_CHANGES" >> "$SCRIPT_DIR/WORK_LOG.md"

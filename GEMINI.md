@@ -15,6 +15,54 @@ trigger: always_on
 8. **Model Lock:** Antigravity model changes require passcode `0012`.
 9. **No Sudo, No Privilege Escalation:** Hard block in Layer 00 on `sudo`, `rm -rf /`, `chmod -R 777`.
 
+---
+
+## 🧹 Token Cleaning & Context Reduction Protocol
+
+To minimize token usage and prevent context overflow when working in WebContainers, IDEs, or cloud environments:
+
+1. **Forbidden Context Ingestion:**
+   - NEVER read or load into LLM context:
+     - `local_py/**` (contains hundreds of discovery cache JSONs exceeding context limits)
+     - `.venv/**`, `node_modules/**`, `dist/**`, `build/**`
+     - `.git/**`, `.cache/**`, `exports/**`, `*.log`
+2. **Surgical Diff Generation:**
+   - Propose changes as targeted diffs / replacement blocks.
+   - Do NOT rewrite or echo unmodified lines or entire multi-thousand-line files.
+3. **Automated Token Audit:**
+   - Before committing or requesting approval, verify staged files:
+     ```bash
+     python3 git_bolt_jules_gate.py audit
+     ```
+   - Generate token-compressed diffs:
+     ```bash
+     python3 git_bolt_jules_gate.py clean-diff
+     ```
+
+---
+
+## 📊 Telemetry & Observability Directives
+
+Track and log all AI operations to maintain complete observability:
+
+1. **Per-Call Metrics:**
+   - Every LLM interaction is automatically recorded in SQLite `research.db` via `src.antigravity_core.telemetry`.
+   - Metrics tracked: `prompt_tokens`, `completion_tokens`, `total_tokens`, `cached_tokens`, `tokens_saved`, `latency_ms`, `cost_estimate_usd`.
+2. **Commit / PR Telemetry Badge:**
+   - Every Git checkpoint commit or PR generated must include the telemetry badge:
+     ```bash
+     python3 git_bolt_jules_gate.py badge --agent gemini --action "[ACTION_NAME]"
+     ```
+   - Example Badge:
+     > 📊 **Telemetry (GEMINI)**: 17,321 tokens used | ⚡ ~46,287 tokens saved (est) | ⏱️ 367.0ms | 🤖 `gemini-3.7-flash`
+3. **Live Dashboard:**
+   - Review cumulative token savings and costs anytime:
+     ```bash
+     python3 git_bolt_jules_gate.py telemetry
+     ```
+
+---
+
 ## 🔄 Verification Workflow
 
 ```bash
@@ -26,14 +74,18 @@ echo "🟡 Starting [ACTION]" >> WORK_LOG.md
 
 # 3. Post-Action Verification & Checkpoint is automatic:
 # - Ollama Gemma 4 COMPLETION_APPROVED
+# - Token audit via git_bolt_jules_gate.py
 # - git commit -m "checkpoint: [ACTION]"
-# - SHA logged to WORK_LOG.md
+# - Telemetry badge & SHA logged to WORK_LOG.md
 ```
 
 ## Key Files
 - `judge_guard.py` — Multi-layer safety engine
 - `gemini_cli.sh` — Automated 7-step execution wrapper
 - `qwen_cli.sh` — Qwen execution wrapper
+- `git_bolt_jules_gate.py` — Token gate, cleaner & telemetry badge generator
 - `TICKET.md` — Current active ticket
 - `WORK_LOG.md` — Mandatory task log
 - `MASTER_ORCHESTRATION.md` — Source of truth
+- `BOLT.md` — Directives for Bolt & WebContainers
+

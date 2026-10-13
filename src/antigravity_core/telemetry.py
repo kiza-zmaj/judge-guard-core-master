@@ -119,13 +119,7 @@ class TelemetryTracker:
         Records an LLM call or agent task execution telemetry record.
         Automatically resolves internal thinking/reasoning tokens if total_tokens exceeds prompt+completion.
         """
-        prompt_tokens = int(prompt_tokens) if isinstance(prompt_tokens, (int, float)) else 0
-        completion_tokens = int(completion_tokens) if isinstance(completion_tokens, (int, float)) else 0
-        thinking_tokens = int(thinking_tokens) if isinstance(thinking_tokens, (int, float)) else 0
-        total_tokens = int(total_tokens) if isinstance(total_tokens, (int, float)) else 0
-        cached_tokens = int(cached_tokens) if isinstance(cached_tokens, (int, float)) else 0
-        tokens_saved = int(tokens_saved) if isinstance(tokens_saved, (int, float)) else 0
-        latency_ms = float(latency_ms) if isinstance(latency_ms, (int, float)) else 0.0
+        latency_ms = float(latency_ms) if isinstance(latency_ms, int) else latency_ms
 
         # Automatic thinking token resolution for reasoning models (e.g. Gemini 3.8 Flash)
         # Note: prompt_tokens already includes cached_tokens (cached_tokens is a subset of prompt_tokens).
