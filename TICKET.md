@@ -1,8 +1,7 @@
 # WORK TICKET
-**Action:** Create and Publish Open-Source Kaggle Notebook for JudgeGuard Gemma 4 Developer Agent
-**Objective:** Author an end-to-end, comprehensive technical Jupyter Notebook in English covering the JudgeGuard Gemma 4 Developer Agent architecture, declarative ADK compilation, SWE-bench lifecycle, in-notebook validation, and push to Kaggle as public open-source kernel
-**Scope:** judge-guard-core-master/judgeguard-gemma4-agent & Kaggle Cloud (kiza123123)
-**Justification:** User sovereignty instruction: "Postuj pravila i koja su u antigravity i napravi mi na engleskom ceo notebook koji smo sad poslali i uploaduj na kaggle kao opensource"
-**Status:** COMPLETED
-**Enforcement:** 100% production mode, zero mocks, complete documentation, verified upload
-**Output:** Public Kaggle Kernel: https://www.kaggle.com/code/kiza123123/judgeguard-gemma-4-autonomous-developer-agent
+**Action:** Implement Screen Recording Wrapper for Antigravity Agent (agy-screen-recorder)
+**Objective:** Build a production-grade Python CLI application that: (1) starts ffmpeg x11grab screen recording, (2) launches an `agy` agent with a given topic via `--print` mode, (3) waits for agent completion, (4) stops recording, (5) writes JSONL audit log, (6) verifies outputs, (7) writes final.txt status.
+**Scope:** /home/testovinovi/DEV hacktoons/agy-screen-recorder
+**Justification:** User /goal directive — Antigravity Task Prompt for Screen Recording Wrapper. JudgeGuard roles: Runner, ScreenRecorder, Logger, Verifier.
+**Status:** OPEN
+**Enforcement:** Non-destructive execution, zero mocks, zero fake simulations, 100% production mode. ffmpeg x11grab verified working on :0. agy CLI at ~/.local/bin/agy verified present.
