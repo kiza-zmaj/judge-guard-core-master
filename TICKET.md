@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Harmonize and cross-align directives between GEMINI.md and BOLT.md
-**Objective:** Execute action: Harmonize and cross-align directives between GEMINI.md and BOLT.md
+**Action:** Export Reproducible JudgeGuard Master Orchestration Blueprint and Packager
+**Objective:** Execute action: Export Reproducible JudgeGuard Master Orchestration Blueprint and Packager
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
