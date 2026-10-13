@@ -6,7 +6,7 @@
 
 ---
 
-## 🏛️ 1. Git & Master Orchestration Directives
+## 🏛️ Immutable Laws (MASTER_ORCHESTRATION.md)
 
 1. **User Sovereignty:** The USER is the ultimate authority. No action without user approval.
 2. **JudgeGuard is Mandatory:** Every major action must pass `judge_guard.py` before execution.
@@ -56,6 +56,7 @@ Bolt MUST track and log all AI operations to maintain complete observability:
      ```bash
      python3 git_bolt_jules_gate.py badge --agent bolt --action "[ACTION_NAME]"
      ```
+     *(Note: `--agent gemini` can be used interchangeably when operating in Antigravity/Gemini environments).*
    - Example Badge:
      > 📊 **Telemetry (BOLT)**: 1,420 tokens used | ⚡ 3,850 tokens saved | ⏱️ 280.5ms | 🤖 `gemini-3.7-flash`
 3. **Live Dashboard:**

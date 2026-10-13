@@ -53,6 +53,7 @@ Track and log all AI operations to maintain complete observability:
      ```bash
      python3 git_bolt_jules_gate.py badge --agent gemini --action "[ACTION_NAME]"
      ```
+     *(Note: `--agent bolt` can be used interchangeably when operating in WebContainers/Bolt environments).*
    - Example Badge:
      > 📊 **Telemetry (GEMINI)**: 17,321 tokens used | ⚡ ~46,287 tokens saved (est) | ⏱️ 367.0ms | 🤖 `gemini-3.7-flash`
 3. **Live Dashboard:**
