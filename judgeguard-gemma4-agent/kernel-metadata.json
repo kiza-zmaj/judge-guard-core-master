@@ -1,0 +1,17 @@
+{
+  "id": "kiza123123/judgeguard-gemma4-developer-agent",
+  "title": "JudgeGuard: Gemma 4 Autonomous Developer Agent",
+  "code_file": "judgeguard_gemma4_developer_agent.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "false",
+  "enable_gpu": "false",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": [],
+  "competition_sources": [
+    "gemma-4-developer-agent"
+  ],
+  "kernel_sources": [],
+  "model_sources": []
+}
