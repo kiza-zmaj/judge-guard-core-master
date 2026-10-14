@@ -553,3 +553,14 @@ This typically
      4. Anti-Jerry Verifier: OpenCV frame inspection ensuring real visual content (mean pixel brightness: 84.69 / 255 across 53.84s).
    - Test Run: Topic "List 2 benefits of async in Python" completed end-to-end, exit 0, real video saved to outputs/recordings/agent_run_20261014_101542.mp4 (26.8 MB).
    - JudgeGuard Compliance: Zero mocks, 100% production mode.
+
+✅ Completed Fix Gemma 4 Developer Agent Submission Compliance & 12h Budget Safeguards
+📌 Competition: gemma-4-developer-agent (Google - The Gemma 4 Developer Agent Competition)
+🎯 Scope: Forensic audit of stuck 16h submission (ref 57151975) and full alignment with Kaggle rules
+🛡️ User Sovereignty: Directed by User
+⚙️ Fixes Applied:
+  • Air-Gapped Offline Law: Enforced strict zero-network execution (network_mode="none") in system prompt, explicitly forbidding pip, curl, wget, git remote, and interactive commands.
+  • Kernel Internet Flag: Changed enable_internet from true to false in kernel-metadata.json.
+  • 12-Hour Budget Compliance: Reduced per-task max_time_minutes from 30m to 4.5m and timeout_seconds from 300s to 60s, ensuring all ~120 test instances fit comfortably within the 12-hour evaluation ceiling.
+  • Re-Packaged & Verified: submission.zip regenerated and 100% passed all ADK specification checks.
+📌 Git checkpoint SHA: 48f8ced
