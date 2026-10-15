@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit Name That LLM Sub1 Fast Stylometric Baseline to Competition v2
-**Objective:** Execute action: Submit Name That LLM Sub1 Fast Stylometric Baseline to Competition v2
+**Action:** Submit Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier to Competition
+**Objective:** Execute action: Submit Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier to Competition
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN

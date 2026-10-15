@@ -678,3 +678,8 @@ Checked locations:
 
 🟡 Starting Submit Name That LLM Sub1 Fast Stylometric Baseline to Competition v2
 ✅ Completed Submit Name That LLM Sub1 Fast Stylometric Baseline to Competition v2
+📌 Git checkpoint SHA: bc26ecd
+📊 **Telemetry (GEMINI)**: 128,338 tokens used | ⚡ ~54,988 tokens saved (est) | ⏱️ 882.3ms | 🤖 `gemini-3.7-flash`
+
+🟡 Starting Submit Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier to Competition
+✅ Completed Submit Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier to Competition
