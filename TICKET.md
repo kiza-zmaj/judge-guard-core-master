@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Push Name That LLM Sub5 Apex SOTA Quintuple Ensemble Kernel
-**Objective:** Execute action: Push Name That LLM Sub5 Apex SOTA Quintuple Ensemble Kernel
+**Action:** Submit Name That LLM Sub4 Qwen3 Dual Fusion to Competition
+**Objective:** Execute action: Submit Name That LLM Sub4 Qwen3 Dual Fusion to Competition
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
