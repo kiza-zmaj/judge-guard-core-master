@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit Name That LLM Sub3 Apex GM Hierarchical Blend to Competition
-**Objective:** Execute action: Submit Name That LLM Sub3 Apex GM Hierarchical Blend to Competition
+**Action:** Record Name That LLM 3 Submissions Leaderboard Scores and Verification
+**Objective:** Execute action: Record Name That LLM 3 Submissions Leaderboard Scores and Verification
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
