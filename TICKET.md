@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier to Competition
-**Objective:** Execute action: Submit Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier to Competition
+**Action:** Submit Name That LLM Sub3 Apex GM Hierarchical Blend to Competition
+**Objective:** Execute action: Submit Name That LLM Sub3 Apex GM Hierarchical Blend to Competition
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
