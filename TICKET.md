@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit CASMI26 E009 MetFrag FragGap SOTA
-**Objective:** Execute action: Submit CASMI26 E009 MetFrag FragGap SOTA
+**Action:** Submit CASMI26 E010 Group Gap SOTA
+**Objective:** Execute action: Submit CASMI26 E010 Group Gap SOTA
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN

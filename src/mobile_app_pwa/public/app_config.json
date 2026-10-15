@@ -4,9 +4,9 @@
   "content": "Welcome to the Agent-Controlled PWA!",
   "components": [],
   "last_verdict": {
-    "action": "Submit CASMI26 E009 MetFrag FragGap SOTA",
+    "action": "Submit CASMI26 E010 Group Gap SOTA",
     "status": "PASSED",
-    "reason": "Approved (Cached)",
+    "reason": "Approved (Unified Verification)",
     "timestamp": "Now"
   }
 }

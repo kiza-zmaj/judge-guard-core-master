@@ -581,3 +581,8 @@ Checked locations:
 
 🟡 Starting Submit CASMI26 E009 MetFrag FragGap SOTA
 ✅ Completed Submit CASMI26 E009 MetFrag FragGap SOTA
+📌 Git checkpoint SHA: fa754b0
+📊 **Telemetry (GEMINI)**: 70,287 tokens used | ⚡ ~52,927 tokens saved (est) | ⏱️ 640.0ms | 🤖 `gemini-3.7-flash`
+
+🟡 Starting Submit CASMI26 E010 Group Gap SOTA
+✅ Completed Submit CASMI26 E010 Group Gap SOTA
