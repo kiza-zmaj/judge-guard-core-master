@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Push CASMI26 E011 Multi-CE SOTA Kernel
-**Objective:** Execute action: Push CASMI26 E011 Multi-CE SOTA Kernel
+**Action:** Push CASMI26 E012 Inverted Diagnostic Kernel
+**Objective:** Execute action: Push CASMI26 E012 Inverted Diagnostic Kernel
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
