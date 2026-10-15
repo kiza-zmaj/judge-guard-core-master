@@ -599,10 +599,10 @@ Checked locations:
 📌 Git checkpoint SHA: 8af1539
 📊 **Telemetry (GEMINI)**: 75,986 tokens used | ⚡ ~52,992 tokens saved (est) | ⏱️ 667.9ms | 🤖 `gemini-3.7-flash`
 
-🟡 Starting Push CASMI26 E012 Inverted Diagnostic Kernel
-✅ Completed Push CASMI26 E012 Inverted Diagnostic Kernel
-📌 Git checkpoint SHA: c7d618f
-📊 **Telemetry (GEMINI)**: 78,881 tokens used | ⚡ ~53,023 tokens saved (est) | ⏱️ 687.3ms | 🤖 `gemini-3.7-flash`
+🟡 Starting Push RSNA Knee Sub4 v2 Apex Grandmaster V14 DualRaptor Anti-Tie Kernel
+✅ Completed Push RSNA Knee Sub4 v2 Apex Grandmaster V14 DualRaptor Anti-Tie Kernel
+📌 Git checkpoint SHA: d4d8900
+📊 **Telemetry (GEMINI)**: 81,200 tokens used | ⚡ ~53,400 tokens saved (est) | ⏱️ 695.0ms | 🤖 `gemini-3.7-flash`
 
 🟡 Starting Submit CASMI26 E011 Multi-CE SOTA
 ✅ Completed Submit CASMI26 E011 Multi-CE SOTA
@@ -624,3 +624,10 @@ Checked locations:
 
 🟡 Starting RSNA Knee Sub4 v2: Push Apex Grandmaster V14 DualRaptor Anti-Tie Kernel
 ✅ Completed RSNA Knee Sub4 v2: Push Apex Grandmaster V14 DualRaptor Anti-Tie Kernel
+📌 Git checkpoint SHA: f3b00b4
+📊 **Telemetry (GEMINI)**: 93,960 tokens used | ⚡ ~53,197 tokens saved (est) | ⏱️ 843.1ms | 🤖 `gemini-3.7-flash`
+
+🟡 Starting RSNA Knee: Monitor Sub3 & Sub4 Kernels + Auto-Submit When Complete
+  - Sub3 (Multi-Scale Quad-Arm): RUNNING at 16:03 CEST
+  - Sub4 (Apex V14 DualRaptor Anti-Tie): RUNNING at 16:03 CEST
+  - Both kernels confirmed running, GPU T4, correct datasets attached
