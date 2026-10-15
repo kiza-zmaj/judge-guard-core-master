@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Push Name That LLM Sub3 Apex GM Hierarchical Blend Kernel v2
-**Objective:** Execute action: Push Name That LLM Sub3 Apex GM Hierarchical Blend Kernel v2
+**Action:** Submit Name That LLM Sub1 Fast Stylometric Baseline to Competition v2
+**Objective:** Execute action: Submit Name That LLM Sub1 Fast Stylometric Baseline to Competition v2
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
