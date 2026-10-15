@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit CASMI26 E010 Group Gap SOTA
-**Objective:** Execute action: Submit CASMI26 E010 Group Gap SOTA
+**Action:** Push CASMI26 E011 Multi-CE SOTA Kernel
+**Objective:** Execute action: Push CASMI26 E011 Multi-CE SOTA Kernel
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
