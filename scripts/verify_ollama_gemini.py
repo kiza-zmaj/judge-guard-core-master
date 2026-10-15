@@ -15,6 +15,15 @@ import logging
 _repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, _repo_root)
 
+# Load environment secrets
+_env_path = os.path.join(_repo_root, ".env")
+if os.path.exists(_env_path):
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(_env_path)
+    except ImportError:
+        pass
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("VERIFY_SUITE")
 
@@ -71,7 +80,7 @@ def verify_gemini_client() -> dict:
         
     authorized_change = client.change_model("gemini-3.7-flash", passcode="0012")
     # Restore standard
-    client.change_model("gemini-3.8-flash", passcode="0012")
+    client.change_model("gemini-3.5-flash-lite", passcode="0012")
     
     security_verified = unauthorized_blocked and (authorized_change is True)
     has_status = bool(generation and len(generation.strip()) > 0)

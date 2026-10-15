@@ -4,9 +4,9 @@
   "content": "Welcome to the Agent-Controlled PWA!",
   "components": [],
   "last_verdict": {
-    "action": "Export Reproducible JudgeGuard Master Orchestration Blueprint and Packager",
+    "action": "Submit CASMI26 E009 MetFrag FragGap SOTA",
     "status": "PASSED",
-    "reason": "Approved (Unified Verification)",
+    "reason": "Approved (Cached)",
     "timestamp": "Now"
   }
 }

@@ -17,6 +17,7 @@ DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__)
 
 # Approximate Gemini & Gemma token cost rates (per million tokens) in USD
 COST_PER_MILLION = {
+    "gemini-3.5-flash-lite": {"prompt": 0.075, "completion": 0.30},
     "gemini-3.8-flash": {"prompt": 0.15, "completion": 0.60},
     "gemini-3.7-flash": {"prompt": 0.10, "completion": 0.40},
     "gemini-2.5-flash": {"prompt": 0.075, "completion": 0.30},

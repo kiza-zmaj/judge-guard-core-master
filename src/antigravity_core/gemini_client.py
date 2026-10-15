@@ -38,11 +38,9 @@ except ImportError:
 # Default active rotation keys (100% production)
 DEFAULT_API_KEYS: list[str] = []
 
-# Default active model rotation: Gemini 3.8 Flash & Gemini 3.7 Flash with 2.5 Flash fallback
+# Default active model: Gemini 3.5 Flash Lite (configured per user instruction, passcode 0012)
 DEFAULT_MODELS = [
-    "gemini-3.8-flash",
-    "gemini-3.7-flash",
-    "gemini-2.5-flash",
+    "gemini-3.5-flash-lite",
 ]
 
 # Security passcode required to modify or override model
@@ -88,7 +86,7 @@ class GeminiClient:
                 "No valid API keys configured."
             )
 
-        # Enforce passcode '0012' if requesting a model other than default gemini-3.8-flash
+        # Enforce passcode '0012' if requesting a model other than default gemini-3.5-flash-lite
         desired_model = model_name or os.getenv("GEMINI_MODEL")
         provided_code = passcode or os.getenv("MODEL_CHANGE_PASSCODE")
 

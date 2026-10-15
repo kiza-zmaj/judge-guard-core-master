@@ -509,6 +509,7 @@ Checked locations:
 📊 **Telemetry (GEMINI)**: 22,136 tokens used | ⚡ ~51,122 tokens saved (est) | ⏱️ 391.5ms | 🤖 `gemini-3.7-flash`
 
 🟡 Starting Commit directive parity notes in GEMINI.md and BOLT.md
+⚠️ Abandoned: Stale task superseded
 
 🟡 Starting Harmonize GEMINI.md and BOLT.md directives
 🛑 Blocked: Commit directive parity notes in GEMINI.md and BOLT.md
@@ -519,11 +520,16 @@ Checked locations:
 ✅ Completed Export Reproducible JudgeGuard Master Orchestration Blueprint and Packager
 📌 Git checkpoint SHA: 5e77649
 📊 **Telemetry (GEMINI)**: 36,415 tokens used | ⚡ ~51,222 tokens saved (est) | ⏱️ 460.0ms | 🤖 `gemini-3.7-flash`
+
 🟡 Starting Deep Documentation Audit and Market Research Verification
+⚠️ Abandoned: Stale audit task superseded
 
 🟡 Starting Deep Documentation Audit and Market Research Verification
 🛑 Blocked: Deep Documentation Audit and Market Research Verification
+
 🟡 Starting SharpBet Score Improvement: Feature Engineering and Hyperparameter Tuning to exceed 0.94670 OOF ROC-AUC
+⚠️ Abandoned: SharpBet track paused for CASMI26 campaign
+
 🟡 Starting [NLM Query]: "sta se nalazi u ovom notebook-u..."
 🛑 Blocked [NLM Query]: Not logged in.
 
@@ -532,14 +538,17 @@ Checked locations:
 
 🟡 Starting Query NotebookLM notebook 5655b056-6070-485b-a6ba-aa45a0d28a32 for contents
 🛑 Blocked: Query NotebookLM notebook 5655b056-6070-485b-a6ba-aa45a0d28a32 for contents
+
 🟡 Starting [NLM Query]: "sta se nalazi u ovom notebook-u..."
 🛑 Blocked [NLM Query]: Not logged in.
 
 Checked locations:
   • Storage file: /home/testovinovi/.notebook
+
 🟡 Starting [NLM Query]: "sta se nalazi u ovom notebook-u..."
 🛑 Blocked [NLM Query]: Unexpected error: Missing required cookies: SID, __Secure-1PSIDTS
-This typically
+⚠️ Abandoned: Missing cookies
+
 
 🟡 Starting AGY Screen Recorder Wayland Engine Upgrade & Anti-Black-Screen Verification
 ✅ Completed AGY Screen Recorder Wayland Engine Upgrade & Anti-Black-Screen Verification
@@ -564,3 +573,11 @@ This typically
   • 12-Hour Budget Compliance: Reduced per-task max_time_minutes from 30m to 4.5m and timeout_seconds from 300s to 60s, ensuring all ~120 test instances fit comfortably within the 12-hour evaluation ceiling.
   • Re-Packaged & Verified: submission.zip regenerated and 100% passed all ADK specification checks.
 📌 Git checkpoint SHA: 48f8ced
+
+🟡 Starting CASMI26 4-Submission Campaign to break 0.440 (Submission 1: E009 MetFrag FragGap SOTA)
+
+🟡 Starting Submit CASMI26 E009 MetFrag FragGap SOTA
+🛑 Blocked: Submit CASMI26 E009 MetFrag FragGap SOTA
+
+🟡 Starting Submit CASMI26 E009 MetFrag FragGap SOTA
+✅ Completed Submit CASMI26 E009 MetFrag FragGap SOTA
