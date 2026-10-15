@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Push Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier Kernel
-**Objective:** Execute action: Push Name That LLM Sub2 UltraBERT 5-Fold Deep Classifier Kernel
+**Action:** Push Name That LLM Sub3 Apex GM Hierarchical Blend Kernel
+**Objective:** Execute action: Push Name That LLM Sub3 Apex GM Hierarchical Blend Kernel
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
