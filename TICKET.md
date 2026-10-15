@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit CASMI26 E012 Inverted Diagnostic
-**Objective:** Execute action: Submit CASMI26 E012 Inverted Diagnostic
+**Action:** RSNA Knee Competition Setup and Discovery
+**Objective:** Execute action: RSNA Knee Competition Setup and Discovery
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
