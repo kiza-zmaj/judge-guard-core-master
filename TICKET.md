@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Record Name That LLM 3 Submissions Leaderboard Scores and Verification
-**Objective:** Execute action: Record Name That LLM 3 Submissions Leaderboard Scores and Verification
+**Action:** Push Name That LLM Sub4 Qwen3 Dual Fusion SOTA Kernel
+**Objective:** Execute action: Push Name That LLM Sub4 Qwen3 Dual Fusion SOTA Kernel
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
