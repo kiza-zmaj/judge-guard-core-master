@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition v2
-**Objective:** Execute action: RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition v2
+**Action:** Push Name That LLM Sub1 Fast Stylometric Baseline Kernel
+**Objective:** Execute action: Push Name That LLM Sub1 Fast Stylometric Baseline Kernel
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN

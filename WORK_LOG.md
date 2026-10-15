@@ -627,13 +627,18 @@ Checked locations:
 📌 Git checkpoint SHA: f3b00b4
 📊 **Telemetry (GEMINI)**: 93,960 tokens used | ⚡ ~53,197 tokens saved (est) | ⏱️ 843.1ms | 🤖 `gemini-3.7-flash`
 
-🟡 Starting RSNA Knee: Monitor Sub3 & Sub4 Kernels + Auto-Submit When Complete
-  - Sub3 (Multi-Scale Quad-Arm): RUNNING at 16:03 CEST
-  - Sub4 (Apex V14 DualRaptor Anti-Tie): RUNNING at 16:03 CEST
-  - Both kernels confirmed running, GPU T4, correct datasets attached
+✅ Completed RSNA Knee: Monitor Sub3 & Sub4 Kernels + Auto-Submit When Complete
+  - Sub3 (Multi-Scale Quad-Arm): COMPLETE on Kaggle, submitted as Ref 57233298 (Scoring on private test set)
+  - Sub4 (Apex V14 DualRaptor Anti-Tie): COMPLETE on Kaggle, submitted as Ref 57233703 (Scoring on private test set)
+  - Both submissions active and undergoing evaluation on Kaggle hidden test set
 
 🟡 Starting RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition
 🛑 Failed during execution: RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition (exit code 1)
 
 🟡 Starting RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition v2
 ✅ Completed RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition v2
+📌 Git checkpoint SHA: 28ef528
+📊 **Telemetry (GEMINI)**: 100,157 tokens used | ⚡ ~53,261 tokens saved (est) | ⏱️ 845.4ms | 🤖 `gemini-3.7-flash`
+
+🟡 Starting Push Name That LLM Sub1 Fast Stylometric Baseline Kernel
+✅ Completed Push Name That LLM Sub1 Fast Stylometric Baseline Kernel
