@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit CASMI26 E011 Multi-CE SOTA
-**Objective:** Execute action: Submit CASMI26 E011 Multi-CE SOTA
+**Action:** Submit CASMI26 E012 Inverted Diagnostic
+**Objective:** Execute action: Submit CASMI26 E012 Inverted Diagnostic
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
