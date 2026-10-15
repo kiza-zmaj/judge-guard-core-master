@@ -631,3 +631,9 @@ Checked locations:
   - Sub3 (Multi-Scale Quad-Arm): RUNNING at 16:03 CEST
   - Sub4 (Apex V14 DualRaptor Anti-Tie): RUNNING at 16:03 CEST
   - Both kernels confirmed running, GPU T4, correct datasets attached
+
+🟡 Starting RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition
+🛑 Failed during execution: RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition (exit code 1)
+
+🟡 Starting RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition v2
+✅ Completed RSNA Knee Sub4: Submit Apex Grandmaster V14 DualRaptor Anti-Tie to Competition v2
