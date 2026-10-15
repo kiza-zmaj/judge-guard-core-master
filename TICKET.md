@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** RSNA Knee Competition Setup and Discovery
-**Objective:** Execute action: RSNA Knee Competition Setup and Discovery
+**Action:** RSNA Knee Sub4 v2: Push Apex Grandmaster V14 DualRaptor Anti-Tie Kernel
+**Objective:** Execute action: RSNA Knee Sub4 v2: Push Apex Grandmaster V14 DualRaptor Anti-Tie Kernel
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
