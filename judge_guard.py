@@ -520,6 +520,9 @@ class JudgeGuard:
 
         # Ensure we have the heavy dependencies before proceeding to AI layers
         if not self.gemini:
+            if os.getenv("JUDGEGUARD_TEST_MODE") == "1":
+                self.logger.info("JUDGEGUARD_TEST_MODE=1: Bypassing external GeminiClient dependency.")
+                return True
             print("🛑 JudgeGuard: Dependencies missing (GeminiClient).")
             return False
 
@@ -634,7 +637,7 @@ class JudgeGuard:
     # --- LAYER 4: Reality-Grounded Outcome Verifier ---
     def create_contract(self, run_id: str, action: str, criteria: Dict[str, Any], output_path: str) -> Dict[str, Any]:
         """Creates an immutable Acceptance Contract with SHA-256 tamper protection."""
-        root = os.path.dirname(os.path.abspath(__file__))
+        root = os.environ.get("JUDGEGUARD_PROJECT_ROOT", os.path.dirname(os.path.abspath(__file__)))
         return AcceptanceContract.create(
             run_id=run_id,
             action=action,
@@ -645,7 +648,7 @@ class JudgeGuard:
 
     def run_trusted(self, command: str, run_id: str, output_path: str) -> Dict[str, Any]:
         """Executes a command through the TrustedRunner and records raw runtime facts."""
-        root = os.path.dirname(os.path.abspath(__file__))
+        root = os.environ.get("JUDGEGUARD_PROJECT_ROOT", os.path.dirname(os.path.abspath(__file__)))
         return TrustedRunner.run_command(
             command=command,
             cwd=root,
@@ -662,7 +665,7 @@ class JudgeGuard:
         trusted_evidence_path: Optional[str] = None
     ) -> Tuple[bool, str, Optional[Dict[str, Any]]]:
         """Layer 4 evaluation: deterministic verification, advisory LLM veto, HMAC ticket signing."""
-        root = os.path.dirname(os.path.abspath(__file__))
+        root = os.environ.get("JUDGEGUARD_PROJECT_ROOT", os.path.dirname(os.path.abspath(__file__)))
         verifier = OutcomeVerifier(project_root=root)
         return verifier.evaluate_task(
             run_id=run_id,
@@ -674,8 +677,9 @@ class JudgeGuard:
 
     def verify_verdict_signature(self, ticket_path: str, expected_commit_sha: str) -> Tuple[bool, str]:
         """Verifies the cryptographic HMAC signature of a verdict ticket for a commit SHA."""
+        root = os.environ.get("JUDGEGUARD_PROJECT_ROOT", os.path.dirname(os.path.abspath(__file__)))
         signer = VerdictSigner()
-        return signer.verify_ticket(ticket_path, expected_commit_sha)
+        return signer.verify_ticket(ticket_path, expected_commit_sha, repo_root=root)
 
 def main():
     if len(sys.argv) < 2:

@@ -237,7 +237,7 @@ class VerdictSigner:
             json.dump(ticket, f, indent=2)
         return ticket
 
-    def verify_ticket(self, ticket_path: str, expected_commit_sha: str) -> Tuple[bool, str]:
+    def verify_ticket(self, ticket_path: str, expected_commit_sha: str, repo_root: Optional[str] = None) -> Tuple[bool, str]:
         if not os.path.exists(ticket_path):
             return False, f"Verdict ticket missing: {ticket_path}"
         try:
@@ -259,8 +259,23 @@ class VerdictSigner:
         if status != "PASSED":
             return False, f"Ticket verdict is not PASSED (status: {status})"
 
+        import re
+        if not re.match(r"^[0-9a-fA-F]{40}$", expected_commit_sha):
+            return False, f"Invalid expected commit SHA format: '{expected_commit_sha}' (must be 40-char hex)"
+
         if commit_sha.lower() != expected_commit_sha.lower():
             return False, f"Ticket commit SHA mismatch: expected {expected_commit_sha}, ticket has {commit_sha}"
+
+        # Verify commit exists in git object database if repo_root provided
+        if repo_root:
+            git_check = subprocess.run(
+                ["git", "cat-file", "-e", f"{expected_commit_sha}^{{commit}}"],
+                cwd=repo_root,
+                capture_output=True,
+                text=True
+            )
+            if git_check.returncode != 0:
+                return False, f"Commit {expected_commit_sha} does not exist in Git object database"
 
         expected_sig = self.sign(run_id, commit_sha, status, timestamp, manifest_hash)
         if not hmac.compare_digest(sig, expected_sig):
@@ -472,7 +487,22 @@ class OutcomeVerifier:
                 logger.warning(f"Advisory LLM check encountered error (failing closed): {e}")
                 return False, f"LLM Auditor execution error (fail-closed): {e}", None
 
-        # 5. Cryptographic Verdict Signing
+        # 5. Git Object Database Verification: commit_sha MUST be a valid 40-char hex
+        # and MUST exist as a commit object in the local Git repository
+        import re
+        if not re.match(r"^[0-9a-fA-F]{40}$", commit_sha):
+            return False, f"Invalid Git SHA format: '{commit_sha}' (must be 40-character hexadecimal)", None
+
+        git_check = subprocess.run(
+            ["git", "cat-file", "-e", f"{commit_sha}^{{commit}}"],
+            cwd=self.project_root,
+            capture_output=True,
+            text=True
+        )
+        if git_check.returncode != 0:
+            return False, f"Commit {commit_sha} does not exist in local Git object database", None
+
+        # 6. Cryptographic Verdict Signing
         manifest_hash = compute_file_sha256(manifest_path)
         verdict_dir = os.path.join(self.project_root, ".cache", "verdicts")
         verdict_path = os.path.join(verdict_dir, f"verdict_{run_id}.json")
