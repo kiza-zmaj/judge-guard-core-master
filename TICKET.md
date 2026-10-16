@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** Submit JudgeGuard Gemma 4 Autonomous Developer Agent v2.0 to Competition
-**Objective:** Execute action: Submit JudgeGuard Gemma 4 Autonomous Developer Agent v2.0 to Competition
+**Action:** RSNA Knee Sub5 H957 R6 Apex Push
+**Objective:** Execute action: RSNA Knee Sub5 H957 R6 Apex Push
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
