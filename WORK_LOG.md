@@ -754,3 +754,9 @@ Checked locations:
 
 🟡 Starting RSNA Knee Sub5 H957 R6 Apex Push
 ✅ Completed RSNA Knee Sub5 H957 R6 Apex Push
+📌 Git checkpoint SHA: d709183
+📊 **Telemetry (GEMINI)**: 161,635 tokens used | ⚡ ~55,239 tokens saved (est) | ⏱️ 933.5ms | 🤖 `gemini-3.7-flash`
+✅ Completed RSNA Knee Sub5+Sub6 Push
+📌 Sub5: https://www.kaggle.com/code/kiza123123/rsna-knee-sub5-h957-r6-apex-0-9576
+📌 Sub6: https://www.kaggle.com/code/kiza123123/rsna-knee-sub6-r6r7-fusion-triple-blend
+🎯 Expected: Sub5=0.9576 (helios R6 exact), Sub6=0.958+ (R6+R7 triple blend)
