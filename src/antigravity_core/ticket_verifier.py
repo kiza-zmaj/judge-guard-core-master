@@ -175,10 +175,11 @@ PROPOSED ACTION TO EXECUTE:
         from src.antigravity_core.outcome_verifier import VerdictSigner
         signer = VerdictSigner()
         if result.endswith(".json") and os.path.exists(result):
-            if expected_commit_sha:
-                ok, sig_msg = signer.verify_ticket(result, expected_commit_sha)
-                if not ok:
-                    return False, f"🛑 TICKET CLOSURE REJECTED: {sig_msg}"
+            if not expected_commit_sha:
+                return False, "🛑 TICKET CLOSURE REJECTED: expected_commit_sha is mandatory when verifying a verdict ticket JSON."
+            ok, sig_msg = signer.verify_ticket(result, expected_commit_sha)
+            if not ok:
+                return False, f"🛑 TICKET CLOSURE REJECTED: {sig_msg}"
 
         ticket_content = self.load_ticket()
 
@@ -248,7 +249,7 @@ STATUS / RESULT:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python3 ticket_verifier.py '<action>' [create|verify_complete]")
+        print("Usage: python3 ticket_verifier.py '<action>' [create|verify_complete] [result] [expected_commit_sha]")
         sys.exit(1)
 
     action = sys.argv[1]
@@ -264,7 +265,8 @@ def main():
             sys.exit(0 if approved else 1)
         elif mode == "verify_complete":
             result = sys.argv[3] if len(sys.argv) > 3 else "COMPLETED"
-            approved, reason = verifier.verify_ticket_completion(action, result=result)
+            expected_commit_sha = sys.argv[4] if len(sys.argv) > 4 else None
+            approved, reason = verifier.verify_ticket_completion(action, result=result, expected_commit_sha=expected_commit_sha)
             print(reason)
             sys.exit(0 if approved else 1)
 

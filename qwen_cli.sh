@@ -1,26 +1,39 @@
 #!/bin/bash
 # Qwen CLI Wrapper for Antigravity — 100% REALITY-GROUNDED PRODUCTION MODE
-# Usage: ./qwen_cli.sh [--worktree] '<action description>' [optional command to execute]
+# Usage: ./qwen_cli.sh [--contract-spec <spec>] '<action description>' [optional command to execute]
+#
+# Worktree isolation is MANDATORY by default (USE_WORKTREE=1).
+# Direct non-worktree execution on master/main is always blocked.
+# To explicitly disable worktree in tests, set USE_WORKTREE=0 externally — but this
+# will be rejected when the active branch is master or main.
 
-USE_WORKTREE=0
-if [ "$1" = "--worktree" ]; then
-    USE_WORKTREE=1
-    shift
-fi
-if [ "$ISOLATE_WORKTREE" = "1" ] || [ "$ISOLATE_WORKTREE" = "true" ]; then
-    USE_WORKTREE=1
-fi
+# External env override is respected; default is 1 (always isolate)
+USE_WORKTREE="${USE_WORKTREE:-1}"
+CONTRACT_SPEC="${JUDGEGUARD_CONTRACT_SPEC:-}"
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --contract-spec)
+            CONTRACT_SPEC="$2"
+            shift 2
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
 
 ACTION=$1
 COMMAND_TO_RUN=$2
 
 if [ -z "$ACTION" ]; then
     echo ""
-    echo "  Usage: qwen_cli.sh [--worktree] '<action description>' [optional command]"
+    echo "  Usage: qwen_cli.sh [--contract-spec <spec>] '<action description>' [optional command]"
     echo ""
     echo "  Examples:"
     echo "    ./qwen_cli.sh 'Deploy model weights'"
-    echo "    ./qwen_cli.sh --worktree 'Verify pipeline health' 'python3 test_health.py'"
+    echo "    ./qwen_cli.sh 'Verify pipeline health' 'python3 test_health.py'"
+    echo "    ./qwen_cli.sh --contract-spec '{\"min_files_changed\": 1}' 'Modify code'"
     echo ""
     exit 1
 fi
@@ -71,6 +84,15 @@ RUN_ID="run_$(date +%Y%m%d_%H%M%S)_${RAND_SUFFIX:-0000}"
 BASE_BRANCH="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "master")"
 BASE_COMMIT="$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo "")"
 
+# Enforce mandatory worktree isolation against protected branches (master / main)
+CURRENT_BRANCH="$(git -C "$REPO_ROOT" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")"
+if [ "$CURRENT_BRANCH" = "master" ] || [ "$CURRENT_BRANCH" = "main" ]; then
+    if [ "$USE_WORKTREE" -ne 1 ]; then
+        echo "🛑 Direct execution on protected branch '$CURRENT_BRANCH' is strictly forbidden. Draft worktree isolation is mandatory."
+        exit 1
+    fi
+fi
+
 if [ "$USE_WORKTREE" -eq 1 ]; then
     TARGET_DIR="$REPO_ROOT/.worktrees/draft-${RUN_ID}"
     DRAFT_BRANCH="draft/${RUN_ID}"
@@ -103,9 +125,18 @@ VERDICT_FILE="$VERDICT_DIR/verdict_${RUN_ID}.json"
 
 echo "🆔 Initializing Reality-Grounded Run: $RUN_ID (Target: $TARGET_DIR)"
 
+# Default contract criteria when none provided: enforce executions and clean git state
+if [ -z "$CONTRACT_SPEC" ]; then
+    if [ -n "$COMMAND_TO_RUN" ]; then
+        CONTRACT_SPEC="{\"required_executions\": [\"$COMMAND_TO_RUN\"], \"require_clean_git\": true}"
+    else
+        CONTRACT_SPEC="{\"require_clean_git\": true}"
+    fi
+fi
+
 # 1. Pre-Flight Acceptance Contract Generation
 echo "📜 Locking Immutable Acceptance Contract..."
-"$VENV_PYTHON" "$SCRIPT_DIR/judge_guard.py" --contract "$RUN_ID" "QWEN: $ACTION" "{}" "$CONTRACT_FILE"
+"$VENV_PYTHON" "$SCRIPT_DIR/judge_guard.py" --contract "$RUN_ID" "QWEN: $ACTION" "$CONTRACT_SPEC" "$CONTRACT_FILE"
 if [ $? -ne 0 ]; then
     echo "🛑 Failed to create Acceptance Contract. Aborting."
     if [ "$USE_WORKTREE" -eq 1 ]; then
@@ -233,7 +264,7 @@ echo "✅ Verdict Cryptographically Verified: $VERDICT_FILE"
 
 # 9. Post-Action Ticket Closure Verification
 echo "🎫 Closing ticket with verified verdict ticket..."
-(cd "$TARGET_DIR" && "$VENV_PYTHON" "$SCRIPT_DIR/src/antigravity_core/ticket_verifier.py" "QWEN: $ACTION" verify_complete "$VERDICT_FILE")
+(cd "$TARGET_DIR" && "$VENV_PYTHON" "$SCRIPT_DIR/src/antigravity_core/ticket_verifier.py" "QWEN: $ACTION" verify_complete "$VERDICT_FILE" "$TARGET_COMMIT_SHA")
 TICKET_CLOSE_EXIT=$?
 
 if [ $TICKET_CLOSE_EXIT -ne 0 ]; then

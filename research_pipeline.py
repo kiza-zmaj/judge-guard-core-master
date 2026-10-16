@@ -171,13 +171,11 @@ class ResearchPipeline:
     def connect(self):
         """Connect to existing database."""
         if not DB_PATH.exists():
-            return self.init_db()
+            raise FileNotFoundError(f"Database not found: {DB_PATH}. Run --init first.")
         # ⚡ Bolt: Enable check_same_thread=False for background sync safety
         self.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
-        self.conn.executescript(SCHEMA)
         self._apply_migrations()
-        self.conn.commit()
         return self
 
     def parse_markdown_files(self) -> List[int]:

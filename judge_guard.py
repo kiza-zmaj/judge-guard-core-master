@@ -703,13 +703,18 @@ def main():
         criteria_arg = sys.argv[4]
         out_path = sys.argv[5]
         if os.path.exists(criteria_arg):
-            with open(criteria_arg, "r") as f:
-                criteria = json.load(f)
+            try:
+                with open(criteria_arg, "r", encoding="utf-8") as f:
+                    criteria = json.load(f)
+            except Exception as e:
+                print(f"🛑 Error: Failed to parse criteria file '{criteria_arg}': {e}")
+                sys.exit(1)
         else:
             try:
                 criteria = json.loads(criteria_arg)
-            except Exception:
-                criteria = {}
+            except Exception as e:
+                print(f"🛑 Error: Invalid criteria JSON specification: {e}")
+                sys.exit(1)
         contract = guard.create_contract(run_id, action, criteria, out_path)
         print(f"✅ Contract created: {out_path} (spec_hash: {contract['spec_hash'][:12]}...)")
         sys.exit(0)
