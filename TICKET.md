@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle
-**Objective:** Execute action: RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle
+**Action:** Push Name That LLM Apex SOTA Decoded LoRA Ensemble Kernel
+**Objective:** Execute action: Push Name That LLM Apex SOTA Decoded LoRA Ensemble Kernel
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN

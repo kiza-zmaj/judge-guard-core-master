@@ -765,3 +765,17 @@ Checked locations:
 
 🟡 Starting RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle
 ✅ Completed RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle
+📌 Git checkpoint SHA: 8014aaf
+📊 **Telemetry (GEMINI)**: 164,617 tokens used | ⚡ ~55,264 tokens saved (est) | ⏱️ 933.9ms | 🤖 `gemini-3.7-flash`
+✅ Completed RSNA Sub5+Sub6 BUNDLE_ID Fix and Re-Push
+📌 Fix: BUNDLE_ID 'fe055406fad6a12f' → '8c7b666e27dc0e8f' (Cell 6 of both notebooks)
+📌 Sub5 pushed: https://www.kaggle.com/code/kiza123123/rsna-knee-sub5-h957-r6-fixed
+📌 Sub6 pushed: https://www.kaggle.com/code/kiza123123/rsna-knee-sub6-r6r7-fixed
+📌 Git checkpoint SHA: 8014aaf
+🕐 Both kernels submitted at ~07:39 UTC+2 (2026-10-16)
+
+🟡 Starting Build and deploy Name That LLM SOTA Pipeline
+✅ Completed Build and deploy Name That LLM SOTA Pipeline
+
+🟡 Starting Push Name That LLM Apex SOTA Decoded LoRA Ensemble Kernel
+✅ Completed Push Name That LLM Apex SOTA Decoded LoRA Ensemble Kernel
