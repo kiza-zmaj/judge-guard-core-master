@@ -760,3 +760,8 @@ Checked locations:
 📌 Sub5: https://www.kaggle.com/code/kiza123123/rsna-knee-sub5-h957-r6-apex-0-9576
 📌 Sub6: https://www.kaggle.com/code/kiza123123/rsna-knee-sub6-r6r7-fusion-triple-blend
 🎯 Expected: Sub5=0.9576 (helios R6 exact), Sub6=0.958+ (R6+R7 triple blend)
+🟡 Starting RSNA Sub5+Sub6 BUNDLE_ID Fix and Re-Push
+📌 Fix: BUNDLE_ID fe055406fad6a12f → 8c7b666e27dc0e8f in Cell 6 of both kernels
+
+🟡 Starting RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle
+✅ Completed RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle

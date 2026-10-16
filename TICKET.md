@@ -1,6 +1,6 @@
 # WORK TICKET
-**Action:** RSNA Knee Sub5 H957 R6 Apex Push
-**Objective:** Execute action: RSNA Knee Sub5 H957 R6 Apex Push
+**Action:** RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle
+**Objective:** Execute action: RSNA Sub5+Sub6 BUNDLE_ID fix repush: push fixed notebooks to Kaggle
 **Scope:** workspace
 **Justification:** Antigravity task execution
 **Status:** OPEN
