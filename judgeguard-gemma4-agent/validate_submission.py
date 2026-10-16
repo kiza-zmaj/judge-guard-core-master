@@ -154,21 +154,20 @@ def validate_submission_directory(root_dir: Path) -> dict:
 
 def package_submission(source_dir: Path, output_zip: Path):
     print(f"\n📦 Packaging submission into {output_zip}...")
-    allowed_dirs = {"configs", "prompts", "sub_agents", "skills", "adapters"}
-    allowed_root_files = {"agent.yaml", "agent.yml", "root_agent.yaml", "root_agent.yml", "eval_config.yaml"}
+    files_to_pack = {
+        "agent.yaml": (source_dir / "agent.yaml").read_text(encoding="utf-8"),
+        "configs/sampling.yaml": (source_dir / "configs/sampling.yaml").read_text(encoding="utf-8"),
+        "eval_config.yaml": (source_dir / "eval_config.yaml").read_text(encoding="utf-8"),
+        "prompts/system.md": (source_dir / "prompts/system.md").read_text(encoding="utf-8"),
+    }
     
-    with zipfile.ZipFile(output_zip, "w", zipfile.ZIP_DEFLATED) as zf:
-        for p in source_dir.rglob("*"):
-            if p.is_file():
-                rel = p.relative_to(source_dir)
-                if rel.suffix == ".zip" or ".git" in rel.parts or "__pycache__" in rel.parts:
-                    continue
-                if len(rel.parts) == 1 and rel.name in allowed_root_files:
-                    zf.write(p, arcname=str(rel))
-                    print(f"   + {rel}")
-                elif len(rel.parts) > 1 and rel.parts[0] in allowed_dirs:
-                    zf.write(p, arcname=str(rel))
-                    print(f"   + {rel}")
+    with zipfile.ZipFile(output_zip, "w") as zf:
+        for name, content in sorted(files_to_pack.items()):
+            info = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o100644 << 16
+            zf.writestr(info, content.encode("utf-8"))
+            print(f"   + {name}")
     
     zip_size = output_zip.stat().st_size
     print(f"✅ Packaged {output_zip.name} successfully ({zip_size:,} bytes / {zip_size/1024:.1f} KB).")
