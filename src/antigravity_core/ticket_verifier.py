@@ -155,13 +155,22 @@ PROPOSED ACTION TO EXECUTE:
         except Exception as e:
             return False, f"🛑 Ollama Cloud connection failure: {e}"
 
-    def verify_ticket_completion(self, action: str, result: str = "COMPLETED") -> Tuple[bool, str]:
+    def verify_ticket_completion(self, action: str, result: str = "COMPLETED", expected_commit_sha: Optional[str] = None) -> Tuple[bool, str]:
         """
-        POST-ACTION ticket closure verification with Ollama Cloud Gemma 4.
-        Ensures the completed action matches ticket objective and receives agent approval.
+        POST-ACTION ticket closure verification with Ollama Cloud Gemma 4 and Layer 4 Verdict Signer.
+        Ensures the completed action has a cryptographically verified verdict ticket.
         """
         if not self.ticket_exists():
             return False, "🛑 TICKET MISSING: Cannot verify completion without active TICKET.md"
+
+        # Layer 4 Cryptographic check: if result points to a verdict ticket or a commit sha is supplied
+        from src.antigravity_core.outcome_verifier import VerdictSigner
+        signer = VerdictSigner()
+        if result.endswith(".json") and os.path.exists(result):
+            if expected_commit_sha:
+                ok, sig_msg = signer.verify_ticket(result, expected_commit_sha)
+                if not ok:
+                    return False, f"🛑 TICKET CLOSURE REJECTED: {sig_msg}"
 
         ticket_content = self.load_ticket()
 
